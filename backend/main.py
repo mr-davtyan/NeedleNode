@@ -72,7 +72,7 @@ def get_thumbnail(file_id: int, db: Session = Depends(get_db)):
 
 @app.post("/api/scan")
 def trigger_scan(background_tasks: BackgroundTasks):
-    background_tasks.add_task(scan_directory, "inbox")
+    background_tasks.add_task(scan_directory, "library")
     return {"status": "scanning", "message": "Background scan started"}
 
 # Mount Frontend static files

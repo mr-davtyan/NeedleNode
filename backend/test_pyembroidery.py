@@ -2,7 +2,7 @@ import pyembroidery
 import sys
 
 try:
-    path = "inbox/Amazing Design Embroidery (22372 Files) Embroiderydonkers/MemoryCards/104 - Birds_ Butterflies/12.pes"
+    path = "library/Amazing Design Embroidery (22372 Files) Embroiderydonkers/MemoryCards/104 - Birds_ Butterflies/12.pes"
     pattern = pyembroidery.read(path)
     if not pattern:
         print("Failed to read pattern")

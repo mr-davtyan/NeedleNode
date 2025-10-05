@@ -12,7 +12,7 @@ def test_scan():
     db.commit()
     
     count = 0
-    for root, _, files in os.walk("inbox"):
+    for root, _, files in os.walk("library"):
         for file in files:
             if file.lower().endswith(".pes"):
                 file_path = os.path.join(root, file)

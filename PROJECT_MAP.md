@@ -1,7 +1,7 @@
 # Project Map - Embroidery Manager
 
 ## Vision
-A high-performance local web application to organize, tag, and browse thousands of embroidery `.PES` files. It features automatic inbox scanning, intelligent tagging support based on file path/name, and a rich visual catalog with large thumbnails and detailed metadata.
+A high-performance local web application to organize, tag, and browse thousands of embroidery `.PES` files. It features automatic library scanning, intelligent tagging support based on file path/name, and a rich visual catalog with large thumbnails and detailed metadata.
 
 ## Tech Stack
 - **Backend**: Python 3.12+ with **FastAPI**
@@ -11,13 +11,13 @@ A high-performance local web application to organize, tag, and browse thousands 
   - Database: **SQLite** (via standard `sqlite3` or `SQLAlchemy`)
 - **Frontend**: **Vite** + **Vanilla JS / React** (To be decided in implementation plan)
   - Styling: **Vanilla CSS** with rich design systems (Gradients, animations, grid layouts)
-- **Data Dir**: `inbox/` for files to scan.
+- **Data Dir**: `library/` for files to scan.
 
 ## Core Modules
 - `backend/`: FastAPI server and background workers
   - `main.py`: API endpoints and static file hosting
   - `database.py`: SQLite connection and models
-  - `scanner.py`: Background scanner for `inbox/` to extract metadata and tags
+  - `scanner.py`: Background scanner for `library/` to extract metadata and tags
   - `parser.py`: Wrappers around `pyembroidery` to extract previews and details
 - `frontend/`: Single-page visual catalog
 
