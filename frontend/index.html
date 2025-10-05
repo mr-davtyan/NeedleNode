@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Embroidery Manager</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="app-container">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="logo">
+                <i class="fa-solid fa-needle"></i>
+                <span>NeedleNode</span>
+            </div>
+            
+            <nav class="sidebar-nav">
+                <div class="nav-section">
+                    <h4>Browse</h4>
+                    <a href="#" class="nav-item active" id="btn-all">
+                        <i class="fa-solid fa-folder-open"></i>
+                        <span>All Designs</span>
+                    </a>
+                </div>
+                
+                <div class="nav-section">
+                    <h4>Tags</h4>
+                    <div id="tags-list" class="tags-list">
+                        <!-- Loaded dynamically -->
+                        <div class="loading-spinner"></div>
+                    </div>
+                </div>
+            </nav>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <header class="top-header">
+                <div class="search-bar">
+                    <i class="fa-solid fa-magnifying-glass"></i>
+                    <input type="text" id="search-input" placeholder="Search designs...">
+                </div>
+                
+                <div class="header-actions">
+                    <button id="btn-scan" class="btn btn-action">
+                        <i class="fa-solid fa-sync"></i>
+                        <span>Scan Inbox</span>
+                    </button>
+                    <div class="stats" id="total-stats">0 Designs</div>
+                </div>
+            </header>
+
+            <!-- Grid Content -->
+            <section class="grid-container" id="grid-container">
+                <!-- Cards Loaded dynamically -->
+                <div class="loading-state">
+                    <div class="spinner"></div>
+                    <p>Loading your designs...</p>
+                </div>
+            </section>
+
+            <!-- Infinite Scroll Trigger -->
+            <div id="scroll-anchor" class="scroll-anchor"></div>
+        </main>
+    </div>
+
+    <!-- Details Dialog/Drawer -->
+    <div id="details-overlay" class="overlay">
+        <div class="details-drawer" id="details-drawer">
+            <button class="close-btn" id="close-details">&times;</button>
+            <div class="details-image">
+                <img id="detail-img" src="" alt="Preview">
+            </div>
+            <div class="details-info">
+                <h2 id="detail-name">Design Name</h2>
+                <div class="tag-list" id="detail-tags"></div>
+                
+                <div class="stats-grid">
+                    <div class="stat-box">
+                        <span class="stat-label">Stitches</span>
+                        <span class="stat-value" id="detail-stitches">-</span>
+                    </div>
+                    <div class="stat-box">
+                        <span class="stat-label">Colors</span>
+                        <span class="stat-value" id="detail-colors">-</span>
+                    </div>
+                    <div class="stat-box">
+                        <span class="stat-label">Width</span>
+                        <span class="stat-value" id="detail-width">-</span>
+                    </div>
+                    <div class="stat-box">
+                        <span class="stat-label">Height</span>
+                        <span class="stat-value" id="detail-height">-</span>
+                    </div>
+                </div>
+
+                <div class="metadata">
+                    <p><strong>Path:</strong> <span id="detail-path"></span></p>
+                    <p><strong>FileSize:</strong> <span id="detail-size"></span></p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>
