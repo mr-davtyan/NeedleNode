@@ -86,6 +86,20 @@ function setupEventListeners() {
         document.getElementById("btn-all").classList.add("active");
         loadFiles(true);
     });
+
+    // Stop Scan Button
+    const btnStopScan = document.getElementById("btn-stop-scan");
+    btnStopScan.addEventListener("click", async () => {
+        btnStopScan.innerText = "Stopping...";
+        btnStopScan.disabled = true;
+        try {
+            await fetch("/api/scan/stop", { method: "POST" });
+        } catch (e) {
+            console.error("Failed to stop scan", e);
+            btnStopScan.disabled = false;
+            btnStopScan.innerText = "Stop Scan 🛑";
+        }
+    });
 }
 
 function setupInfiniteScroll() {
@@ -214,6 +228,17 @@ async function pollScanStatus() {
                 scanText.innerText = `Scanning: ${fileLabel}`;
             } else {
                 scanText.innerText = "Scanning...";
+            }
+            
+            // Update Stop Button State
+            const btnStopScan = document.getElementById("btn-stop-scan");
+            if (btnStopScan) {
+                btnStopScan.disabled = status.stop_requested || false;
+                if (status.stop_requested) {
+                    btnStopScan.innerText = "Stopping...";
+                } else {
+                    btnStopScan.innerText = "Stop Scan 🛑";
+                }
             }
             
             // Poll again in 1s

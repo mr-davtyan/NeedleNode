@@ -190,6 +190,25 @@ body {
     transition: width 0.3s ease;
 }
 
+.btn-stop {
+    margin-top: 8px;
+    padding: 6px 12px;
+    background: rgba(234, 74, 74, 0.1);
+    border: 1px solid rgba(234, 74, 74, 0.3);
+    border-radius: 6px;
+    color: #ea4a4a;
+    font-size: 0.75rem;
+    font-weight: 600;
+    cursor: pointer;
+    text-align: center;
+    transition: all 0.2s;
+}
+
+.btn-stop:hover {
+    background: #ea4a4a;
+    color: #fff;
+}
+
 .header-actions {
     display: flex;
     align-items: center;

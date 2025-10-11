@@ -22,8 +22,16 @@ def get_scan_status():
         "is_scanning": scan_state.is_scanning,
         "processed": scan_state.processed,
         "total": scan_state.total,
-        "current_file": scan_state.current_file
+        "current_file": scan_state.current_file,
+        "stop_requested": scan_state.stop_requested
     }
+
+@app.post("/api/scan/stop")
+def stop_scan():
+    if scan_state.is_scanning:
+        scan_state.stop_requested = True
+        return {"status": "stopping", "message": "Scan stop requested"}
+    return {"status": "idle", "message": "No scan running"}
 
 @app.get("/api/files")
 def get_files(
