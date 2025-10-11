@@ -154,6 +154,42 @@ body {
     outline: none;
 }
 
+.scan-progress {
+    display: flex;
+    flex-direction: column;
+    width: 200px;
+    font-size: 0.8rem;
+    background: rgba(255,255,255,0.02);
+    padding: 8px 12px;
+    border-radius: 8px;
+    border: 1px solid var(--border-color);
+}
+
+.scan-progress.hidden {
+    display: none !important;
+}
+
+.progress-info {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 5px;
+    color: var(--text-secondary);
+}
+
+.progress-bar-bg {
+    height: 6px;
+    background: rgba(255,255,255,0.05);
+    border-radius: 3px;
+    overflow: hidden;
+}
+
+.progress-bar-fill {
+    height: 100%;
+    background: var(--accent-color);
+    width: 0%;
+    transition: width 0.3s ease;
+}
+
 .header-actions {
     display: flex;
     align-items: center;

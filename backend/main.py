@@ -7,6 +7,7 @@ from typing import List, Optional
 
 from backend.database import get_db, init_db, File, Tag
 from backend.scanner import scan_directory
+from backend.state import scan_state
 
 app = FastAPI(title="Embroidery Manager API")
 
@@ -14,6 +15,15 @@ app = FastAPI(title="Embroidery Manager API")
 @app.on_event("startup")
 def startup_db():
     init_db()
+
+@app.get("/api/scan/status")
+def get_scan_status():
+    return {
+        "is_scanning": scan_state.is_scanning,
+        "processed": scan_state.processed,
+        "total": scan_state.total,
+        "current_file": scan_state.current_file
+    }
 
 @app.get("/api/files")
 def get_files(

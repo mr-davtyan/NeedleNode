@@ -45,9 +45,19 @@
                 </div>
                 
                 <div class="header-actions">
+                    <div id="scan-progress" class="scan-progress hidden">
+                        <div class="progress-info">
+                            <span id="scan-text">Scanning...</span>
+                            <span><span id="scan-count">0</span> / <span id="scan-total">0</span></span>
+                        </div>
+                        <div class="progress-bar-bg">
+                            <div id="progress-bar-fill" class="progress-bar-fill"></div>
+                        </div>
+                    </div>
+
                     <button id="btn-scan" class="btn btn-action">
                         <i class="fa-solid fa-sync"></i>
-                        <span>Scan Inbox</span>
+                        <span>Scan Library</span>
                     </button>
                     <div class="stats" id="total-stats">0 Designs</div>
                 </div>

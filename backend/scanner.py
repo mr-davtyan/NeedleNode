@@ -100,6 +100,8 @@ def process_file(file_path: str, db: Session) -> bool:
         print(f"Error processing {file_path}: {e}")
         return False
 
+from backend.state import scan_state
+
 def clean_orphaned_files(db: Session):
     """
     Removes database entries for files that no longer exist on disk.
@@ -127,25 +129,41 @@ def scan_directory(directory: str):
     init_db()
     db = SessionLocal()
     
-    # Clean up missing files first
-    clean_orphaned_files(db)
+    scan_state.is_scanning = True
+    scan_state.processed = 0
+    scan_state.current_file = "Counting files..."
     
-    count = 0
-    success_count = 0
-    
-    print(f"Starting scan in {directory}...")
-    for root, _, files in os.walk(directory):
-        for file in files:
-            if file.lower().endswith(".pes"):
-                file_path = os.path.join(root, file)
-                count += 1
-                if process_file(file_path, db):
-                    success_count += 1
-                if count % 100 == 0:
-                    print(f"Scanned {count} files... ({success_count} added)")
+    try:
+        # Count total files first for progress bar % accuracy
+        total_files = 0
+        for root, _, filenames in os.walk(directory):
+            total_files += sum(1 for f in filenames if f.lower().endswith(".pes"))
+        scan_state.total = total_files
+        
+        # Clean up missing files first
+        clean_orphaned_files(db)
+        
+        count = 0
+        success_count = 0
+        
+        print(f"Starting scan in {directory}...")
+        for root, _, files in os.walk(directory):
+            for file in files:
+                if file.lower().endswith(".pes"):
+                    file_path = os.path.join(root, file)
+                    scan_state.current_file = file
+                    count += 1
+                    if process_file(file_path, db):
+                        success_count += 1
+                    scan_state.processed = count
                     
-    print(f"Scan complete. Found {count} files, Added {success_count} new entries.")
-    db.close()
+                    if count % 100 == 0:
+                        print(f"Scanned {count} / {total_files} files... ({success_count} added)")
+                        
+        print(f"Scan complete. Found {count} files, Added {success_count} new entries.")
+    finally:
+        scan_state.is_scanning = False
+        db.close()
 
 if __name__ == "__main__":
     import sys
