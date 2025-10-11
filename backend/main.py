@@ -39,6 +39,7 @@ def get_files(
     offset: int = 0, 
     search: Optional[str] = None, 
     tag: Optional[str] = None, 
+    starred: Optional[bool] = None,
     db: Session = Depends(get_db)
 ):
     query = db.query(File)
@@ -48,6 +49,9 @@ def get_files(
         
     if tag:
         query = query.join(File.tags).filter(Tag.name == tag.lower())
+        
+    if starred is not None:
+        query = query.filter(File.is_starred == starred)
         
     total_count = query.count()
     files = query.offset(offset).limit(limit).all()
@@ -64,13 +68,23 @@ def get_files(
             "height": f.height,
             "colors": f.colors,
             "tags": [t.name for t in f.tags],
-            "modified_at": f.modified_at.isoformat()
+            "modified_at": f.modified_at.isoformat(),
+            "is_starred": f.is_starred
         })
         
     return {
         "total": total_count,
         "items": result
     }
+
+@app.post("/api/files/{file_id}/star")
+def toggle_star(file_id: int, db: Session = Depends(get_db)):
+    file = db.query(File).filter(File.id == file_id).first()
+    if not file:
+        raise HTTPException(status_code=404, detail="File not found")
+    file.is_starred = not file.is_starred
+    db.commit()
+    return {"is_starred": file.is_starred}
 
 @app.get("/api/tags")
 def get_tags(db: Session = Depends(get_db)):

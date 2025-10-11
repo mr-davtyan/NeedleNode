@@ -4,6 +4,7 @@ let loading = false;
 let hasMore = true;
 let currentTag = "";
 let searchTerm = "";
+let currentStarred = false;
 
 const gridContainer = document.getElementById("grid-container");
 const tagsList = document.getElementById("tags-list");
@@ -82,8 +83,19 @@ function setupEventListeners() {
     document.getElementById("btn-all").addEventListener("click", (e) => {
         e.preventDefault();
         currentTag = "";
-        document.querySelectorAll(".tag-item").forEach(t => t.classList.remove("active"));
+        currentStarred = false;
+        document.querySelectorAll(".nav-item").forEach(t => t.classList.remove("active"));
         document.getElementById("btn-all").classList.add("active");
+        loadFiles(true);
+    });
+
+    // Starred Designs
+    document.getElementById("btn-starred").addEventListener("click", (e) => {
+        e.preventDefault();
+        currentTag = "";
+        currentStarred = true;
+        document.querySelectorAll(".nav-item").forEach(t => t.classList.remove("active"));
+        document.getElementById("btn-starred").classList.add("active");
         loadFiles(true);
     });
 
@@ -148,6 +160,7 @@ async function loadFiles(reset = false) {
         let url = `/api/files?limit=${limit}&offset=${offset}`;
         if (searchTerm) url += `&search=${encodeURIComponent(searchTerm)}`;
         if (currentTag) url += `&tag=${encodeURIComponent(currentTag)}`;
+        if (currentStarred) url += `&starred=true`;
 
         const res = await fetch(url);
         const data = await res.json();
@@ -168,6 +181,7 @@ async function loadFiles(reset = false) {
             card.className = "file-card";
             card.innerHTML = `
                 <div class="card-preview">
+                    <i class="fa-solid fa-star star-icon ${file.is_starred ? 'active' : ''}"></i>
                     <img src="/api/thumbnail/${file.id}" alt="${file.name}" loading="lazy" onerror="this.src='https://via.placeholder.com/200?text=Error'">
                 </div>
                 <div class="card-info">
@@ -178,6 +192,23 @@ async function loadFiles(reset = false) {
                     </div>
                 </div>
             `;
+            
+            // Star Toggle
+            const star = card.querySelector(".star-icon");
+            star.addEventListener("click", async (e) => {
+                e.stopPropagation(); // prevent opening details
+                try {
+                    const res = await fetch(`/api/files/${file.id}/star`, { method: "POST" });
+                    const result = await res.json();
+                    if (result.is_starred) {
+                        star.classList.add("active");
+                    } else {
+                        star.classList.remove("active");
+                        if (currentStarred) card.remove(); // Remove immediately if in Starred Filter view
+                    }
+                } catch (e) { console.error("Toggle star failed", e); }
+            });
+
             card.addEventListener("click", () => showDetails(file));
             gridContainer.appendChild(card);
         });
