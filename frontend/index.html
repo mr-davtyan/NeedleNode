@@ -52,12 +52,14 @@
                     <div id="scan-progress" class="scan-progress hidden">
                         <div class="progress-info">
                             <span id="scan-text">Scanning...</span>
-                            <span><span id="scan-count">0</span> / <span id="scan-total">0</span></span>
                         </div>
-                        <div class="progress-bar-bg">
-                            <div id="progress-bar-fill" class="progress-bar-fill"></div>
+                        <div class="progress-row">
+                            <div class="progress-bar-bg">
+                                <div id="progress-bar-fill" class="progress-bar-fill"></div>
+                            </div>
+                            <span class="progress-numbers"><span id="scan-count">0</span> / <span id="scan-total">0</span></span>
+                            <button id="btn-stop-scan" class="btn-stop">Stop</button>
                         </div>
-                        <button id="btn-stop-scan" class="btn-stop">Stop Scan 🛑</button>
                     </div>
 
                     <button id="btn-scan" class="btn btn-action">
