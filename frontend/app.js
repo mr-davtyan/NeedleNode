@@ -245,6 +245,7 @@ async function pollScanStatus() {
         
         if (status.is_scanning) {
             scanProgress.classList.remove("hidden");
+            if (btnScan) btnScan.classList.add("hidden");
             scanCount.innerText = status.processed;
             scanTotal.innerText = status.total;
             
@@ -277,6 +278,7 @@ async function pollScanStatus() {
         } else {
             const wasScanning = !scanProgress.classList.contains("hidden");
             scanProgress.classList.add("hidden");
+            if (btnScan) btnScan.classList.remove("hidden");
             if (wasScanning) {
                 // Refresh list if scan just completed
                 loadFiles(true);
