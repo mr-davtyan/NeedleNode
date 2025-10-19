@@ -102,6 +102,16 @@ def get_thumbnail(file_id: int, db: Session = Depends(get_db)):
          
     return FileResponse(file.thumbnail_path)
 
+@app.get("/api/files/{file_id}/download")
+def download_file(file_id: int, db: Session = Depends(get_db)):
+    file = db.query(File).filter(File.id == file_id).first()
+    if not file:
+        raise HTTPException(status_code=404, detail="File not found")
+    if not os.path.exists(file.path):
+        raise HTTPException(status_code=404, detail="File missing on disk")
+        
+    return FileResponse(file.path, filename=os.path.basename(file.path))
+
 @app.post("/api/scan")
 def trigger_scan(background_tasks: BackgroundTasks):
     background_tasks.add_task(scan_directory, "library")

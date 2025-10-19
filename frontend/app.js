@@ -181,20 +181,25 @@ async function loadFiles(reset = false) {
             card.className = "file-card";
             card.innerHTML = `
                 <div class="card-preview">
-                    <i class="fa-solid fa-star star-icon ${file.is_starred ? 'active' : ''}"></i>
                     <img src="/api/thumbnail/${file.id}" alt="${file.name}" loading="lazy" onerror="this.src='https://via.placeholder.com/200?text=Error'">
                 </div>
                 <div class="card-info">
                     <div class="file-title" title="${file.name}">${file.name}</div>
-                    <div class="file-meta">
-                        <span>${file.stitches} Stitches</span>
-                        <span>${(file.size / 1024).toFixed(1)} KB</span>
+                    <div class="card-footer">
+                        <div class="file-meta">
+                            <span>${file.stitches} S</span>
+                            <span>${(file.size / 1024).toFixed(1)} KB</span>
+                        </div>
+                        <div class="card-actions">
+                            <button class="action-circle btn-star ${file.is_starred ? 'active' : ''}" title="Star"><i class="fa-solid fa-star"></i></button>
+                            <button class="action-circle btn-download" title="Download"><i class="fa-solid fa-download"></i></button>
+                        </div>
                     </div>
                 </div>
             `;
             
-            // Star Toggle
-            const star = card.querySelector(".star-icon");
+            // Star Button
+            const star = card.querySelector(".btn-star");
             star.addEventListener("click", async (e) => {
                 e.stopPropagation(); // prevent opening details
                 try {
@@ -204,9 +209,16 @@ async function loadFiles(reset = false) {
                         star.classList.add("active");
                     } else {
                         star.classList.remove("active");
-                        if (currentStarred) card.remove(); // Remove immediately if in Starred Filter view
+                        if (currentStarred) card.remove();
                     }
                 } catch (e) { console.error("Toggle star failed", e); }
+            });
+
+            // Download Button
+            const downloadBtn = card.querySelector(".btn-download");
+            downloadBtn.addEventListener("click", (e) => {
+                e.stopPropagation(); // prevent details trigger
+                window.location.href = `/api/files/${file.id}/download`;
             });
 
             card.addEventListener("click", () => showDetails(file));
@@ -234,6 +246,16 @@ function showDetails(file) {
     detailHeight.innerText = file.height ? `${file.height.toFixed(1)} mm` : "-";
     
     detailTags.innerHTML = file.tags.map(t => `<span class="detail-tag">${t}</span>`).join("");
+    
+    // Wire up download button
+    const detailDownload = document.getElementById("detail-download");
+    if (detailDownload) {
+        const newBtn = detailDownload.cloneNode(true);
+        detailDownload.parentNode.replaceChild(newBtn, detailDownload);
+        newBtn.addEventListener("click", () => {
+             window.location.href = `/api/files/${file.id}/download`;
+        });
+    }
     
     detailsOverlay.classList.add("active");
 }
