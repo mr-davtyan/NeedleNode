@@ -131,6 +131,7 @@ def scan_directory(directory: str):
     
     scan_state.is_scanning = True
     scan_state.processed = 0
+    scan_state.stop_requested = False
     scan_state.current_file = "Counting files..."
     
     try:
