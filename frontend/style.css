@@ -156,10 +156,11 @@ body {
 
 .scan-progress {
     display: flex;
-    flex-direction: column;
-    width: 200px;
+    flex-direction: row;
+    align-items: center;
+    gap: 12px;
     font-size: 0.8rem;
-    background: rgba(255,255,255,0.02);
+    background: rgba(255,255,255,0.03);
     padding: 8px 12px;
     border-radius: 8px;
     border: 1px solid var(--border-color);
@@ -169,14 +170,17 @@ body {
     display: none !important;
 }
 
-.progress-info {
-    display: flex;
-    justify-content: space-between;
-    margin-bottom: 5px;
+.scan-text {
+    font-size: 0.75rem;
     color: var(--text-secondary);
+    white-space: nowrap;
+    max-width: 140px;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
 .progress-bar-bg {
+    width: 120px;
     height: 6px;
     background: rgba(255,255,255,0.05);
     border-radius: 3px;
@@ -190,15 +194,8 @@ body {
     transition: width 0.3s ease;
 }
 
-.progress-row {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    width: 100%;
-    margin-top: 5px;
-}
-
 .progress-numbers {
+    font-style: thin;
     font-size: 0.75rem;
     color: var(--text-secondary);
     white-space: nowrap;
