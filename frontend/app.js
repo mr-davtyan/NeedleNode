@@ -197,6 +197,7 @@ async function loadFiles(reset = false) {
                     </div>
                 </div>
             `;
+            file.cardNode = card; // Save node reference for live triggers Updates
             
             // Star Button
             const star = card.querySelector(".btn-star");
@@ -262,12 +263,18 @@ function showDetails(file) {
             try {
                 const res = await fetch(`/api/files/${file.id}/star`, { method: "POST" });
                 const result = await res.json();
+                
+                const originalStar = file.cardNode ? file.cardNode.querySelector(".btn-star") : null;
+                
                 if (result.is_starred) {
                     newStar.classList.add("active");
                     file.is_starred = true;
+                    if (originalStar) originalStar.classList.add("active");
                 } else {
                     newStar.classList.remove("active");
                     file.is_starred = false;
+                    if (originalStar) originalStar.classList.remove("active");
+                    if (currentStarred && file.cardNode) file.cardNode.remove(); // Remove immediately if viewing Starred Filter viewport
                 }
             } catch (e) { console.error("Toggle star inside details failed", e); }
         });
