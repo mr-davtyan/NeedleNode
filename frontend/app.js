@@ -247,6 +247,32 @@ function showDetails(file) {
     
     detailTags.innerHTML = file.tags.map(t => `<span class="detail-tag">${t}</span>`).join("");
     
+    // Wire up star button
+    const detailStar = document.getElementById("detail-star");
+    if (detailStar) {
+        if (file.is_starred) {
+            detailStar.classList.add("active");
+        } else {
+            detailStar.classList.remove("active");
+        }
+        
+        const newStar = detailStar.cloneNode(true);
+        detailStar.parentNode.replaceChild(newStar, detailStar);
+        newStar.addEventListener("click", async () => {
+            try {
+                const res = await fetch(`/api/files/${file.id}/star`, { method: "POST" });
+                const result = await res.json();
+                if (result.is_starred) {
+                    newStar.classList.add("active");
+                    file.is_starred = true;
+                } else {
+                    newStar.classList.remove("active");
+                    file.is_starred = false;
+                }
+            } catch (e) { console.error("Toggle star inside details failed", e); }
+        });
+    }
+
     // Wire up download button
     const detailDownload = document.getElementById("detail-download");
     if (detailDownload) {
