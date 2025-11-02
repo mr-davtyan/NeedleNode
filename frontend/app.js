@@ -94,6 +94,8 @@ function setupEventListeners() {
         e.preventDefault();
         currentTag = "";
         currentStarred = true;
+        searchTerm = ""; // Clear Search filter
+        document.getElementById("search-input").value = ""; // sync DOM input
         document.querySelectorAll(".nav-item").forEach(t => t.classList.remove("active"));
         document.getElementById("btn-starred").classList.add("active");
         loadFiles(true);
