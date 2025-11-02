@@ -8,6 +8,25 @@ from backend.database import SessionLocal, File, Tag, init_db
 THUMBNAIL_DIR = ".cache/thumbnails"
 os.makedirs(THUMBNAIL_DIR, exist_ok=True)
 
+def should_keep_tag(w: str) -> bool:
+    """
+    Filter heuristics to exclude meaningless acronyms, pure numbers, or clutter.
+    """
+    if len(w) <= 2:
+        return False
+    if w.isdigit():
+        return False
+        
+    has_digit = any(char.isdigit() for char in w)
+    if has_digit and len(w) <= 4: # catches AZ2, mm1, LT1, etc.
+        return False
+        
+    # Skip noise words
+    if w in ["files", "embroidery", "design", "amazing", "library", "folder"]:
+         return False
+         
+    return True
+
 def extract_tags(file_path: str) -> set[str]:
     """
     Extracts tags from file path and folder structure.
@@ -21,7 +40,7 @@ def extract_tags(file_path: str) -> set[str]:
         clean_part = part.replace("_", " ").replace("-", " ").replace("(", " ").replace(")", " ")
         for word in clean_part.split():
             word = word.strip().lower()
-            if len(word) > 2 and not word.isdigit():
+            if should_keep_tag(word):
                 tags.add(word)
                 
     # Also process filename (excluding extension)
@@ -29,7 +48,7 @@ def extract_tags(file_path: str) -> set[str]:
     clean_filename = filename.replace("_", " ").replace("-", " ").replace("(", " ").replace(")", " ")
     for word in clean_filename.split():
         word = word.strip().lower()
-        if len(word) > 2 and not word.isdigit():
+        if should_keep_tag(word):
             tags.add(word)
             
     return tags
@@ -52,8 +71,8 @@ def process_file(file_path: str, db: Session) -> bool:
         # Metadata extraction
         stitches = len(pattern.stitches)
         bounds = pattern.bounds() # [min_x, min_y, max_x, max_y]
-        width = bounds[2] - bounds[0] if bounds else 0
-        height = bounds[3] - bounds[1] if bounds else 0
+        width = (bounds[2] - bounds[0]) / 10.0 if bounds else 0
+        height = (bounds[3] - bounds[1]) / 10.0 if bounds else 0
         
         # Color count - count COLOR_CHANGE commands
         colors = sum(1 for s in pattern.stitches if s[2] == pyembroidery.COLOR_CHANGE) + 1
