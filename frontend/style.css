@@ -54,8 +54,15 @@ body {
     margin-bottom: 40px;
 }
 
+.sidebar-nav {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    overflow: hidden; /* Prevent the nav container itself from overflowing */
+}
+
 .nav-section {
-    margin-bottom: 30px;
+    margin-bottom: 25px;
 }
 
 .nav-section h4 {
@@ -87,7 +94,7 @@ body {
     display: flex;
     flex-direction: column;
     gap: 5px;
-    max-height: calc(100vh - 300px);
+    flex: 1;
     overflow-y: auto;
 }
 
