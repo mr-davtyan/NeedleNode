@@ -101,9 +101,19 @@ def get_tags(db: Session = Depends(get_db)):
             if len(single_file.tags) > 1:
                 # Skip tag if it has 1 file and that file belongs to multiple tags
                 continue
-        result.append(t.name)
+        # Return object containing is_hidden state
+        result.append({"name": t.name, "is_hidden": t.is_hidden})
         
     return result
+
+@app.post("/api/tags/{tag_name}/toggle_hide")
+def toggle_tag_hide(tag_name: str, db: Session = Depends(get_db)):
+    tag = db.query(Tag).filter(Tag.name == tag_name).first()
+    if not tag:
+        raise HTTPException(status_code=404, detail="Tag not found")
+    tag.is_hidden = not tag.is_hidden
+    db.commit()
+    return {"name": tag.name, "is_hidden": tag.is_hidden}
 
 @app.get("/api/thumbnail/{file_id}")
 def get_thumbnail(file_id: int, db: Session = Depends(get_db)):
