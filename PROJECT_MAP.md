@@ -21,6 +21,11 @@ A high-performance local web application to organize, tag, and browse thousands 
   - `parser.py`: Wrappers around `pyembroidery` to extract previews and details
 - `frontend/`: Single-page visual catalog
 
+## CI/CD & DevOps
+- **Docker**: `Dockerfile` setups isolated system-wide Python FastAPI server bundle correctly.
+- **GitHub Actions**: Automated `.github/workflows/build-container.yml` builds/pushes on tags/main flawlessly caching layers accurately.
+- **Versioning**: `VERSION` file & `bump-version.sh` for driving tagging seamlessly.
+
 ## Patterns
 - **Database-First Metadata**: All file paths and tags are stored in SQLite for O(1) searches on 10k+ files.
 - **Lazy Loading**: Images and lists use intersection observer or infinite scroll.
