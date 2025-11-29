@@ -19,6 +19,7 @@ A high-performance local web application to organize, tag, and browse thousands 
   - `database.py`: SQLite connection and models
   - `scanner.py`: Background scanner for `library/` to extract metadata and tags
   - `parser.py`: Wrappers around `pyembroidery` to extract previews and details
+  - `classify_inbox.py`: AI-powered classifier for processing files in `inbox/` into sorted tags
 - `frontend/`: Single-page visual catalog
 
 ## CI/CD & DevOps
