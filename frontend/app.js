@@ -71,22 +71,6 @@ function setupEventListeners() {
         }
     });
 
-    // Import Button
-    btnImport.addEventListener("click", async () => {
-        btnImport.disabled = true;
-        btnImport.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> <span>Triggering...</span>';
-        try {
-            await fetch("/api/import", { method: "POST" });
-            pollImportStatus();
-            setTimeout(() => {
-                btnImport.disabled = false;
-                btnImport.innerHTML = '<i class="fa-solid fa-file-import"></i> <span>Import Inbox</span>';
-            }, 2000);
-        } catch (e) {
-            console.error(e);
-            btnImport.disabled = false;
-        }
-    });
 
     // Close Modal
     closeDetails.addEventListener("click", () => {
@@ -129,19 +113,6 @@ function setupEventListeners() {
             console.error("Failed to stop scan", e);
             btnStopScan.disabled = false;
             btnStopScan.innerText = "Stop Scan 🛑";
-        }
-    });
-
-    // Stop Import Button
-    btnStopImport.addEventListener("click", async () => {
-        btnStopImport.innerText = "Stopping...";
-        btnStopImport.disabled = true;
-        try {
-            await fetch("/api/import/stop", { method: "POST" });
-        } catch (e) {
-            console.error("Failed to stop import", e);
-            btnStopImport.disabled = false;
-            btnStopImport.innerText = "Stop";
         }
     });
 }
