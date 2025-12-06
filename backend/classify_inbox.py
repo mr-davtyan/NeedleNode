@@ -37,7 +37,11 @@ def render_pes_to_image(pes_path: str) -> Image.Image:
     temp_png = f".temp_{os.path.basename(pes_path)}.png"
     try:
         pyembroidery.write_png(pattern, temp_png)
-        img = Image.open(temp_png).convert("RGB")
+        img = Image.open(temp_png).convert("RGBA")
+        background = Image.new("RGB", img.size, (255, 255, 255))
+        background.paste(img, (0, 0), img) # Paste with mask
+        img = background
+        img.thumbnail((1024, 1024))
         return img
     finally:
         if os.path.exists(temp_png):
