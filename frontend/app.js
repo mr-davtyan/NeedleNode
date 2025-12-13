@@ -270,6 +270,7 @@ async function loadFiles(reset = false) {
                         <div class="card-actions">
                             <button class="action-circle btn-star ${file.is_starred ? 'active' : ''}" title="Star"><i class="fa-solid fa-star"></i></button>
                             <button class="action-circle btn-download" title="Download"><i class="fa-solid fa-download"></i></button>
+                            <button class="action-circle btn-trash" title="Move to Trash"><i class="fa-solid fa-trash"></i></button>
                         </div>
                     </div>
                 </div>
@@ -298,6 +299,28 @@ async function loadFiles(reset = false) {
             downloadBtn.addEventListener("click", (e) => {
                 e.stopPropagation(); // prevent details trigger
                 window.location.href = `/api/files/${file.id}/download`;
+            });
+
+            // Trash Button
+            const trashBtn = card.querySelector(".btn-trash");
+            trashBtn.addEventListener("click", async (e) => {
+                e.stopPropagation(); // prevent details trigger
+                if (!confirm(`Move ${file.name} to trash?`)) return;
+                
+                try {
+                    await fetch(`/api/files/${file.id}/trash`, { method: "POST" });
+                    card.remove(); // Remove immediately from grid
+                    
+                    const totalStats = document.getElementById("total-stats");
+                    if (totalStats) {
+                         const current = parseInt(totalStats.innerText);
+                         if (!isNaN(current)) {
+                              totalStats.innerText = `${current - 1} Designs`;
+                         }
+                    }
+                } catch (e) {
+                    console.error("Trash failed", e);
+                }
             });
 
             card.addEventListener("click", () => showDetails(file));
@@ -365,6 +388,29 @@ function showDetails(file) {
         detailDownload.parentNode.replaceChild(newBtn, detailDownload);
         newBtn.addEventListener("click", () => {
              window.location.href = `/api/files/${file.id}/download`;
+        });
+    }
+    
+    // Wire up delete button
+    const detailDelete = document.getElementById("detail-delete");
+    if (detailDelete) {
+        const deleteBtn = detailDelete.cloneNode(true);
+        detailDelete.parentNode.replaceChild(deleteBtn, detailDelete);
+        deleteBtn.addEventListener("click", async () => {
+             if (!confirm(`Move ${file.name} to trash?`)) return;
+              try {
+                  await fetch(`/api/files/${file.id}/trash`, { method: "POST" });
+                  detailsOverlay.classList.remove("active");
+                  if (file.cardNode) file.cardNode.remove();
+                  
+                  const totalStats = document.getElementById("total-stats");
+                  if (totalStats) {
+                       const current = parseInt(totalStats.innerText);
+                       if (!isNaN(current)) {
+                            totalStats.innerText = `${current - 1} Designs`;
+                       }
+                  }
+              } catch (e) { console.error("Trash from details failed", e); }
         });
     }
     

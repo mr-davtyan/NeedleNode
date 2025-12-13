@@ -97,6 +97,32 @@ def toggle_star(file_id: int, db: Session = Depends(get_db)):
     db.commit()
     return {"is_starred": file.is_starred}
 
+@app.post("/api/files/{file_id}/trash")
+def trash_file(file_id: int, db: Session = Depends(get_db)):
+    import shutil
+    file = db.query(File).filter(File.id == file_id).first()
+    if not file:
+        raise HTTPException(status_code=404, detail="File not found")
+        
+    current_path = file.path
+    if "library/" in current_path:
+         target_path = current_path.replace("library/", "trash/", 1)
+    else:
+         # Fallback absolute path relative replacement
+         target_path = os.path.join("trash", os.path.basename(current_path))
+         
+    target_dir = os.path.dirname(target_path)
+    os.makedirs(target_dir, exist_ok=True)
+    
+    try:
+        shutil.move(current_path, target_path)
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Failed to move file: {e}")
+        
+    db.delete(file)
+    db.commit()
+    return {"status": "success", "message": "Moved to trash"}
+
 @app.get("/api/tags")
 def get_tags(db: Session = Depends(get_db)):
     from sqlalchemy.orm import selectinload

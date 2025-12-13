@@ -5,6 +5,7 @@ __pycache__/
 embroidery.db
 library/
 inbox/
+trash/
 temp/
 frontend/app.js.map
 node_modules/server.log
