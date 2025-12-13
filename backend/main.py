@@ -135,7 +135,7 @@ def get_tags(db: Session = Depends(get_db)):
     sub_tags = []
     
     for t in tags:
-        tag_data = {"name": t.name, "is_hidden": t.is_hidden}
+        tag_data = {"name": t.name, "is_hidden": t.is_hidden, "count": len(t.files)}
         if t.is_main:
             main_tags.append(tag_data)
         else:
