@@ -9,6 +9,11 @@ from backend.database import get_db, init_db, File, Tag
 from backend.scanner import scan_directory
 from backend.classify_inbox import process_inbox
 from backend.state import scan_state, import_state
+from pydantic import BaseModel
+
+class EditTagsInput(BaseModel):
+    main_tag: Optional[str] = None
+    sub_tags: Optional[List[str]] = None
 
 # Simple .env loader
 if os.path.exists(".env"):
@@ -69,6 +74,19 @@ def get_files(
     
     result = []
     for f in files:
+        # Extract main tag from path: library/<MainTag>/...
+        parts = f.path.split("/")
+        main_tag_display = "Unsorted"
+        if len(parts) > 1 and parts[0] == "library":
+             main_tag_display = parts[1]
+        elif "library" in parts:
+             idx = parts.index("library")
+             if idx + 1 < len(parts):
+                  main_tag_display = parts[idx+1]
+                  
+        all_tags = [t.name for t in f.tags]
+        curr_sub_tags = [t for t in all_tags if t.lower() != main_tag_display.lower()]
+        
         result.append({
             "id": f.id,
             "name": f.name,
@@ -78,7 +96,8 @@ def get_files(
             "width": f.width,
             "height": f.height,
             "colors": f.colors,
-            "tags": [t.name for t in f.tags],
+            "main_tag": main_tag_display,
+            "sub_tags": curr_sub_tags,
             "modified_at": f.modified_at.isoformat(),
             "is_starred": f.is_starred
         })
@@ -214,6 +233,91 @@ def import_and_scan():
 def trigger_scan(background_tasks: BackgroundTasks):
     background_tasks.add_task(import_and_scan)
     return {"status": "scanning", "message": "Background Import & Scan started"}
+
+@app.post("/api/files/{file_id}/edit_tags")
+def edit_tags(file_id: int, input_data: EditTagsInput, db: Session = Depends(get_db)):
+    import re
+    file = db.query(File).filter(File.id == file_id).first()
+    if not file:
+        raise HTTPException(status_code=404, detail="File not found")
+        
+    current_main_tags = [t.name for t in file.tags if t.is_main]
+    current_sub_tags = [t.name for t in file.tags if not t.is_main]
+    curr_main = current_main_tags[0] if current_main_tags else ""
+    
+    orig_name = file.name
+    clean_base_name = os.path.splitext(orig_name)[0]
+    
+    # regex matches: "MainTag (sub,tags) OriginalName"
+    match = re.match(r'^([^\s\(]+)\s*\((.*?)\)\s*(.*)$', orig_name)
+    if match:
+         clean_base_name = os.path.splitext(match.group(3))[0]
+    else:
+         # fallback if no parenthesis: "MainTag OriginalName"
+         match_no_parens = re.match(r'^([^\s]+)\s+(.*)$', orig_name)
+         if match_no_parens:
+              clean_base_name = os.path.splitext(match_no_parens.group(2))[0]
+              
+    if not clean_base_name.strip():
+         clean_base_name = "unnamed"
+    new_main = (input_data.main_tag or curr_main or "Unsorted").strip()
+    new_sub_list = [t.strip().lower() for t in (input_data.sub_tags if input_data.sub_tags is not None else current_sub_tags)]
+    new_sub_str = ",".join(new_sub_list)
+    
+    new_filename = new_main
+    if new_sub_str:
+         new_filename += f" ({new_sub_str})"
+    new_filename += f" {clean_base_name}.pes"
+    
+    LIBRARY_DIR = "library"
+    new_dir = os.path.join(LIBRARY_DIR, new_main)
+    new_path = os.path.join(new_dir, new_filename)
+    
+    if os.path.exists(new_path) and new_path != file.path:
+         raise HTTPException(status_code=400, detail="Target file already exists")
+         
+    try:
+         os.makedirs(new_dir, exist_ok=True)
+         if os.path.exists(file.path):
+              import shutil
+              shutil.move(file.path, new_path)
+         else:
+              raise HTTPException(status_code=404, detail="Physical file missing on disk")
+    except Exception as e:
+         raise HTTPException(status_code=500, detail=f"Failed to move file: {e}")
+         
+    file.name = new_filename
+    file.path = new_path
+    
+    new_tags = []
+    main_tag_obj = db.query(Tag).filter(Tag.name == new_main.lower()).first()
+    if not main_tag_obj:
+         main_tag_obj = Tag(name=new_main.lower(), is_main=True)
+         db.add(main_tag_obj)
+         db.flush()
+    else:
+         main_tag_obj.is_main = True
+    new_tags.append(main_tag_obj)
+    
+    for t_name in new_sub_list:
+         t_name = t_name.lower()
+         tag_obj = db.query(Tag).filter(Tag.name == t_name).first()
+         if not tag_obj:
+              tag_obj = Tag(name=t_name, is_main=False)
+              db.add(tag_obj)
+              db.flush()
+         new_tags.append(tag_obj)
+         
+    file.tags = new_tags
+    db.commit()
+    
+    return {
+         "id": file.id,
+         "name": file.name,
+         "path": file.path,
+         "main_tag": new_main,
+         "sub_tags": [t.name for t in file.tags if t.name.lower() != new_main.lower()]
+    }
 
 # Mount Frontend static files
 # Note: Ensure frontend/dist or frontend exists to avoid error on startup

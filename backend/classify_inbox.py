@@ -47,7 +47,7 @@ def render_pes_to_image(pes_path: str) -> Image.Image:
         if os.path.exists(temp_png):
             os.remove(temp_png)
 
-def classify_embroidery_batch(client: genai.Client, images_with_filenames: list[tuple[Image.Image, str, str]]) -> list[FileClassification]:
+def classify_embroidery_batch(client: genai.Client, images_with_filenames: list[tuple[Image.Image, str, str]], existing_main_tags: list[str] = []) -> list[FileClassification]:
     """
     Sends a batch of images to Gemini for classification with structured output.
     """
@@ -65,6 +65,8 @@ def classify_embroidery_batch(client: genai.Client, images_with_filenames: list[
         ))
         filenames_list.append(name)
 
+    existing_list_str = ", ".join([f"'{t}'" for t in existing_main_tags]) if existing_main_tags else "None"
+    
     prompt = f"""
     You are an expert at organizing embroidery designs.
     Analyze the attached embroidery pattern images.
@@ -74,6 +76,9 @@ def classify_embroidery_batch(client: genai.Client, images_with_filenames: list[
     
     For each image:
     1. Identify the **Main Tag** (Primary Category).
+       - ALWAYS use the **Singular** form where applicable (e.g., use 'Frame' instead of 'Frames', 'Fairy' instead of 'Fairies', 'Flower' instead of 'Flowers').
+       - **Existing Categories**: {existing_list_str}
+       - **Rule**: If the image fits well into ONE of the Existing Categories listed above, REUSE THAT CATEGORY EXACTLY to avoid duplicates. Otherwise, create a new singular category.
     2. Identify **Sub-tags** (Descriptive keywords).
     
     Return a structured JSON match containing a list of classification results.
@@ -118,6 +123,11 @@ def process_inbox(dry_run=True, limit=None, batch_size=4):
     print(f"Batch Size: {batch_size}")
 
     try:
+        # 0. Get existing main tags for prompt context to avoid singular/plural conflicts
+        existing_main_tags = []
+        if os.path.exists(LIBRARY_DIR):
+             existing_main_tags = [d for d in os.listdir(LIBRARY_DIR) if os.path.isdir(os.path.join(LIBRARY_DIR, d))]
+             
         # 1. Collect all files first to facilitate batching
         all_files = []
         for root, dirs, files in os.walk(INBOX_DIR):
@@ -165,7 +175,7 @@ def process_inbox(dry_run=True, limit=None, batch_size=4):
                 continue
 
             try:
-                results = classify_embroidery_batch(client, batch_images)
+                results = classify_embroidery_batch(client, batch_images, existing_main_tags=existing_main_tags)
                 results_dict = {r.filename: r for r in results}
                 
                 for pes_path, file in valid_files_in_batch:
