@@ -135,6 +135,16 @@ def trash_file(file_id: int, db: Session = Depends(get_db)):
     
     try:
         shutil.move(current_path, target_path)
+        
+        # Cleanup empty folder in library/
+        file_dir = os.path.dirname(current_path)
+        parts = file_dir.split("/")
+        if "library" in parts:
+             idx = parts.index("library")
+             # ensure it is library/<SUB_FOLDER> structure accurately
+             if idx + 1 < len(parts) and parts[idx+1]: 
+                  if os.path.exists(file_dir) and not os.listdir(file_dir):
+                       os.rmdir(file_dir)
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Failed to move file: {e}")
         
