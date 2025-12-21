@@ -145,6 +145,12 @@ def trash_file(file_id: int, db: Session = Depends(get_db)):
              if idx + 1 < len(parts) and parts[idx+1]: 
                   if os.path.exists(file_dir) and not os.listdir(file_dir):
                        os.rmdir(file_dir)
+                       # Update tag to not be main anymore
+                       from sqlalchemy import func
+                       folder_name = parts[idx+1]
+                       tag_obj = db.query(Tag).filter(func.lower(Tag.name) == folder_name.lower()).first()
+                       if tag_obj:
+                            tag_obj.is_main = False
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Failed to move file: {e}")
         
@@ -306,8 +312,23 @@ def edit_tags(file_id: int, input_data: EditTagsInput, db: Session = Depends(get
     try:
          os.makedirs(new_dir, exist_ok=True)
          if os.path.exists(file.path):
+              old_path = file.path
               import shutil
-              shutil.move(file.path, new_path)
+              shutil.move(old_path, new_path)
+              
+              # Cleanup empty OLD directory in library/
+              old_dir = os.path.dirname(old_path)
+              parts = old_dir.split("/")
+              if "library" in parts:
+                   idx = parts.index("library")
+                   if idx + 1 < len(parts) and parts[idx+1]:
+                        if os.path.exists(old_dir) and not os.listdir(old_dir):
+                             os.rmdir(old_dir)
+                             from sqlalchemy import func
+                             folder_name = parts[idx+1]
+                             tag_obj = db.query(Tag).filter(func.lower(Tag.name) == folder_name.lower()).first()
+                             if tag_obj:
+                                  tag_obj.is_main = False
          else:
               raise HTTPException(status_code=404, detail="Physical file missing on disk")
     except Exception as e:
