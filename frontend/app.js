@@ -299,16 +299,23 @@ async function loadFiles(reset = false) {
                 
                 const btnEditMain = card.querySelector(".btn-edit-main");
                 const btnEditSub = card.querySelector(".btn-edit-sub");
+                const txtMain = card.querySelector(".main-tag-value");
+                const txtSub = card.querySelector(".sub-tags-value");
                 
-                btnEditMain.addEventListener("click", (e) => {
+                const triggerMainEdit = (e) => {
                     e.stopPropagation();
                     showInlineEditor(card, file, "main", renderCardContent);
-                });
+                };
                 
-                btnEditSub.addEventListener("click", (e) => {
+                const triggerSubEdit = (e) => {
                     e.stopPropagation();
                     showInlineEditor(card, file, "sub", renderCardContent);
-                });
+                };
+                
+                if (btnEditMain) btnEditMain.addEventListener("click", triggerMainEdit);
+                if (txtMain) txtMain.addEventListener("click", triggerMainEdit);
+                if (btnEditSub) btnEditSub.addEventListener("click", triggerSubEdit);
+                if (txtSub) txtSub.addEventListener("click", triggerSubEdit);
                 
                 const star = card.querySelector(".btn-star");
                 star.addEventListener("click", async (e) => {
@@ -609,27 +616,13 @@ function showInlineEditor(card, file, type, onSuccess) {
         } catch (err) {
              console.error("Save edit failed", err);
              alert("Failed to save changes: " + err.message);
-             row.innerHTML = originalHTML;
-             const newEdit = row.querySelector(".btn-edit-title");
-             if (newEdit) {
-                  newEdit.addEventListener("click", (ev) => {
-                      ev.stopPropagation();
-                      showInlineEditor(card, file, type, onSuccess);
-                  });
-             }
+             onSuccess();
         }
     });
 
     btnCancel.addEventListener("click", (e) => {
         e.stopPropagation();
-        row.innerHTML = originalHTML;
-        const newEdit = row.querySelector(".btn-edit-title");
-        if (newEdit) {
-             newEdit.addEventListener("click", (ev) => {
-                  ev.stopPropagation();
-                  showInlineEditor(card, file, type, onSuccess);
-             });
-        }
+        onSuccess();
     });
     
     input.addEventListener("click", (e) => e.stopPropagation());
