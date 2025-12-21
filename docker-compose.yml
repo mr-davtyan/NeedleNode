@@ -1,0 +1,22 @@
+version: '3.8'
+
+services:
+  needlenode:
+    image: ghcr.io/mr-davtyan/needlenode/needlenode:latest
+    container_name: needlenode
+    restart: unless-stopped
+    ports:
+      - "8000:8000"
+    environment:
+      # Absolute path inside the container to the data volume mount
+      - DATABASE_URL=sqlite:////app/data/embroidery.db
+      # Add your Gemini API Key here for AI indexing features
+      # - GEMINI_API_KEY=AIzaSy...
+    volumes:
+      # Mount paths relative to the docker-compose.yml
+      # Ensure these directories exist on your host or Docker will create them as root.
+      - ./library:/app/library
+      - ./inbox:/app/inbox
+      - ./trash:/app/trash
+      - ./data:/app/data
+      - ./cache:/app/.cache

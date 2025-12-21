@@ -4,7 +4,7 @@ from typing import List
 from sqlalchemy import create_engine, ForeignKey, Table, Column, Integer, String, Float, DateTime
 from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column, relationship, sessionmaker
 
-DATABASE_URL = "sqlite:///embroidery.db"
+DATABASE_URL = os.environ.get("DATABASE_URL", "sqlite:///embroidery.db")
 
 engine = create_engine(DATABASE_URL, connect_args={"check_same_thread": False})
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
