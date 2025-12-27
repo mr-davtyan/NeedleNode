@@ -6,6 +6,7 @@ let currentTag = "";
 let searchTerm = "";
 let currentStarred = false;
 let scanTriggerAttempts = 0;
+let activeInlineEditor = null;
 // Collapsed Tags persisted in DB now
 
 const gridContainer = document.getElementById("grid-container");
@@ -555,12 +556,18 @@ function getCleanFileName(name) {
 }
 
 function showInlineEditor(card, file, type, onSuccess) {
-    const row = type === "main" ? card.querySelector(".card-main-row") : card.querySelector(".card-sub-row");
+    let row = type === "main" ? card.querySelector(".card-main-row") : card.querySelector(".card-sub-row");
     const valueSpan = row.querySelector(".card-tag-value");
     
     if (!valueSpan) return;
 
     const currentValue = valueSpan.innerText === "Unsorted" || valueSpan.innerText === "-" ? "" : valueSpan.innerText;
+
+    if (activeInlineEditor) {
+        activeInlineEditor.cancel();
+        // Re-select row since cancel() replaces card.innerHTML
+        row = type === "main" ? card.querySelector(".card-main-row") : card.querySelector(".card-sub-row");
+    }
     
     const input = document.createElement("input");
     input.type = "text";
@@ -582,6 +589,29 @@ function showInlineEditor(card, file, type, onSuccess) {
     row.appendChild(btnSave);
     row.appendChild(btnCancel);
     input.focus();
+
+    const cleanup = () => {
+        document.removeEventListener("click", clickOutsideHandler);
+        activeInlineEditor = null;
+    };
+
+    const cancelEditor = () => {
+        cleanup();
+        onSuccess();
+    };
+
+    const clickOutsideHandler = (e) => {
+        if (!row.contains(e.target)) {
+            setTimeout(cancelEditor, 0);
+        }
+    };
+
+    document.addEventListener("click", clickOutsideHandler);
+
+    activeInlineEditor = {
+        row: row,
+        cancel: cancelEditor
+    };
     
     btnSave.addEventListener("click", async (e) => {
         e.stopPropagation();
@@ -598,9 +628,9 @@ function showInlineEditor(card, file, type, onSuccess) {
              btnSave.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i>';
              
              const res = await fetch(`/api/files/${file.id}/edit_tags`, {
-                 method: "POST",
-                 headers: { "Content-Type": "application/json" },
-                 body: JSON.stringify(payload)
+                  method: "POST",
+                  headers: { "Content-Type": "application/json" },
+                  body: JSON.stringify(payload)
              });
              
              if (!res.ok) throw new Error(await res.text());
@@ -611,18 +641,20 @@ function showInlineEditor(card, file, type, onSuccess) {
              file.main_tag = data.main_tag;
              file.sub_tags = data.sub_tags;
              
+             cleanup();
              onSuccess();
              loadTags(); 
         } catch (err) {
              console.error("Save edit failed", err);
              alert("Failed to save changes: " + err.message);
+             cleanup();
              onSuccess();
         }
     });
 
     btnCancel.addEventListener("click", (e) => {
         e.stopPropagation();
-        onSuccess();
+        cancelEditor();
     });
     
     input.addEventListener("click", (e) => e.stopPropagation());
