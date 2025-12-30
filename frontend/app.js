@@ -2,7 +2,7 @@ let offset = 0;
 const limit = 40;
 let loading = false;
 let hasMore = true;
-let currentTag = "";
+let currentTags = [];
 let searchTerm = "";
 let currentStarred = false;
 let scanTriggerAttempts = 0;
@@ -81,19 +81,35 @@ function setupEventListeners() {
     });
 
     // Tag Clear (All Designs)
+    // Tag Clear (All Designs)
     document.getElementById("btn-all").addEventListener("click", (e) => {
         e.preventDefault();
-        currentTag = "";
+        currentTags = [];
         currentStarred = false;
-        document.querySelectorAll(".nav-item").forEach(t => t.classList.remove("active"));
+        document.querySelectorAll(".tag-item").forEach(t => t.classList.remove("active"));
         document.getElementById("btn-all").classList.add("active");
+        const btnClear = document.getElementById("btn-clear-tags");
+        if (btnClear) btnClear.style.display = "none";
         loadFiles(true);
     });
+
+    // Clear Tags Button
+    const btnClearTags = document.getElementById("btn-clear-tags");
+    if (btnClearTags) {
+        btnClearTags.addEventListener("click", (e) => {
+            e.preventDefault();
+            currentTags = [];
+            document.querySelectorAll(".tag-item").forEach(t => t.classList.remove("active"));
+            document.getElementById("btn-all").classList.add("active");
+            btnClearTags.style.display = "none";
+            loadFiles(true);
+        });
+    }
 
     // Starred Designs
     document.getElementById("btn-starred").addEventListener("click", (e) => {
         e.preventDefault();
-        currentTag = "";
+        currentTags = [];
         currentStarred = true;
         searchTerm = ""; // Clear Search filter
         document.getElementById("search-input").value = ""; // sync DOM input
@@ -145,7 +161,7 @@ async function loadTags() {
             const div = document.createElement("div");
             div.className = "tag-item";
             div.setAttribute("data-tag", name);
-            if (currentTag === name) div.classList.add("active");
+            if (currentTags.includes(name)) div.classList.add("active");
             
             div.innerHTML = `
                 <span class="tag-name">${name} <span class="tag-count">(${tag.count || 0})</span></span>
@@ -166,11 +182,17 @@ async function loadTags() {
             
             // Tag Filter Trigger
             div.addEventListener("click", () => {
-                document.querySelectorAll(".tag-item").forEach(t => t.classList.remove("active"));
-                document.getElementById("btn-all").classList.remove("active");
-                div.classList.add("active");
-                currentTag = name;
+                const clearBtn = document.getElementById("btn-clear-tags");
+                if (currentTags.includes(name)) {
+                    currentTags = currentTags.filter(t => t !== name);
+                    div.classList.remove("active");
+                } else {
+                    currentTags.push(name);
+                    div.classList.add("active");
+                }
                 currentStarred = false;
+                document.getElementById("btn-all").classList.toggle("active", currentTags.length === 0);
+                if (clearBtn) clearBtn.style.display = currentTags.length > 0 ? "block" : "none";
                 loadFiles(true);
             });
             
@@ -238,7 +260,9 @@ async function loadFiles(reset = false) {
     try {
         let url = `/api/files?limit=${limit}&offset=${offset}`;
         if (searchTerm) url += `&search=${encodeURIComponent(searchTerm)}`;
-        if (currentTag) url += `&tag=${encodeURIComponent(currentTag)}`;
+        if (currentTags && currentTags.length > 0) {
+            url += `&tag=${encodeURIComponent(currentTags.join(','))}`;
+        }
         if (currentStarred) url += `&starred=true`;
 
         const res = await fetch(url);

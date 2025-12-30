@@ -34,7 +34,10 @@
                 </div>
 
                 <div class="nav-section tag-section">
-                    <h4>Tags</h4>
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+                        <h4 style="margin-bottom: 0;">Tags</h4>
+                        <button id="btn-clear-tags" class="btn-clear" style="background: transparent; border: none; font-size: 0.75rem; color: var(--accent-color); cursor: pointer; display: none;">Clear</button>
+                    </div>
                     <div id="tags-list" class="tags-list">
                         <!-- Loaded dynamically -->
                         <div class="loading-spinner"></div>
