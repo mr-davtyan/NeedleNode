@@ -49,6 +49,13 @@ def stop_scan():
         return {"status": "stopping", "message": "Scan stop requested"}
     return {"status": "idle", "message": "No scan running"}
 
+@app.get("/api/version")
+def get_version():
+    if os.path.exists("VERSION"):
+        with open("VERSION") as f:
+            return {"version": f.read().strip()}
+    return {"version": "0.0.1"}
+
 @app.get("/api/files")
 def get_files(
     limit: int = 100, 
