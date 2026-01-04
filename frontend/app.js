@@ -60,9 +60,25 @@ document.addEventListener("DOMContentLoaded", () => {
 function setupEventListeners() {
     // Search
     let debounceTimer;
+    const btnClearSearch = document.getElementById("btn-clear-search");
+    
+    if (btnClearSearch) {
+        btnClearSearch.addEventListener("click", () => {
+            searchInput.value = "";
+            searchTerm = "";
+            btnClearSearch.style.display = "none";
+            loadFiles(true);
+        });
+    }
+
     searchInput.addEventListener("input", (e) => {
         clearTimeout(debounceTimer);
         searchTerm = e.target.value;
+        
+        if (btnClearSearch) {
+            btnClearSearch.style.display = searchTerm.length > 0 ? "block" : "none";
+        }
+
         debounceTimer = setTimeout(() => {
             loadFiles(true);
         }, 300);
@@ -314,6 +330,9 @@ async function loadFiles(reset = false) {
                     
                     const btnClear = document.getElementById("btn-clear-tags");
                     if (btnClear) btnClear.style.display = "none";
+                    
+                    const btnClearSearch = document.getElementById("btn-clear-search");
+                    if (btnClearSearch) btnClearSearch.style.display = "none";
                     
                     loadFiles(true);
                 });
