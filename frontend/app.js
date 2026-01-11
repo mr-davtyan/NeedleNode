@@ -36,6 +36,16 @@ const scanTotal = document.getElementById("scan-total");
 const scanText = document.getElementById("scan-text");
 const progressBarFill = document.getElementById("progress-bar-fill");
 
+// Theme Management
+function initTheme() {
+    const savedTheme = localStorage.getItem("theme") || "dark";
+    const btnIcon = document.querySelector("#btn-theme-toggle i");
+    if (savedTheme === "light") {
+         document.body.classList.add("light-theme");
+         if (btnIcon) btnIcon.className = "fa-solid fa-sun";
+    }
+}
+
 // Init
 async function loadVersion() {
     try {
@@ -49,6 +59,7 @@ async function loadVersion() {
 }
 
 document.addEventListener("DOMContentLoaded", () => {
+    initTheme();
     loadVersion();
     loadTags();
     loadFiles(true); // reset
@@ -163,6 +174,19 @@ function setupEventListeners() {
             btnStopScan.innerText = "Stop Scan 🛑";
         }
     });
+
+    // Theme Toggle
+    const btnTheme = document.getElementById("btn-theme-toggle");
+    if (btnTheme) {
+        btnTheme.addEventListener("click", () => {
+             const isLight = document.body.classList.toggle("light-theme");
+             localStorage.setItem("theme", isLight ? "light" : "dark");
+             const icon = btnTheme.querySelector("i");
+             if (icon) {
+                  icon.className = isLight ? "fa-solid fa-sun" : "fa-solid fa-moon";
+             }
+        });
+    }
 }
 
 function setupInfiniteScroll() {
