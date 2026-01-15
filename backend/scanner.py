@@ -9,6 +9,8 @@ from backend.database import SessionLocal, File, Tag, init_db
 THUMBNAIL_DIR = ".cache/thumbnails"
 os.makedirs(THUMBNAIL_DIR, exist_ok=True)
 
+SUPPORTED_EXTENSIONS = (".pes", ".dst", ".jef", ".exp", ".vp3", ".hus", ".pec", ".vip", ".shv", ".sew")
+
 def should_keep_tag(w: str) -> bool:
     """
     Filter heuristics to exclude meaningless acronyms, pure numbers, or clutter.
@@ -183,7 +185,7 @@ def scan_directory(directory: str):
         # Count total files first for progress bar % accuracy
         total_files = 0
         for root, _, filenames in os.walk(directory):
-            total_files += sum(1 for f in filenames if f.lower().endswith(".pes"))
+            total_files += sum(1 for f in filenames if f.lower().endswith(SUPPORTED_EXTENSIONS))
         scan_state.total = total_files
         
         # Clean up missing files first
@@ -202,7 +204,7 @@ def scan_directory(directory: str):
                 if scan_state.stop_requested:
                     break
                     
-                if file.lower().endswith(".pes"):
+                if file.lower().endswith(SUPPORTED_EXTENSIONS):
                     file_path = os.path.join(root, file)
                     scan_state.current_file = file
                     count += 1

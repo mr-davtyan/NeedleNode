@@ -6,7 +6,7 @@ from sqlalchemy.orm import Session
 from typing import List, Optional
 
 from backend.database import get_db, init_db, File, Tag
-from backend.scanner import scan_directory
+from backend.scanner import scan_directory, SUPPORTED_EXTENSIONS
 from backend.classify_inbox import process_inbox
 from backend.state import scan_state, import_state
 from pydantic import BaseModel
@@ -303,11 +303,11 @@ def edit_tags(file_id: int, input_data: EditTagsInput, db: Session = Depends(get
               
     if not clean_base_name.strip():
          clean_base_name = "unnamed"
-         
     if input_data.name is not None:
          clean_base_name = input_data.name.strip()
-         if clean_base_name.lower().endswith(".pes"):
-              clean_base_name = clean_base_name[:-4]
+         ext = os.path.splitext(clean_base_name)[1]
+         if ext.lower() in SUPPORTED_EXTENSIONS:
+              clean_base_name = clean_base_name[:-len(ext)]
          if not clean_base_name:
               clean_base_name = "unnamed"
               
@@ -315,10 +315,11 @@ def edit_tags(file_id: int, input_data: EditTagsInput, db: Session = Depends(get
     new_sub_list = [t.strip().lower() for t in (input_data.sub_tags if input_data.sub_tags is not None else current_sub_tags)]
     new_sub_str = ",".join(new_sub_list)
     
+    orig_ext = os.path.splitext(orig_name)[1]
     new_filename = new_main
     if new_sub_str:
          new_filename += f" ({new_sub_str})"
-    new_filename += f" {clean_base_name}.pes"
+    new_filename += f" {clean_base_name}{orig_ext}"
     
     LIBRARY_DIR = "library"
     new_dir = os.path.join(LIBRARY_DIR, new_main)

@@ -35,3 +35,4 @@ A high-performance local web application to organize, tag, and browse thousands 
 - **Vanilla CSS**: Bespoke premium layout without Tailwind weights.
 - **Light/Dark Theme**: Fluid theme switching via CSS Variables with `localStorage` persistence seamlessly.
 - **Offline Mode Support**: Embedded font families hosted inside static locations under `frontend/vendor/` natively seamlessly.
+- **Multi-Format Support**: Supports `.pes`, `.dst`, `.jef`, `.exp`, `.vp3`, `.hus`, `.pec`, `.vip`, `.shv`, and `.sew` formats flawlessly.
