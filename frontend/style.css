@@ -770,5 +770,22 @@ body.light-theme {
 }
 
 body.light-theme .btn-theme-toggle i {
+    color: #ffd700;
+}
+
+/* Select Format dropdown styling */
+.select-format {
+    background: rgba(255, 255, 255, 0.05) !important;
+    border: 1px solid var(--border-color) !important;
+    color: var(--text-primary) !important;
+    font-weight: normal !important;
+}
+
+body.light-theme .select-format {
+    background: #ffffff !important;
+    border: 1px solid rgba(0, 0, 0, 0.15) !important;
+    color: var(--text-primary) !important;
+}
+body.light-theme .btn-theme-toggle i {
     transform: rotate(360deg);
 }

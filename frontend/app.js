@@ -605,6 +605,17 @@ function showDetails(file) {
              window.location.href = `/api/files/${file.id}/download`;
         });
     }
+
+    // Wire up convert button
+    const detailConvert = document.getElementById("detail-download-convert");
+    if (detailConvert) {
+        const convertBtn = detailConvert.cloneNode(true);
+        detailConvert.parentNode.replaceChild(convertBtn, detailConvert);
+        convertBtn.addEventListener("click", () => {
+             const format = document.getElementById("download-format").value;
+             window.location.href = `/api/files/${file.id}/download?format=${format}`;
+        });
+    }
     
     // Wire up delete button
     const detailDelete = document.getElementById("detail-delete");

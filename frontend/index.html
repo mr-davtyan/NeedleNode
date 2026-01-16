@@ -136,22 +136,41 @@
                     <p><strong>FileSize:</strong> <span id="detail-size"></span></p>
                 </div>
 
-                <div class="detail-actions" style="margin-top: auto; display: flex; gap: 10px; align-items: center;">
-                    <button id="detail-star" class="action-circle btn-star" title="Star"
-                        style="width: 42px; height: 42px; font-size: 1.1rem;">
-                        <i class="fa-solid fa-star"></i>
-                    </button>
-                    <button id="detail-download" class="btn btn-action"
-                        style="flex: 1; justify-content: center; background: var(--accent-color);">
-                        <i class="fa-solid fa-download"></i>
-                        <span>Download PES File</span>
-                    </button>
-                    <button id="detail-delete" class="btn btn-action"
-                        style="background: rgba(234, 74, 74, 0.1); border: 1px solid rgba(234, 74, 74, 0.3); color: #ea4a4a;"
-                        title="Move to Trash">
-                        <i class="fa-solid fa-trash"></i>
-                        <span>Delete</span>
-                    </button>
+                <div class="detail-actions" style="margin-top: auto; display: flex; flex-direction: column; gap: 10px;">
+                    <div style="display: flex; gap: 10px; align-items: center; width: 100%;">
+                        <button id="detail-star" class="action-circle btn-star" title="Star"
+                            style="width: 42px; height: 42px; font-size: 1.1rem;">
+                            <i class="fa-solid fa-star"></i>
+                        </button>
+                        <button id="detail-download" class="btn btn-action"
+                            style="flex: 2; justify-content: center; background: var(--accent-color);" title="Download Original">
+                            <i class="fa-solid fa-download"></i>
+                            <span>Download Standard</span>
+                        </button>
+                        <button id="detail-delete" class="btn btn-action btn-danger"
+                            style="background: rgba(234, 74, 74, 0.1); border: 1px solid rgba(234, 74, 74, 0.3); color: #ea4a4a;"
+                            title="Move to Trash">
+                            <i class="fa-solid fa-trash"></i>
+                        </button>
+                    </div>
+                    
+                    <div class="convert-section" style="display: flex; gap: 10px; width: 100%;">
+                        <select id="download-format" class="btn btn-action select-format" style="flex: 3; cursor: pointer; text-align: left; padding: 0 10px; height: 38px;">
+                            <option value="pes">PES (Brother)</option>
+                            <option value="dst">DST (Tajima)</option>
+                            <option value="jef">JEF (Janome)</option>
+                            <option value="exp">EXP (Melco)</option>
+                            <option value="vp3">VP3 (Pfaff)</option>
+                            <option value="hus">HUS (Husqvarna)</option>
+                            <option value="pec">PEC (Brother)</option>
+                            <option value="vip">VIP (Pfaff)</option>
+                            <option value="shv">SHV (Husqvarna)</option>
+                            <option value="sew">SEW (Janome)</option>
+                        </select>
+                        <button id="detail-download-convert" class="btn btn-action" style="background: var(--accent-hover); flex: 1; justify-content: center; height: 38px;" title="Convert & Download">
+                            <i class="fa-solid fa-file-arrow-down" style="font-size: 1rem;"></i>
+                        </button>
+                    </div>
                 </div>
             </div>
         </div>
