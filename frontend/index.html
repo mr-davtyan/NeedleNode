@@ -12,6 +12,12 @@
 </head>
 
 <body>
+    <script>
+        const savedTheme = localStorage.getItem("theme") || "light";
+        if (savedTheme === "light") {
+            document.body.classList.add("light-theme");
+        }
+    </script>
     <div class="app-container">
         <!-- Sidebar -->
         <aside class="sidebar">
