@@ -776,7 +776,7 @@ body.light-theme .btn-theme-toggle i {
 /* Select Format dropdown styling */
 .select-format {
     background: rgba(255, 255, 255, 0.05) !important;
-    border: 1px solid var(--border-color) !important;
+    border: none !important;
     color: var(--text-primary) !important;
     font-weight: normal !important;
 }
@@ -786,6 +786,17 @@ body.light-theme .select-format {
     border: 1px solid rgba(0, 0, 0, 0.15) !important;
     color: var(--text-primary) !important;
 }
+
 body.light-theme .btn-theme-toggle i {
     transform: rotate(360deg);
+}
+
+.select-format option {
+    background-color: #161b22;
+    color: #c9d1d9;
+}
+
+body.light-theme .select-format option {
+    background-color: #ffffff;
+    color: #24292f;
 }
