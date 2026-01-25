@@ -39,6 +39,30 @@ A high-performance local web application to organize, tag, and browse thousands 
 -   `library/`: Context folders holding embroidery files to browse.
 -   `inbox/`: Incoming files buffer processing flawlessy.
 
+## Library Structure & Naming Convention
+
+The `library/` folder organizes files using a specific folder hierarchy and file naming pattern.
+
+### 📂 Folder Hierarchy
+-   **Root**: `library/`
+-   **Main Tag**: Subdirectories inside `library/` map directly to the **Main Tag** category.
+    -   Example: `library/Floral/`
+
+### 🏷️ Naming Pattern
+Files within the directories must follow this structure:
+`[Main Tag] ([sub_tag1],[sub_tag2],...) [Design Name].[extension]`
+
+-   **Main Tag**: Must match the parent folder name exactly.
+-   **Sub-tags**: Multi-tag labels contained inside parentheses, separated by commas (no spaces).
+-   **Design Name**: Descriptive name of the embroidery.
+-   **Extension**: Preserves original formats (e.g., `.pes`, `.dst`, `.jef`, `.exp`).
+
+**Example**:
+`library/Floral/Floral (rose,red,leaf) Rose01.pes`
+-   **Main Tag**: `Floral`
+-   **Sub-tags**: `rose`, `red`, `leaf`
+-   **Name**: `Rose01`
+
 ## AI Inbox Classification (Optional)
 
 The application includes an AI-powered inbox classifier (`backend/classify_inbox.py`) that organizes design archives from `inbox/` into `library/` flawlessly.
