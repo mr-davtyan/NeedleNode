@@ -481,7 +481,10 @@ async function loadFiles(reset = false) {
                             star.classList.add("active");
                         } else {
                             star.classList.remove("active");
-                            if (currentStarred) card.remove();
+                            if (currentStarred) {
+                                card.remove();
+                                if (document.querySelectorAll(".file-card").length === 0) loadFiles(true);
+                            }
                         }
                     } catch (e) { console.error("Toggle star failed", e); }
                 });
@@ -499,6 +502,7 @@ async function loadFiles(reset = false) {
                     try {
                         await fetch(`/api/files/${file.id}/trash`, { method: "POST" });
                         card.remove();
+                        if (document.querySelectorAll(".file-card").length === 0) loadFiles(true);
                         if (typeof loadTags === "function") loadTags(); // Refresh sidebar tags count
                         const totalStats = document.getElementById("total-stats");
                         if (totalStats) {
@@ -621,7 +625,10 @@ function showDetails(file) {
                     newStar.classList.remove("active");
                     file.is_starred = false;
                     if (originalStar) originalStar.classList.remove("active");
-                    if (currentStarred && file.cardNode) file.cardNode.remove();
+                    if (currentStarred && file.cardNode) {
+                        file.cardNode.remove();
+                        if (document.querySelectorAll(".file-card").length === 0) loadFiles(true);
+                    }
                 }
             } catch (e) { console.error("Toggle star inside details failed", e); }
         });
@@ -658,7 +665,12 @@ function showDetails(file) {
               try {
                   await fetch(`/api/files/${file.id}/trash`, { method: "POST" });
                   detailsOverlay.classList.remove("active");
-                  if (file.cardNode) file.cardNode.remove();
+                  if (file.cardNode) {
+                      file.cardNode.remove();
+                      if (document.querySelectorAll(".file-card").length === 0) {
+                          loadFiles(true);
+                      }
+                  }
                   const totalStats = document.getElementById("total-stats");
                   if (totalStats) {
                        const current = parseInt(totalStats.innerText);
