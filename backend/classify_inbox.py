@@ -43,7 +43,7 @@ def render_embroidery_to_image(emb_path: str) -> Image.Image:
         background = Image.new("RGB", img.size, (255, 255, 255))
         background.paste(img, (0, 0), img) # Paste with mask
         img = background
-        img.thumbnail((1024, 1024))
+        img.thumbnail((512, 512))
         return img
     finally:
         if os.path.exists(temp_png):
@@ -105,7 +105,7 @@ def classify_embroidery_batch(client: genai.Client, images_with_filenames: list[
         print(f"Response text: {response.text}")
         raise e
 
-def process_inbox(dry_run=True, limit=None, batch_size=4):
+def process_inbox(dry_run=True, limit=None, batch_size=12):
     client = genai.Client() # Uses GEMINI_API_KEY
     
     if not os.path.exists(INBOX_DIR):
@@ -256,7 +256,7 @@ if __name__ == "__main__":
     parser.add_argument("--run", action="store_true", help="Perform actual file moving (defaults to dry-run)")
     parser.add_argument("--dry-run", action="store_true", help="Dry run mode (default)")
     parser.add_argument("--limit", type=int, help="Limit number of files to process")
-    parser.add_argument("--batch-size", type=int, default=4, help="Number of files to process per Gemini call")
+    parser.add_argument("--batch-size", type=int, default=12, help="Number of files to process per Gemini call")
     parser.add_argument("--api-key", type=str, help="Gemini API Key")
     args = parser.parse_args()
 
