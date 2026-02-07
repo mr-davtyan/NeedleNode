@@ -135,7 +135,9 @@ def process_inbox(dry_run=True, limit=None, batch_size=12):
         for root, dirs, files in os.walk(INBOX_DIR):
              for file in files:
                  if file.lower().endswith(SUPPORTED_EXTENSIONS):
-                     all_files.append((os.path.join(root, file), file))
+                     pes_path = os.path.join(root, file)
+                     rel_path = os.path.relpath(pes_path, INBOX_DIR)
+                     all_files.append((pes_path, file, rel_path))
 
         if not all_files:
             print("No supported embroidery files found in inbox.")
@@ -163,12 +165,12 @@ def process_inbox(dry_run=True, limit=None, batch_size=12):
             batch_images = []
             valid_files_in_batch = []
             
-            for pes_path, file in current_batch_files:
+            for pes_path, file, rel_path in current_batch_files:
                 import_state.current_file = file
                 try:
                     img = render_embroidery_to_image(pes_path)
-                    batch_images.append((img, file, pes_path))
-                    valid_files_in_batch.append((pes_path, file))
+                    batch_images.append((img, rel_path, pes_path))
+                    valid_files_in_batch.append((pes_path, file, rel_path))
                 except Exception as e:
                     print(f"  Error rendering {file}: {e}")
                     fail_count += 1
@@ -180,11 +182,11 @@ def process_inbox(dry_run=True, limit=None, batch_size=12):
                 results = classify_embroidery_batch(client, batch_images, existing_main_tags=existing_main_tags)
                 results_dict = {r.filename: r for r in results}
                 
-                for pes_path, file in valid_files_in_batch:
+                for pes_path, file, rel_path in valid_files_in_batch:
                     if import_state.stop_requested:
                          break
                          
-                    classification = results_dict.get(file)
+                    classification = results_dict.get(rel_path)
                     if not classification:
                         print(f"  Warning: No classification returned for {file}")
                         fail_count += 1
