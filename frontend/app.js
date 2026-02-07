@@ -183,8 +183,8 @@ function setupEventListeners() {
         currentStarred = true; // Exclusive
         currentTags = []; // Clear tags
         
-        document.getElementById("btn-starred").classList.add("active");
         document.querySelectorAll(".tag-item").forEach(t => t.classList.remove("active"));
+        document.getElementById("btn-starred").classList.add("active");
         document.getElementById("btn-all").classList.remove("active");
         
         localStorage.setItem("selectedTags", JSON.stringify([]));
@@ -202,16 +202,18 @@ function setupEventListeners() {
             e.stopPropagation();
             e.preventDefault();
             
-            if (!currentStarred) {
-                currentStarred = true;
-                document.getElementById("btn-starred").classList.add("active");
-                localStorage.setItem("selectedStarred", "true");
-                document.getElementById("btn-all").classList.remove("active");
-                
-                const clearBtn = document.getElementById("btn-clear-tags");
-                if (clearBtn) clearBtn.style.display = "block";
-                loadFiles(true);
+            currentStarred = !currentStarred;
+            document.getElementById("btn-starred").classList.toggle("active", currentStarred);
+            localStorage.setItem("selectedStarred", currentStarred);
+            
+            const isAllActive = currentTags.length === 0 && !currentStarred;
+            document.getElementById("btn-all").classList.toggle("active", isAllActive);
+            
+            const clearBtn = document.getElementById("btn-clear-tags");
+            if (clearBtn) {
+                 clearBtn.style.display = (currentTags.length > 0 || currentStarred) ? "block" : "none";
             }
+            loadFiles(true);
         });
     }
 
@@ -276,11 +278,14 @@ async function loadTags() {
             // Inclusive Filter Trigger
             toggle.addEventListener("click", (e) => {
                 e.stopPropagation(); // prevent exclusive filtering
-                if (!currentTags.includes(name)) {
+                if (currentTags.includes(name)) {
+                    currentTags = currentTags.filter(t => t !== name);
+                    div.classList.remove("active");
+                } else {
                     currentTags.push(name);
                     div.classList.add("active");
-                    localStorage.setItem("selectedTags", JSON.stringify(currentTags));
                 }
+                localStorage.setItem("selectedTags", JSON.stringify(currentTags));
                 document.getElementById("btn-all").classList.toggle("active", currentTags.length === 0 && !currentStarred);
                 const btnClearTags = document.getElementById("btn-clear-tags");
                 if (btnClearTags) {
