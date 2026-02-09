@@ -105,6 +105,26 @@ def classify_embroidery_batch(client: genai.Client, images_with_filenames: list[
         print(f"Response text: {response.text}")
         raise e
 
+def get_unique_target_path(target_dir: str, main_tag: str, sub_tags_str: str, orig_name_clean: str, orig_ext: str) -> tuple[str, str]:
+    """
+    Constructs a unique target path by appending _1, _2, etc. if needed.
+    """
+    base_new = f"{main_tag}"
+    if sub_tags_str:
+        base_new += f" ({sub_tags_str})"
+    base_new += f" {orig_name_clean}"
+    
+    new_filename = f"{base_new}{orig_ext}"
+    target_path = os.path.join(target_dir, new_filename)
+    
+    counter = 1
+    while os.path.exists(target_path):
+        new_filename = f"{base_new}_{counter}{orig_ext}"
+        target_path = os.path.join(target_dir, new_filename)
+        counter += 1
+         
+    return target_path, new_filename
+
 def process_inbox(dry_run=True, limit=None, batch_size=12):
     client = genai.Client() # Uses GEMINI_API_KEY
     
@@ -206,23 +226,22 @@ def process_inbox(dry_run=True, limit=None, batch_size=12):
                     orig_name_clean = os.path.splitext(file)[0]
                     orig_ext = os.path.splitext(file)[1]
                     
-                    new_filename = f"{main_tag}"
-                    if sub_tags_str:
-                         new_filename += f" ({sub_tags_str})"
-                    new_filename += f" {orig_name_clean}{orig_ext}"
-                    
                     target_dir = os.path.join(LIBRARY_DIR, main_tag)
-                    target_path = os.path.join(target_dir, new_filename)
+                    target_path, new_filename = get_unique_target_path(target_dir, main_tag, sub_tags_str, orig_name_clean, orig_ext)
                     
                     print(f"  > Target: {target_path}")
                     
+                    # Log rename for collisions
+                    initial_filename = f"{main_tag}"
+                    if sub_tags_str:
+                         initial_filename += f" ({sub_tags_str})"
+                    initial_filename += f" {orig_name_clean}{orig_ext}"
+                    
+                    if new_filename != initial_filename:
+                         print(f"  -> Renamed to avoid collision: {new_filename}")
+                    
                     if not dry_run:
                         os.makedirs(target_dir, exist_ok=True)
-                        if os.path.exists(target_path):
-                             print(f"  ! File already exists at target: {target_path}. Skipping.")
-                             fail_count += 1
-                             continue
-                             
                         shutil.move(pes_path, target_path)
                         print("  [MOVED]")
                     

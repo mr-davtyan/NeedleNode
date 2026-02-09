@@ -53,6 +53,8 @@ This file defines strict constraints, assumptions, and behavioral rules that Cur
 * Use consistent naming conventions across models, APIs, and UI
 * Avoid hardcoding business rules; use configuration where reasonable
 * Prefer explicit, readable logic over abstraction-heavy patterns
+* **Code Testability**: Design code to be modular and testable (e.g., extract complex logic into helper functions).
+* **Test Suite Retention**: Any tests created during implementation must be saved into the test suite (e.g., `backend/test_*.py`) for future regression prevention.
 
 ## Non-Goals (Strict)
 
