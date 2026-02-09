@@ -92,6 +92,35 @@ document.addEventListener("DOMContentLoaded", () => {
 });
 
 function setupEventListeners() {
+    // Sidebar Toggle for Mobile
+    const btnSidebarToggle = document.getElementById("btn-sidebar-toggle");
+    const sidebarOverlay = document.getElementById("sidebar-overlay");
+    
+    if (btnSidebarToggle) {
+        btnSidebarToggle.addEventListener("click", (e) => {
+            e.stopPropagation();
+            document.body.classList.toggle("sidebar-open");
+        });
+    }
+    
+    if (sidebarOverlay) {
+        sidebarOverlay.addEventListener("click", () => {
+            document.body.classList.remove("sidebar-open");
+        });
+    }
+
+    // Close sidebar on navigation (Mobile)
+    const sidebar = document.querySelector(".sidebar");
+    if (sidebar) {
+        sidebar.addEventListener("click", (e) => {
+            if (e.target.closest("a") || e.target.closest(".tag-item")) {
+                if (!e.target.closest(".btn-toggle-tag")) {
+                    document.body.classList.remove("sidebar-open");
+                }
+            }
+        });
+    }
+
     // Search
     let debounceTimer;
     const btnClearSearch = document.getElementById("btn-clear-search");
