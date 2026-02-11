@@ -47,6 +47,19 @@ function initTheme() {
          document.body.classList.remove("light-theme");
          if (btnIcon) btnIcon.className = "fa-solid fa-moon";
     }
+
+    // Accent Init
+    const savedAccent = localStorage.getItem("accent") || "green";
+    document.body.className.split(' ').forEach(c => {
+        if (c.startsWith('accent-')) document.body.classList.remove(c);
+    });
+    if (savedAccent !== "green") {
+        document.body.classList.add(`accent-${savedAccent}`);
+    }
+    
+    document.querySelectorAll(".accent-dot").forEach(dot => {
+        dot.classList.toggle("active", dot.getAttribute("data-accent") === savedAccent);
+    });
 }
 
 // Init
@@ -270,6 +283,29 @@ function setupEventListeners() {
              if (icon) {
                   icon.className = isLight ? "fa-solid fa-sun" : "fa-solid fa-moon";
              }
+        });
+    }
+
+    // Accent Picker
+    const accentPicker = document.getElementById("accent-picker");
+    if (accentPicker) {
+        accentPicker.addEventListener("click", (e) => {
+             const dot = e.target.closest(".accent-dot");
+             if (!dot) return;
+             
+             const accent = dot.getAttribute("data-accent");
+             localStorage.setItem("accent", accent);
+             
+             document.body.className.split(' ').forEach(c => {
+                 if (c.startsWith('accent-')) document.body.classList.remove(c);
+             });
+             if (accent !== "green") {
+                 document.body.classList.add(`accent-${accent}`);
+             }
+             
+             document.querySelectorAll(".accent-dot").forEach(d => {
+                 d.classList.toggle("active", d === dot);
+             });
         });
     }
 }

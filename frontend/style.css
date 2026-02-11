@@ -3,8 +3,8 @@
     --sidebar-bg: rgba(22, 27, 34, 0.7);
     --card-bg: rgba(33, 38, 45, 0.5);
     --border-color: rgba(240, 246, 252, 0.1);
-    --accent-color: #58a6ff;
-    --accent-hover: #1f6feb;
+    --accent-color: #2ea44f; /* Green Default */
+    --accent-hover: #22863a;
     --text-primary: #c9d1d9;
     --text-secondary: #8b949e;
     --sidebar-width: 260px;
@@ -17,8 +17,8 @@
     --search-bg: rgba(255, 255, 255, 0.05);
     --item-subtle-bg: rgba(255, 255, 255, 0.03);
     --card-shadow: rgba(0, 0, 0, 0.5);
-    --action-hover-bg: rgba(255, 255, 255, 0.1);
-    --action-hover-color: #ffffff;
+    --action-hover-bg: rgba(46, 164, 79, 0.1);
+    --action-hover-color: #2ea44f;
 }
 
 body.light-theme {
@@ -26,8 +26,8 @@ body.light-theme {
     --sidebar-bg: rgba(242, 244, 246, 0.85);
     --card-bg: #ffffff;
     --border-color: rgba(27, 31, 36, 0.15);
-    --accent-color: #0969da;
-    --accent-hover: #0a4da4;
+    --accent-color: #1a7f37; /* Green Default */
+    --accent-hover: #116329;
     --text-primary: #24292f;
     --text-secondary: #57606a;
 
@@ -36,8 +36,8 @@ body.light-theme {
     --search-bg: rgba(0, 0, 0, 0.03);
     --item-subtle-bg: rgba(0, 0, 0, 0.02);
     --card-shadow: rgba(140, 149, 159, 0.12);
-    --action-hover-bg: rgba(9, 105, 218, 0.1);
-    --action-hover-color: #0969da;
+    --action-hover-bg: rgba(26, 127, 55, 0.1);
+    --action-hover-color: #1a7f37;
 }
 
 body {
@@ -801,6 +801,71 @@ body.light-theme .btn-theme-toggle i {
 body.light-theme .select-format option {
     background-color: #ffffff;
     color: #24292f;
+}
+
+/* Color Accent Picker */
+.accent-picker {
+    display: flex;
+    gap: 8px;
+    background: var(--item-subtle-bg);
+    padding: 6px 10px;
+    border-radius: 20px;
+    border: 1px solid var(--border-color);
+    align-items: center;
+}
+
+.accent-dot {
+    width: 14px;
+    height: 14px;
+    border-radius: 50%;
+    cursor: pointer;
+    border: 2px solid transparent;
+    transition: transform 0.2s, border-color 0.2s;
+}
+
+.accent-dot:hover {
+    transform: scale(1.2);
+}
+
+.accent-dot.active {
+    border-color: #fff;
+    transform: scale(1.1);
+}
+
+body.light-theme .accent-dot.active {
+    border-color: #24292f;
+}
+
+/* Accent Colors */
+.dot-green { background-color: #2ea44f; }
+.dot-blue { background-color: #58a6ff; }
+.dot-orange { background-color: #f0883e; }
+
+/* Themes Accents */
+body.accent-blue {
+    --accent-color: #58a6ff;
+    --accent-hover: #1f6feb;
+    --action-hover-bg: rgba(88, 166, 255, 0.1);
+    --action-hover-color: #58a6ff;
+}
+body.light-theme.accent-blue {
+    --accent-color: #0969da;
+    --accent-hover: #0a4da4;
+    --action-hover-bg: rgba(9, 105, 218, 0.1);
+    --action-hover-color: #0969da;
+}
+
+body.accent-orange {
+    --accent-color: #f0883e;
+    --accent-hover: #db6d28;
+    --action-hover-bg: rgba(240, 136, 62, 0.1);
+    --action-hover-color: #f0883e;
+}
+body.light-theme.accent-orange {
+    --accent-color: #cf5600;
+    --accent-hover: #a34300;
+    --action-hover-bg: rgba(207, 86, 0, 0.1);
+    --action-hover-color: #cf5600;
 }
 
 /* Sidebar Toggle Button */

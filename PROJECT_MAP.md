@@ -33,7 +33,7 @@ A high-performance local web application to organize, tag, and browse thousands 
 - **Lazy Loading**: Images and lists use intersection observer or infinite scroll.
 - **Background Scanning**: Large directories lookups run asynchronously.
 - **Vanilla CSS**: Bespoke premium layout without Tailwind weights.
-- **Light/Dark Theme**: Fluid theme switching via CSS Variables with `localStorage` persistence seamlessly.
+- **Light/Dark & Accent Themes**: Fluid theme switching and color accent customization via CSS Variables with `localStorage` persistence seamlessly.
 - **Offline Mode Support**: Embedded font families hosted inside static locations under `frontend/vendor/` natively seamlessly.
 - **Mobile Responsive Design**: Collapsible sidebars and fluid grids using Vanilla CSS calculations for seamless workflow support across viewports flawlessly.
 - **Multi-Format Support**: Supports `.pes`, `.dst`, `.jef`, `.exp`, `.vp3`, `.hus`, `.pec`, `.vip`, `.shv`, and `.sew` formats flawlessly.
