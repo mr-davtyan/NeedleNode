@@ -192,6 +192,12 @@ function setupEventListeners() {
         localStorage.setItem("selectedTags", JSON.stringify([]));
         currentStarred = false;
         localStorage.setItem("selectedStarred", "false");
+        
+        searchTerm = "";
+        if (searchInput) searchInput.value = "";
+        const btnClearSearch = document.getElementById("btn-clear-search");
+        if (btnClearSearch) btnClearSearch.style.display = "none";
+
         document.querySelectorAll(".tag-item").forEach(t => t.classList.remove("active"));
         document.getElementById("btn-starred").classList.remove("active");
         document.getElementById("btn-all").classList.add("active");
@@ -209,6 +215,12 @@ function setupEventListeners() {
             localStorage.setItem("selectedTags", JSON.stringify([]));
             currentStarred = false;
             localStorage.setItem("selectedStarred", "false");
+            
+            searchTerm = "";
+            if (searchInput) searchInput.value = "";
+            const btnClearSearch = document.getElementById("btn-clear-search");
+            if (btnClearSearch) btnClearSearch.style.display = "none";
+
             document.querySelectorAll(".tag-item").forEach(t => t.classList.remove("active"));
             document.getElementById("btn-starred").classList.remove("active");
             document.getElementById("btn-all").classList.add("active");
