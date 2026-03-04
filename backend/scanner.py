@@ -90,7 +90,10 @@ def process_file(file_path: str, db: Session) -> bool:
         
         # Thumbnail Generation
         path_hash = hashlib.md5(file_path.encode()).hexdigest()
-        thumb_path = os.path.join(THUMBNAIL_DIR, f"{path_hash}.png")
+        shard = path_hash[:2]
+        shard_dir = os.path.join(THUMBNAIL_DIR, shard)
+        os.makedirs(shard_dir, exist_ok=True)
+        thumb_path = os.path.join(shard_dir, f"{path_hash}.png")
         
         # write_png can render view
         pyembroidery.write_png(pattern, thumb_path)
