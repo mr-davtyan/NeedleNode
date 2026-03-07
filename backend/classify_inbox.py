@@ -227,7 +227,7 @@ def process_inbox(dry_run=True, limit=None, batch_size=12):
                     print(f"  > Sub Tags: {sub_tags}")
                     print(f"  > Colors: {main_colors}")
                     
-                    combined_tags = sub_tags + main_colors
+                    combined_tags = list(dict.fromkeys(sub_tags + main_colors))
                     sub_tags_str = ",".join(combined_tags)
                     orig_name_clean = os.path.splitext(file)[0]
                     orig_ext = os.path.splitext(file)[1]
