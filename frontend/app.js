@@ -5,6 +5,9 @@ let hasMore = true;
 let currentTags = [];
 let searchTerm = "";
 let currentStarred = false;
+let currentSortBy = "date";
+let currentSortOrder = "desc";
+
 let scanTriggerAttempts = 0;
 let activeInlineEditor = null;
 // Collapsed Tags persisted in DB now
@@ -320,6 +323,17 @@ function setupEventListeners() {
              });
         });
     }
+
+    // Sort Select
+    const sortSelect = document.getElementById("sort-select");
+    if (sortSelect) {
+        sortSelect.addEventListener("change", (e) => {
+            const parts = e.target.value.split(":");
+            currentSortBy = parts[0] || "date";
+            currentSortOrder = parts[1] || "desc";
+            loadFiles(true);
+        });
+    }
 }
 
 function setupInfiniteScroll() {
@@ -443,7 +457,7 @@ async function loadFiles(reset = false) {
     }
 
     try {
-        let url = `/api/files?limit=${limit}&offset=${offset}`;
+        let url = `/api/files?limit=${limit}&offset=${offset}&sort_by=${currentSortBy}&order=${currentSortOrder}`;
         if (searchTerm) url += `&search=${encodeURIComponent(searchTerm)}`;
         if (currentTags && currentTags.length > 0) {
             url += `&tag=${encodeURIComponent(currentTags.join(','))}`;
@@ -532,6 +546,7 @@ async function loadFiles(reset = false) {
                                 <div class="file-meta">
                                     <span>${file.stitches} S</span>
                                     <span>${(file.size / 1024).toFixed(1)} KB</span>
+                                    <span>${file.modified_at ? new Date(file.modified_at).toLocaleDateString() : '-'}</span>
                                 </div>
                                 <div class="card-actions">
                                     <button class="action-circle btn-star ${file.is_starred ? 'active' : ''}" title="Star"><i class="fa-solid fa-star"></i></button>
