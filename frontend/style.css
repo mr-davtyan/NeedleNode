@@ -345,33 +345,40 @@ body {
 
 /* Sort Selector */
 .sort-select-wrapper {
+    background: var(--item-subtle-bg);
+    border: 1px solid var(--border-color);
+    color: var(--text-primary);
+    width: 36px;
+    height: 36px;
+    border-radius: 8px;
     display: flex;
     align-items: center;
-    gap: 8px;
-    background: var(--search-bg);
-    padding: 8px 12px;
-    border-radius: 8px;
-    border: 1px solid transparent;
-    transition: border var(--transition-speed);
+    justify-content: center;
+    cursor: pointer;
+    transition: all var(--transition-speed);
+    position: relative;
 }
 
-.sort-select-wrapper:focus-within {
+.sort-select-wrapper:hover {
+    background: rgba(88, 166, 255, 0.1);
     border-color: var(--accent-color);
+    color: var(--accent-color);
+    transform: translateY(-1px);
 }
 
 .sort-select-wrapper i {
-    color: var(--text-secondary);
-    font-size: 0.85rem;
+    font-size: 1.1rem;
 }
 
 .sort-select {
-    background: transparent;
-    border: none;
-    color: var(--text-primary);
-    font-family: inherit;
-    font-size: 0.85rem;
-    outline: none;
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    opacity: 0;
     cursor: pointer;
+    border: none;
 }
 
 .sort-select option {
@@ -978,6 +985,9 @@ body.sidebar-open .sidebar-overlay {
         gap: 8px;
         flex-shrink: 0;
     }
+
+
+
 
     /* Optimize Scan Progress for Mobile */
     .scan-progress {
