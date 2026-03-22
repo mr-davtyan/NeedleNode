@@ -45,14 +45,17 @@
                             <i class="fa-solid fa-star"></i>
                             <span>Starred</span>
                         </span>
-                        <button class="btn-toggle-tag" title="Add to filters" style="margin-left: auto;"><i class="fa-solid fa-plus"></i></button>
+                        <button class="btn-toggle-tag" title="Add to filters" style="margin-left: auto;"><i
+                                class="fa-solid fa-plus"></i></button>
                     </a>
                 </div>
 
                 <div class="nav-section tag-section">
-                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+                    <div
+                        style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
                         <h4 style="margin-bottom: 0;">Tags</h4>
-                        <button id="btn-clear-tags" class="btn-clear" style="background: transparent; border: none; font-size: 0.75rem; color: var(--accent-color); cursor: pointer; display: none;">Clear</button>
+                        <button id="btn-clear-tags" class="btn-clear"
+                            style="background: transparent; border: none; font-size: 0.75rem; color: var(--accent-color); cursor: pointer; display: none;">Clear</button>
                     </div>
                     <div id="tags-list" class="tags-list">
                         <!-- Loaded dynamically -->
@@ -73,7 +76,9 @@
                 <div class="search-bar">
                     <i class="fa-solid fa-magnifying-glass"></i>
                     <input type="text" id="search-input" placeholder="Search designs...">
-                    <button id="btn-clear-search" class="btn-clear-search" style="border: none; background: transparent; color: var(--text-secondary); cursor: pointer; display: none;"><i class="fa-solid fa-times"></i></button>
+                    <button id="btn-clear-search" class="btn-clear-search"
+                        style="border: none; background: transparent; color: var(--text-secondary); cursor: pointer; display: none;"><i
+                            class="fa-solid fa-times"></i></button>
                 </div>
 
                 <div class="header-actions">
@@ -97,10 +102,14 @@
                         <button id="btn-stop-scan" class="btn-stop">Stop</button>
                     </div>
 
-                    <div class="accent-picker" id="accent-picker">
-                        <div class="accent-dot dot-green" data-accent="green" title="Green Accent"></div>
-                        <div class="accent-dot dot-blue" data-accent="blue" title="Blue Accent"></div>
-                        <div class="accent-dot dot-orange" data-accent="orange" title="Orange Accent"></div>
+                    <div class="accent-select-wrapper" id="accent-select-wrapper" title="Color Theme"
+                        id="accent-picker">
+                        <i class="fa-solid fa-palette"></i>
+                        <select id="accent-select" class="accent-select">
+                            <option value="green">🟢</option>
+                            <option value="blue">🔵</option>
+                            <option value="orange">🟠</option>
+                        </select>
                     </div>
 
                     <button id="btn-theme-toggle" class="btn-theme-toggle" title="Toggle Theme">
@@ -109,7 +118,7 @@
 
                     <button id="btn-scan" class="btn btn-action">
                         <i class="fa-solid fa-sync"></i>
-                        <span>Scan Library</span>
+                        <span>Scan</span>
                     </button>
                     <div class="stats" id="total-stats">0 Designs</div>
                 </div>
@@ -171,7 +180,8 @@
                             <i class="fa-solid fa-star"></i>
                         </button>
                         <button id="detail-download" class="btn btn-action"
-                            style="flex: 2; justify-content: center; background: var(--accent-color);" title="Download Original">
+                            style="flex: 2; justify-content: center; background: var(--accent-color);"
+                            title="Download Original">
                             <i class="fa-solid fa-download"></i>
                             <span>Download Standard</span>
                         </button>
@@ -181,9 +191,10 @@
                             <i class="fa-solid fa-trash"></i>
                         </button>
                     </div>
-                    
+
                     <div class="convert-section" style="display: flex; gap: 10px; width: 100%;">
-                        <select id="download-format" class="btn btn-action select-format" style="flex: 3; cursor: pointer; text-align: left; padding: 0 10px; height: 38px;">
+                        <select id="download-format" class="btn btn-action select-format"
+                            style="flex: 3; cursor: pointer; text-align: left; padding: 0 10px; height: 38px;">
                             <option value="pes">PES (Brother)</option>
                             <option value="dst">DST (Tajima)</option>
                             <option value="jef">JEF (Janome)</option>
@@ -195,7 +206,9 @@
                             <option value="shv">SHV (Husqvarna)</option>
                             <option value="sew">SEW (Janome)</option>
                         </select>
-                        <button id="detail-download-convert" class="btn btn-action" style="background: var(--accent-hover); flex: 1; justify-content: center; height: 38px;" title="Convert & Download">
+                        <button id="detail-download-convert" class="btn btn-action"
+                            style="background: var(--accent-hover); flex: 1; justify-content: center; height: 38px;"
+                            title="Convert & Download">
                             <i class="fa-solid fa-file-arrow-down" style="font-size: 1rem;"></i>
                         </button>
                     </div>

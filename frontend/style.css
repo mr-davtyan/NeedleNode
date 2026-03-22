@@ -3,7 +3,8 @@
     --sidebar-bg: rgba(22, 27, 34, 0.7);
     --card-bg: rgba(33, 38, 45, 0.5);
     --border-color: rgba(240, 246, 252, 0.1);
-    --accent-color: #2ea44f; /* Green Default */
+    --accent-color: #2ea44f;
+    /* Green Default */
     --accent-hover: #22863a;
     --text-primary: #c9d1d9;
     --text-secondary: #8b949e;
@@ -26,7 +27,8 @@ body.light-theme {
     --sidebar-bg: rgba(242, 244, 246, 0.85);
     --card-bg: #ffffff;
     --border-color: rgba(27, 31, 36, 0.15);
-    --accent-color: #1a7f37; /* Green Default */
+    --accent-color: #1a7f37;
+    /* Green Default */
     --accent-hover: #116329;
     --text-primary: #24292f;
     --text-secondary: #57606a;
@@ -211,6 +213,7 @@ body {
     display: flex;
     align-items: center;
     justify-content: space-between;
+    gap: 12px;
     padding: 0 30px;
     border-bottom: 1px solid var(--border-color);
     background: var(--overlay-bg);
@@ -813,7 +816,6 @@ body.light-theme {
 
 .btn-theme-toggle:hover {
     background: rgba(88, 166, 255, 0.1);
-    /* fallback to safe blue overlay */
     border-color: var(--accent-color);
     color: var(--accent-color);
     transform: translateY(-1px);
@@ -827,6 +829,56 @@ body.light-theme {
 body.light-theme .btn-theme-toggle i {
     color: #ffd700;
 }
+
+/* Accent Color Select Wrapper - square icon button with dropdown */
+.accent-select-wrapper {
+    background: var(--item-subtle-bg);
+    border: 1px solid var(--border-color);
+    color: var(--text-primary);
+    width: 36px;
+    height: 36px;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all var(--transition-speed);
+    position: relative;
+}
+
+.accent-select-wrapper:hover {
+    background: rgba(88, 166, 255, 0.1);
+    border-color: var(--accent-color);
+    color: var(--accent-color);
+    transform: translateY(-1px);
+}
+
+.accent-select-wrapper i {
+    font-size: 1.1rem;
+    pointer-events: none;
+}
+
+.accent-select {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    opacity: 0;
+    cursor: pointer;
+    border: none;
+    color-scheme: dark;
+}
+
+body.light-theme .accent-select {
+    color-scheme: light;
+}
+
+.accent-select option {
+    background-color: var(--bg-color, #161b22);
+    color: var(--text-primary);
+}
+
 
 /* Select Format dropdown styling */
 .select-format {
@@ -899,9 +951,17 @@ body.light-theme .accent-dot.active {
 }
 
 /* Accent Colors */
-.dot-green { background-color: #2ea44f; }
-.dot-blue { background-color: #58a6ff; }
-.dot-orange { background-color: #f0883e; }
+.dot-green {
+    background-color: #2ea44f;
+}
+
+.dot-blue {
+    background-color: #58a6ff;
+}
+
+.dot-orange {
+    background-color: #f0883e;
+}
 
 /* Themes Accents */
 body.accent-blue {
@@ -910,6 +970,7 @@ body.accent-blue {
     --action-hover-bg: rgba(88, 166, 255, 0.1);
     --action-hover-color: #58a6ff;
 }
+
 body.light-theme.accent-blue {
     --accent-color: #0969da;
     --accent-hover: #0a4da4;
@@ -923,6 +984,7 @@ body.accent-orange {
     --action-hover-bg: rgba(240, 136, 62, 0.1);
     --action-hover-color: #f0883e;
 }
+
 body.light-theme.accent-orange {
     --accent-color: #cf5600;
     --accent-hover: #a34300;
@@ -956,6 +1018,11 @@ body.sidebar-open .sidebar-overlay {
     visibility: visible;
 }
 
+.stats {
+    font-size: 0.8rem;
+    white-space: nowrap;
+}
+
 /* Responsive Design */
 @media (max-width: 768px) {
     .sidebar {
@@ -985,7 +1052,8 @@ body.sidebar-open .sidebar-overlay {
         cursor: pointer;
         font-size: 1.1rem;
         transition: all 0.2s;
-        flex-shrink: 0; /* Prevent squeezing */
+        flex-shrink: 0;
+        /* Prevent squeezing */
     }
 
     .top-header {
@@ -996,16 +1064,14 @@ body.sidebar-open .sidebar-overlay {
     .search-bar {
         width: auto;
         flex: 1;
-        min-width: 120px; /* Ensure a minimum width to prevent collapsing */
+        min-width: 120px;
+        /* Ensure a minimum width to prevent collapsing */
     }
 
     .header-actions {
         gap: 8px;
         flex-shrink: 0;
     }
-
-
-
 
     /* Optimize Scan Progress for Mobile */
     .scan-progress {
@@ -1014,7 +1080,8 @@ body.sidebar-open .sidebar-overlay {
     }
 
     .scan-text {
-        display: none; /* Hide 'Scanning...' text to save space */
+        display: none;
+        /* Hide 'Scanning...' text to save space */
     }
 
     .progress-numbers {
@@ -1022,7 +1089,8 @@ body.sidebar-open .sidebar-overlay {
     }
 
     .progress-bar-bg {
-        width: 60px; /* Scale down progress bar */
+        width: 60px;
+        /* Scale down progress bar */
         height: 4px;
     }
 
@@ -1037,11 +1105,6 @@ body.sidebar-open .sidebar-overlay {
         min-width: 0 !important;
         padding: 0 !important;
         justify-content: center;
-    }
-
-
-    .stats {
-        font-size: 0.8rem;
     }
 
     .grid-container {
@@ -1071,9 +1134,9 @@ body.sidebar-open .sidebar-overlay {
 
 /* Extra small devices (phones) */
 @media (max-width: 480px) {
-    .accent-picker,
     .stats {
-        display: none !important; /* Hide non-essential elements to free space for search & scan */
+        display: none !important;
+        /* Hide non-essential elements to free space for search & scan */
     }
 
     .search-bar {
@@ -1081,7 +1144,8 @@ body.sidebar-open .sidebar-overlay {
     }
 
     .progress-bar-bg {
-        display: none; /* Hide progress bar, leave only numbers and Stop button */
+        display: none;
+        /* Hide progress bar, leave only numbers and Stop button */
     }
 
     .header-actions {

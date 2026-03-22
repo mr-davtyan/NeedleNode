@@ -44,11 +44,11 @@ function initTheme() {
     const savedTheme = localStorage.getItem("theme") || "light";
     const btnIcon = document.querySelector("#btn-theme-toggle i");
     if (savedTheme === "light") {
-         document.body.classList.add("light-theme");
-         if (btnIcon) btnIcon.className = "fa-solid fa-sun";
+        document.body.classList.add("light-theme");
+        if (btnIcon) btnIcon.className = "fa-solid fa-sun";
     } else {
-         document.body.classList.remove("light-theme");
-         if (btnIcon) btnIcon.className = "fa-solid fa-moon";
+        document.body.classList.remove("light-theme");
+        if (btnIcon) btnIcon.className = "fa-solid fa-moon";
     }
 
     // Accent Init
@@ -59,10 +59,11 @@ function initTheme() {
     if (savedAccent !== "green") {
         document.body.classList.add(`accent-${savedAccent}`);
     }
-    
-    document.querySelectorAll(".accent-dot").forEach(dot => {
-        dot.classList.toggle("active", dot.getAttribute("data-accent") === savedAccent);
-    });
+
+    // Sync accent select value
+    const accentSelectEl = document.getElementById("accent-select");
+    if (accentSelectEl) accentSelectEl.value = savedAccent;
+
 }
 
 // Init
@@ -72,7 +73,7 @@ async function loadVersion() {
         const data = await res.json();
         const logoText = document.querySelector(".logo span");
         if (logoText && data.version) {
-             logoText.innerHTML = `NeedleNode <span style="font-size: 0.8rem; color: var(--text-secondary); font-weight: 400; margin-left: 4px;">v${data.version}</span>`;
+            logoText.innerHTML = `NeedleNode <span style="font-size: 0.8rem; color: var(--text-secondary); font-weight: 400; margin-left: 4px;">v${data.version}</span>`;
         }
     } catch (e) { console.error("Failed to load version", e); }
 }
@@ -81,7 +82,7 @@ document.addEventListener("DOMContentLoaded", () => {
     // Restore selected tags
     const savedTags = localStorage.getItem("selectedTags");
     if (savedTags) {
-        try { currentTags = JSON.parse(savedTags); } catch (e) {}
+        try { currentTags = JSON.parse(savedTags); } catch (e) { }
     }
     const savedStarred = localStorage.getItem("selectedStarred");
     if (savedStarred !== null) {
@@ -89,7 +90,7 @@ document.addEventListener("DOMContentLoaded", () => {
         const btn = document.getElementById("btn-starred");
         if (btn) btn.classList.toggle("active", currentStarred);
     }
-    
+
     // Update active highlight states on load
     const isAllActive = currentTags.length === 0 && !currentStarred;
     document.getElementById("btn-all").classList.toggle("active", isAllActive);
@@ -97,7 +98,7 @@ document.addEventListener("DOMContentLoaded", () => {
     if (btnClearTags) {
         btnClearTags.style.display = (!isAllActive) ? "block" : "none";
     }
-    
+
     initTheme();
     loadVersion();
     loadTags();
@@ -111,14 +112,14 @@ function setupEventListeners() {
     // Sidebar Toggle for Mobile
     const btnSidebarToggle = document.getElementById("btn-sidebar-toggle");
     const sidebarOverlay = document.getElementById("sidebar-overlay");
-    
+
     if (btnSidebarToggle) {
         btnSidebarToggle.addEventListener("click", (e) => {
             e.stopPropagation();
             document.body.classList.toggle("sidebar-open");
         });
     }
-    
+
     if (sidebarOverlay) {
         sidebarOverlay.addEventListener("click", () => {
             document.body.classList.remove("sidebar-open");
@@ -140,7 +141,7 @@ function setupEventListeners() {
     // Search
     let debounceTimer;
     const btnClearSearch = document.getElementById("btn-clear-search");
-    
+
     if (btnClearSearch) {
         btnClearSearch.addEventListener("click", () => {
             searchInput.value = "";
@@ -153,7 +154,7 @@ function setupEventListeners() {
     searchInput.addEventListener("input", (e) => {
         clearTimeout(debounceTimer);
         searchTerm = e.target.value;
-        
+
         if (btnClearSearch) {
             btnClearSearch.style.display = searchTerm.length > 0 ? "block" : "none";
         }
@@ -170,11 +171,11 @@ function setupEventListeners() {
         scanTriggerAttempts = 5; // Allow 5s delay on FastAPI thread spinup
         try {
             await fetch("/api/scan", { method: "POST" });
-            setTimeout(pollScanStatus, 1000); 
+            setTimeout(pollScanStatus, 1000);
         } catch (e) {
             console.error(e);
             btnScan.disabled = false;
-            btnScan.innerHTML = '<i class="fa-solid fa-sync"></i> <span>Scan Library</span>';
+            btnScan.innerHTML = '<i class="fa-solid fa-sync"></i> <span>Scan</span>';
         }
     });
 
@@ -195,7 +196,7 @@ function setupEventListeners() {
         localStorage.setItem("selectedTags", JSON.stringify([]));
         currentStarred = false;
         localStorage.setItem("selectedStarred", "false");
-        
+
         searchTerm = "";
         if (searchInput) searchInput.value = "";
         const btnClearSearch = document.getElementById("btn-clear-search");
@@ -218,7 +219,7 @@ function setupEventListeners() {
             localStorage.setItem("selectedTags", JSON.stringify([]));
             currentStarred = false;
             localStorage.setItem("selectedStarred", "false");
-            
+
             searchTerm = "";
             if (searchInput) searchInput.value = "";
             const btnClearSearch = document.getElementById("btn-clear-search");
@@ -239,14 +240,14 @@ function setupEventListeners() {
         e.preventDefault();
         currentStarred = true; // Exclusive
         currentTags = []; // Clear tags
-        
+
         document.querySelectorAll(".tag-item").forEach(t => t.classList.remove("active"));
         document.getElementById("btn-starred").classList.add("active");
         document.getElementById("btn-all").classList.remove("active");
-        
+
         localStorage.setItem("selectedTags", JSON.stringify([]));
         localStorage.setItem("selectedStarred", "true");
-        
+
         const clearBtn = document.getElementById("btn-clear-tags");
         if (clearBtn) clearBtn.style.display = "block";
         loadFiles(true);
@@ -258,17 +259,17 @@ function setupEventListeners() {
         btnStarredAdd.addEventListener("click", (e) => {
             e.stopPropagation();
             e.preventDefault();
-            
+
             currentStarred = !currentStarred;
             document.getElementById("btn-starred").classList.toggle("active", currentStarred);
             localStorage.setItem("selectedStarred", currentStarred);
-            
+
             const isAllActive = currentTags.length === 0 && !currentStarred;
             document.getElementById("btn-all").classList.toggle("active", isAllActive);
-            
+
             const clearBtn = document.getElementById("btn-clear-tags");
             if (clearBtn) {
-                 clearBtn.style.display = (currentTags.length > 0 || currentStarred) ? "block" : "none";
+                clearBtn.style.display = (currentTags.length > 0 || currentStarred) ? "block" : "none";
             }
             loadFiles(true);
         });
@@ -292,35 +293,28 @@ function setupEventListeners() {
     const btnTheme = document.getElementById("btn-theme-toggle");
     if (btnTheme) {
         btnTheme.addEventListener("click", () => {
-             const isLight = document.body.classList.toggle("light-theme");
-             localStorage.setItem("theme", isLight ? "light" : "dark");
-             const icon = btnTheme.querySelector("i");
-             if (icon) {
-                  icon.className = isLight ? "fa-solid fa-sun" : "fa-solid fa-moon";
-             }
+            const isLight = document.body.classList.toggle("light-theme");
+            localStorage.setItem("theme", isLight ? "light" : "dark");
+            const icon = btnTheme.querySelector("i");
+            if (icon) {
+                icon.className = isLight ? "fa-solid fa-sun" : "fa-solid fa-moon";
+            }
         });
     }
 
-    // Accent Picker
-    const accentPicker = document.getElementById("accent-picker");
-    if (accentPicker) {
-        accentPicker.addEventListener("click", (e) => {
-             const dot = e.target.closest(".accent-dot");
-             if (!dot) return;
-             
-             const accent = dot.getAttribute("data-accent");
-             localStorage.setItem("accent", accent);
-             
-             document.body.className.split(' ').forEach(c => {
-                 if (c.startsWith('accent-')) document.body.classList.remove(c);
-             });
-             if (accent !== "green") {
-                 document.body.classList.add(`accent-${accent}`);
-             }
-             
-             document.querySelectorAll(".accent-dot").forEach(d => {
-                 d.classList.toggle("active", d === dot);
-             });
+    // Accent Select
+    const accentSelect = document.getElementById("accent-select");
+    if (accentSelect) {
+        accentSelect.addEventListener("change", (e) => {
+            const accent = e.target.value;
+            localStorage.setItem("accent", accent);
+
+            document.body.className.split(' ').forEach(c => {
+                if (c.startsWith('accent-')) document.body.classList.remove(c);
+            });
+            if (accent !== "green") {
+                document.body.classList.add(`accent-${accent}`);
+            }
         });
     }
 
@@ -341,9 +335,9 @@ function setupInfiniteScroll() {
         if (entries[0].isIntersecting && !loading && hasMore) {
             loadFiles(false);
         }
-    }, { 
+    }, {
         root: document.querySelector('.main-content'),
-        rootMargin: "200px" 
+        rootMargin: "200px"
     });
     observer.observe(scrollAnchor);
 }
@@ -352,26 +346,26 @@ async function loadTags() {
     try {
         const res = await fetch("/api/tags");
         const tags = await res.json();
-        
+
         // Hide tags with only 1 file
         if (tags.main) tags.main = tags.main.filter(t => (t.count || 0) > 1);
         if (tags.sub) tags.sub = tags.sub.filter(t => (t.count || 0) > 1);
-        
+
         const tagsList = document.getElementById("tags-list");
         tagsList.innerHTML = "";
-        
+
         function createTagNode(tag) {
             const name = tag.name;
             const div = document.createElement("div");
             div.className = "tag-item";
             div.setAttribute("data-tag", name);
             if (currentTags.includes(name)) div.classList.add("active");
-            
+
             div.innerHTML = `
                 <span class="tag-name">${name} <span class="tag-count">(${tag.count || 0})</span></span>
                 <button class="btn-toggle-tag" title="Add to filters"><i class="fa-solid fa-plus"></i></button>
             `;
-            
+
             const toggle = div.querySelector(".btn-toggle-tag");
             // Inclusive Filter Trigger
             toggle.addEventListener("click", (e) => {
@@ -391,27 +385,27 @@ async function loadTags() {
                 }
                 loadFiles(true);
             });
-            
+
             // Exclusive Filter Trigger
             div.addEventListener("click", () => {
                 currentTags = [name]; // Exclusive!
                 currentStarred = false; // Reset starred
                 document.querySelectorAll(".tag-item").forEach(t => t.classList.remove("active"));
                 div.classList.add("active");
-                
+
                 const btnStarred = document.getElementById("btn-starred");
                 if (btnStarred) btnStarred.classList.remove("active");
-                
+
                 document.getElementById("btn-all").classList.remove("active");
                 localStorage.setItem("selectedTags", JSON.stringify(currentTags));
                 localStorage.setItem("selectedStarred", "false");
-                
+
                 const btnClearTags = document.getElementById("btn-clear-tags");
                 if (btnClearTags) btnClearTags.style.display = "block";
-                
+
                 loadFiles(true);
             });
-            
+
             return div;
         }
 
@@ -481,7 +475,7 @@ async function loadFiles(reset = false) {
             `;
             hasMore = false;
             loading = false;
-            
+
             const btnClearEmpty = gridContainer.querySelector("#btn-clear-empty");
             if (btnClearEmpty) {
                 btnClearEmpty.addEventListener("click", () => {
@@ -492,18 +486,18 @@ async function loadFiles(reset = false) {
                     searchTerm = "";
                     const searchInput = document.getElementById("search-input");
                     if (searchInput) searchInput.value = "";
-                    
+
                     document.querySelectorAll(".tag-item").forEach(t => t.classList.remove("active"));
                     const btnStarred = document.getElementById("btn-starred");
                     if (btnStarred) btnStarred.classList.remove("active");
                     document.getElementById("btn-all").classList.add("active");
-                    
+
                     const btnClear = document.getElementById("btn-clear-tags");
                     if (btnClear) btnClear.style.display = "none";
-                    
+
                     const btnClearSearch = document.getElementById("btn-clear-search");
                     if (btnClearSearch) btnClearSearch.style.display = "none";
-                    
+
                     loadFiles(true);
                 });
             }
@@ -514,12 +508,12 @@ async function loadFiles(reset = false) {
             try {
                 const card = document.createElement("div");
                 card.className = "file-card";
-                
+
                 function renderCardContent() {
                     const cleanName = getCleanFileName(file.name);
                     const mainTag = file.main_tag || 'Unsorted';
                     const subTags = file.sub_tags && file.sub_tags.length > 0 ? file.sub_tags.join(', ') : '-';
-                    
+
                     card.innerHTML = `
                         <div class="card-preview">
                             <img src="/api/thumbnail/${file.id}" alt="${file.name}" loading="lazy" onerror="this.onerror=null;this.src='data:image/svg+xml;utf8,<svg xmlns=%22http://www.w3.org/2000/svg%22 width=%22200%22 height=%22200%22><rect width=%22100%25%22 height=%22100%25%22 fill=%22transparent%22/><text x=%2250%25%22 y=%2250%25%22 font-family=%22sans-serif%22 font-size=%2214%22 fill=%22%238b949e%22 text-anchor=%22middle%22 dy=%22.3em%22>No Preview</text></svg>'">
@@ -556,37 +550,37 @@ async function loadFiles(reset = false) {
                             </div>
                         </div>
                     `;
-                    
+
                     const btnEditMain = card.querySelector(".btn-edit-main");
                     const btnEditSub = card.querySelector(".btn-edit-sub");
                     const txtMain = card.querySelector(".main-tag-value");
                     const txtSub = card.querySelector(".sub-tags-value");
-                    
+
                     const triggerMainEdit = (e) => {
                         e.stopPropagation();
                         showInlineEditor(card, file, "main", renderCardContent);
                     };
-                    
+
                     const triggerSubEdit = (e) => {
                         e.stopPropagation();
                         showInlineEditor(card, file, "sub", renderCardContent);
                     };
-                    
+
                     const btnEditName = card.querySelector(".btn-edit-name");
                     const txtName = card.querySelector(".card-file-name");
-                    
+
                     const triggerNameEdit = (e) => {
                         e.stopPropagation();
                         showInlineEditor(card, file, "name", renderCardContent);
                     };
-                    
+
                     if (btnEditMain) btnEditMain.addEventListener("click", triggerMainEdit);
                     if (txtMain) txtMain.addEventListener("click", triggerMainEdit);
                     if (btnEditSub) btnEditSub.addEventListener("click", triggerSubEdit);
                     if (txtSub) txtSub.addEventListener("click", triggerSubEdit);
                     if (btnEditName) btnEditName.addEventListener("click", triggerNameEdit);
                     if (txtName) txtName.addEventListener("click", triggerNameEdit);
-                    
+
                     const star = card.querySelector(".btn-star");
                     star.addEventListener("click", async (e) => {
                         e.stopPropagation();
@@ -623,13 +617,13 @@ async function loadFiles(reset = false) {
                             if (typeof loadTags === "function") loadTags(); // Refresh sidebar tags count
                             const totalStats = document.getElementById("total-stats");
                             if (totalStats) {
-                                 const current = parseInt(totalStats.innerText);
-                                 if (!isNaN(current)) totalStats.innerText = `${current - 1} Designs`;
+                                const current = parseInt(totalStats.innerText);
+                                if (!isNaN(current)) totalStats.innerText = `${current - 1} Designs`;
                             }
                         } catch (e) { console.error("Trash failed", e); }
                     });
                 }
-                
+
                 renderCardContent();
                 file.cardNode = card;
                 file.renderCard = renderCardContent;
@@ -645,11 +639,11 @@ async function loadFiles(reset = false) {
 
         // Continuity check: If anchor is still in viewport (e.g. large screen didn't fill), trigger next automatically.
         if (hasMore) {
-             const rect = scrollAnchor.getBoundingClientRect();
-             const isVisible = rect.top < window.innerHeight;
-             if (isVisible) {
-                  setTimeout(() => loadFiles(false), 100);
-             }
+            const rect = scrollAnchor.getBoundingClientRect();
+            const isVisible = rect.top < window.innerHeight;
+            if (isVisible) {
+                setTimeout(() => loadFiles(false), 100);
+            }
         }
 
     } catch (e) {
@@ -661,7 +655,7 @@ async function loadFiles(reset = false) {
 
 function showDetails(file) {
     const detailsInfo = document.querySelector(".details-info");
-    
+
     detailImg.src = `/api/thumbnail/${file.id}`;
     detailPath.innerText = file.path;
     detailSize.innerText = `${(file.size / 1024).toFixed(1)} KB`;
@@ -669,19 +663,19 @@ function showDetails(file) {
     detailColors.innerText = file.colors || "-";
     detailWidth.innerText = file.width ? `${file.width.toFixed(1)} mm` : "-";
     detailHeight.innerText = file.height ? `${file.height.toFixed(1)} mm` : "-";
-    
+
     function renderDetailsContent() {
         const mainTag = file.main_tag || 'Unsorted';
         const subTags = file.sub_tags && file.sub_tags.length > 0 ? file.sub_tags.join(', ') : '-';
         const cleanName = getCleanFileName(file.name);
-        
+
         let titleParts = detailsInfo.querySelector(".card-title-parts");
         if (!titleParts) {
-             titleParts = document.createElement("div");
-             titleParts.className = "card-title-parts";
-             detailsInfo.insertBefore(titleParts, detailsInfo.firstChild);
+            titleParts = document.createElement("div");
+            titleParts.className = "card-title-parts";
+            detailsInfo.insertBefore(titleParts, detailsInfo.firstChild);
         }
-        
+
         titleParts.innerHTML = `
             <div class="card-tag-row card-main-row">
                 <span class="card-label">Main:</span>
@@ -699,7 +693,7 @@ function showDetails(file) {
                 <button class="btn-edit-title btn-edit-name" title="Edit Name"><i class="fa-solid fa-pen"></i></button>
             </div>
         `;
-        
+
         const oldName = detailsInfo.querySelector("#detail-name");
         const oldTags = detailsInfo.querySelector("#detail-tags");
         if (oldName) oldName.remove();
@@ -711,15 +705,15 @@ function showDetails(file) {
         const txtSub = titleParts.querySelector(".sub-tags-value");
         const btnEditName = titleParts.querySelector(".btn-edit-name");
         const txtName = titleParts.querySelector(".card-file-name");
-        
+
         const triggerEdit = (type) => (e) => {
-             e.stopPropagation();
-             showInlineEditor(detailsInfo, file, type, () => {
-                  renderDetailsContent();
-                  if (file.renderCard) file.renderCard();
-             });
+            e.stopPropagation();
+            showInlineEditor(detailsInfo, file, type, () => {
+                renderDetailsContent();
+                if (file.renderCard) file.renderCard();
+            });
         };
-        
+
         if (btnEditMain) btnEditMain.addEventListener("click", triggerEdit("main"));
         if (txtMain) txtMain.addEventListener("click", triggerEdit("main"));
         if (btnEditSub) btnEditSub.addEventListener("click", triggerEdit("sub"));
@@ -729,7 +723,7 @@ function showDetails(file) {
     }
 
     renderDetailsContent();
-    
+
     // Wire up star button
     const detailStar = document.getElementById("detail-star");
     if (detailStar) {
@@ -738,7 +732,7 @@ function showDetails(file) {
         } else {
             detailStar.classList.remove("active");
         }
-        
+
         const newStar = detailStar.cloneNode(true);
         detailStar.parentNode.replaceChild(newStar, detailStar);
         newStar.addEventListener("click", async () => {
@@ -769,7 +763,7 @@ function showDetails(file) {
         const newBtn = detailDownload.cloneNode(true);
         detailDownload.parentNode.replaceChild(newBtn, detailDownload);
         newBtn.addEventListener("click", () => {
-             window.location.href = `/api/files/${file.id}/download`;
+            window.location.href = `/api/files/${file.id}/download`;
         });
     }
 
@@ -779,36 +773,36 @@ function showDetails(file) {
         const convertBtn = detailConvert.cloneNode(true);
         detailConvert.parentNode.replaceChild(convertBtn, detailConvert);
         convertBtn.addEventListener("click", () => {
-             const format = document.getElementById("download-format").value;
-             window.location.href = `/api/files/${file.id}/download?format=${format}`;
+            const format = document.getElementById("download-format").value;
+            window.location.href = `/api/files/${file.id}/download?format=${format}`;
         });
     }
-    
+
     // Wire up delete button
     const detailDelete = document.getElementById("detail-delete");
     if (detailDelete) {
         const deleteBtn = detailDelete.cloneNode(true);
         detailDelete.parentNode.replaceChild(deleteBtn, detailDelete);
         deleteBtn.addEventListener("click", async () => {
-             if (!confirm(`Move ${file.name} to trash?`)) return;
-              try {
-                  await fetch(`/api/files/${file.id}/trash`, { method: "POST" });
-                  detailsOverlay.classList.remove("active");
-                  if (file.cardNode) {
-                      file.cardNode.remove();
-                      if (document.querySelectorAll(".file-card").length === 0) {
-                          loadFiles(true);
-                      }
-                  }
-                  const totalStats = document.getElementById("total-stats");
-                  if (totalStats) {
-                       const current = parseInt(totalStats.innerText);
-                       if (!isNaN(current)) totalStats.innerText = `${current - 1} Designs`;
-                  }
-              } catch (e) { console.error("Trash from details failed", e); }
+            if (!confirm(`Move ${file.name} to trash?`)) return;
+            try {
+                await fetch(`/api/files/${file.id}/trash`, { method: "POST" });
+                detailsOverlay.classList.remove("active");
+                if (file.cardNode) {
+                    file.cardNode.remove();
+                    if (document.querySelectorAll(".file-card").length === 0) {
+                        loadFiles(true);
+                    }
+                }
+                const totalStats = document.getElementById("total-stats");
+                if (totalStats) {
+                    const current = parseInt(totalStats.innerText);
+                    if (!isNaN(current)) totalStats.innerText = `${current - 1} Designs`;
+                }
+            } catch (e) { console.error("Trash from details failed", e); }
         });
     }
-    
+
     detailsOverlay.classList.add("active");
 }
 
@@ -818,21 +812,21 @@ async function pollScanStatus() {
         const resImport = await fetch("/api/import/status");
         const importStatus = await resImport.json();
         const btnStopScan = document.getElementById("btn-stop-scan");
-        
+
         if (importStatus.is_importing) {
             scanTriggerAttempts = 0; // Clear attempts
             scanProgress.classList.remove("hidden");
             if (btnScan) btnScan.classList.add("hidden");
-            
+
             scanCount.innerText = importStatus.processed;
             scanTotal.innerText = importStatus.total;
             const percent = importStatus.total > 0 ? (importStatus.processed / importStatus.total) * 100 : 0;
             progressBarFill.style.width = `${percent}%`;
-            
-            scanText.innerText = importStatus.current_file 
-                ? `Importing: ${importStatus.current_file.substring(0, 17)}...` 
+
+            scanText.innerText = importStatus.current_file
+                ? `Importing: ${importStatus.current_file.substring(0, 17)}...`
                 : "Importing from Inbox...";
-                
+
             if (btnStopScan) {
                 btnStopScan.disabled = importStatus.stop_requested;
                 btnStopScan.innerText = importStatus.stop_requested ? "Stopping..." : "Stop Import";
@@ -849,21 +843,21 @@ async function pollScanStatus() {
         const resScan = await fetch("/api/scan/status");
         const scanStatus = await resScan.json();
         const wasActive = !scanProgress.classList.contains("hidden");
-        
+
         if (scanStatus.is_scanning) {
             scanTriggerAttempts = 0; // Clear attempts
             scanProgress.classList.remove("hidden");
             if (btnScan) btnScan.classList.add("hidden");
-            
+
             scanCount.innerText = scanStatus.processed;
             scanTotal.innerText = scanStatus.total;
             const percent = scanStatus.total > 0 ? (scanStatus.processed / scanStatus.total) * 100 : 0;
             progressBarFill.style.width = `${percent}%`;
-            
-            scanText.innerText = scanStatus.current_file 
-                ? `Scanning: ${scanStatus.current_file.substring(0, 17)}...` 
+
+            scanText.innerText = scanStatus.current_file
+                ? `Scanning: ${scanStatus.current_file.substring(0, 17)}...`
                 : "Scanning Library...";
-                
+
             if (btnStopScan) {
                 btnStopScan.disabled = scanStatus.stop_requested;
                 btnStopScan.innerText = scanStatus.stop_requested ? "Stopping..." : "Stop Scan";
@@ -883,7 +877,7 @@ async function pollScanStatus() {
             if (btnScan) {
                 btnScan.classList.remove("hidden");
                 btnScan.disabled = false;
-                btnScan.innerHTML = '<i class="fa-solid fa-sync"></i> <span>Scan Library</span>';
+                btnScan.innerHTML = '<i class="fa-solid fa-sync"></i> <span>Scan</span>';
             }
             if (wasActive) {
                 // Refresh list if scan cycle just completed
@@ -903,12 +897,12 @@ function getCleanFileName(name) {
     // Extract base name which starts after MainTag (sub,tag) sequence
     const match = clean.match(/^([^\s\(]+)\s*\((.*?)\)\s*(.*)$/);
     if (match) {
-         return match[3];
+        return match[3];
     } else {
-         const matchNoParens = clean.match(/^([^\s]+)\s+(.*)$/);
-         if (matchNoParens) {
-              return matchNoParens[2];
-         }
+        const matchNoParens = clean.match(/^([^\s]+)\s+(.*)$/);
+        if (matchNoParens) {
+            return matchNoParens[2];
+        }
     }
     return clean;
 }
@@ -919,7 +913,7 @@ function showInlineEditor(card, file, type, onSuccess) {
     else if (type === "sub") row = card.querySelector(".card-sub-row");
     else row = card.querySelector(".card-name-row");
     const valueSpan = row.querySelector(".card-tag-value");
-    
+
     if (!valueSpan) return;
 
     const currentValue = valueSpan.innerText === "Unsorted" || valueSpan.innerText === "-" ? "" : valueSpan.innerText;
@@ -930,21 +924,21 @@ function showInlineEditor(card, file, type, onSuccess) {
         else if (type === "sub") row = card.querySelector(".card-sub-row");
         else row = card.querySelector(".card-name-row");
     }
-    
+
     const input = document.createElement("input");
     input.type = "text";
     input.className = "inline-edit-input";
     input.value = currentValue;
     input.placeholder = type === "main" ? "Main Tag" : (type === "sub" ? "sub,tags" : "File Name");
-    
+
     const btnSave = document.createElement("button");
     btnSave.className = "btn-inline-save";
     btnSave.innerHTML = '<i class="fa-solid fa-check"></i>';
-    
+
     const btnCancel = document.createElement("button");
     btnCancel.className = "btn-inline-cancel";
     btnCancel.innerHTML = '<i class="fa-solid fa-xmark"></i>';
-    
+
     const originalHTML = row.innerHTML;
     row.innerHTML = "";
     row.appendChild(input);
@@ -974,45 +968,45 @@ function showInlineEditor(card, file, type, onSuccess) {
         row: row,
         cancel: cancelEditor
     };
-    
+
     btnSave.addEventListener("click", async (e) => {
         e.stopPropagation();
         const newValue = input.value.trim();
         let payload = {};
         if (type === "main") {
-             payload.main_tag = newValue;
+            payload.main_tag = newValue;
         } else if (type === "sub") {
-             payload.sub_tags = newValue ? newValue.split(",").map(t => t.trim()) : [];
+            payload.sub_tags = newValue ? newValue.split(",").map(t => t.trim()) : [];
         } else {
-             payload.name = newValue;
+            payload.name = newValue;
         }
-        
+
         try {
-             btnSave.disabled = true;
-             btnSave.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i>';
-             
-             const res = await fetch(`/api/files/${file.id}/edit_tags`, {
-                  method: "POST",
-                  headers: { "Content-Type": "application/json" },
-                  body: JSON.stringify(payload)
-             });
-             
-             if (!res.ok) throw new Error(await res.text());
-             
-             const data = await res.json();
-             file.name = data.name;
-             file.path = data.path;
-             file.main_tag = data.main_tag;
-             file.sub_tags = data.sub_tags;
-             
-             cleanup();
-             onSuccess();
-             loadTags(); 
+            btnSave.disabled = true;
+            btnSave.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i>';
+
+            const res = await fetch(`/api/files/${file.id}/edit_tags`, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(payload)
+            });
+
+            if (!res.ok) throw new Error(await res.text());
+
+            const data = await res.json();
+            file.name = data.name;
+            file.path = data.path;
+            file.main_tag = data.main_tag;
+            file.sub_tags = data.sub_tags;
+
+            cleanup();
+            onSuccess();
+            loadTags();
         } catch (err) {
-             console.error("Save edit failed", err);
-             alert("Failed to save changes: " + err.message);
-             cleanup();
-             onSuccess();
+            console.error("Save edit failed", err);
+            alert("Failed to save changes: " + err.message);
+            cleanup();
+            onSuccess();
         }
     });
 
@@ -1020,11 +1014,11 @@ function showInlineEditor(card, file, type, onSuccess) {
         e.stopPropagation();
         cancelEditor();
     });
-    
+
     input.addEventListener("click", (e) => e.stopPropagation());
-    input.addEventListener("keydown", (e) => { 
-         e.stopPropagation(); 
-         if (e.key === "Enter") btnSave.click(); 
-         if (e.key === "Escape") btnCancel.click(); 
+    input.addEventListener("keydown", (e) => {
+        e.stopPropagation();
+        if (e.key === "Enter") btnSave.click();
+        if (e.key === "Escape") btnCancel.click();
     });
 }
