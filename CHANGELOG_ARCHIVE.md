@@ -30,3 +30,7 @@
 ## [2026-03-22] Live Scan Progress Tracking
 - **Feature**: Top bar Progress Indicator Dashboard
 - **Description**: Added a singleton `ScanState` tracker for background workers. Exposed details via new `/api/scan/status` updates polled asynchronously using `app.js` with client-side CSS progress updates rendering proportional loading bars correctly avoiding blind spots.
+
+## [2026-03-22] Scan Cancellation Support
+- **Feature**: Stop Scan Button
+- **Description**: Enabled a cancellation flag check (`stop_requested`) within background scanning loops to abort large directory crawlers safely on demand. Wired with a `POST /api/scan/stop` endpoint and a frontend click listener to improve batch operations management securely.

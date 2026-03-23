@@ -37,6 +37,7 @@ class File(Base):
     path: Mapped[str] = mapped_column(String, unique=True, index=True, nullable=False)
     name: Mapped[str] = mapped_column(String, index=True, nullable=False)
     size: Mapped[int] = mapped_column(Integer, nullable=False)
+    is_starred: Mapped[bool] = mapped_column(default=False, server_default="0")
     
     # Embroidery specific metadata
     width: Mapped[float | None] = mapped_column(Float, nullable=True)  # in mm or pixels
