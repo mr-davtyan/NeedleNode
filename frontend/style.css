@@ -96,6 +96,7 @@ body {
     gap: 5px;
     flex: 1;
     overflow-y: auto;
+    min-height: 0; /* Force flexbox to respect parent heights for scrolling */
 }
 
 .tag-item {
