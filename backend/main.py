@@ -88,8 +88,22 @@ def toggle_star(file_id: int, db: Session = Depends(get_db)):
 
 @app.get("/api/tags")
 def get_tags(db: Session = Depends(get_db)):
-    tags = db.query(Tag).join(Tag.files).distinct().all()
-    return [t.name for t in tags]
+    from sqlalchemy.orm import selectinload
+    
+    tags = db.query(Tag).options(
+        selectinload(Tag.files).selectinload(File.tags)
+    ).join(Tag.files).distinct().all()
+    
+    result = []
+    for t in tags:
+        if len(t.files) == 1:
+            single_file = t.files[0]
+            if len(single_file.tags) > 1:
+                # Skip tag if it has 1 file and that file belongs to multiple tags
+                continue
+        result.append(t.name)
+        
+    return result
 
 @app.get("/api/thumbnail/{file_id}")
 def get_thumbnail(file_id: int, db: Session = Depends(get_db)):
