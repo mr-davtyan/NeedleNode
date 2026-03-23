@@ -42,3 +42,7 @@
 ## [2026-03-22] UI Progress Alignment
 - **Feature**: Row structure for Scan Progress Bar and button
 - **Description**: Refactored the DOM inside `index.html` layout list row elements containing inline button padding constraints, avoiding redundant block stacked stack heights seamlessly.
+
+## [2026-03-22] Scan Restart Fix
+- **BugFix**: reset `stop_requested` flag on Scan Trigger
+- **Description**: Enabled accurate start states inside `scan_directory` avoiding residual cancellation lock states from freezing subsequent crawls. Cleared residual flag overrides safely in loops accurately.
