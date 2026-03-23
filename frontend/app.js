@@ -206,6 +206,7 @@ async function loadFiles(reset = false) {
                 try {
                     const res = await fetch(`/api/files/${file.id}/star`, { method: "POST" });
                     const result = await res.json();
+                    file.is_starred = result.is_starred; // Sync memory state for modals setup
                     if (result.is_starred) {
                         star.classList.add("active");
                     } else {
