@@ -9,7 +9,7 @@ def batch_scan(limit=1000):
     count = 0
     success = 0
     print(f"Starting batch scan for max {limit} files...")
-    for root, _, files in os.walk("inbox"):
+    for root, _, files in os.walk("library"):
         for file in files:
             if file.lower().endswith(".pes"):
                 file_path = os.path.join(root, file)

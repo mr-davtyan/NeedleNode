@@ -15,7 +15,7 @@ def extract_tags(file_path: str) -> set[str]:
     tags = set()
     parts = file_path.split("/")
     
-    # Skip 'inbox/' and look at directories
+    # Skip 'library/' and look at directories
     for part in parts[1:-1]:
         # Clean up common grouping symbols
         clean_part = part.replace("_", " ").replace("-", " ").replace("(", " ").replace(")", " ")
@@ -125,4 +125,4 @@ def scan_directory(directory: str):
 
 if __name__ == "__main__":
     import sys
-    scan_directory("inbox")
+    scan_directory("library")

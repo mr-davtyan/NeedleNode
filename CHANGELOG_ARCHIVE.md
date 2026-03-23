@@ -17,3 +17,7 @@
 - **Context for Future**: 
   - Run with `uvicorn backend.main:app` out of `.venv`.
   - Database schema initializes on first endpoint startup.
+
+## [2026-03-22] Server Lifecycle Management
+- **Feature**: Automatic Start and Stop Scripts
+- **Description**: Added `start.sh` and `stop.sh` scripts to safely run the FastAPI app in the background, logging outputs, and preventing redundant processes from locking the port.
