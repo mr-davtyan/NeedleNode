@@ -165,7 +165,7 @@ body {
     border: 1px solid var(--border-color);
 }
 
-.scan-progress.hidden {
+.hidden {
     display: none !important;
 }
 
