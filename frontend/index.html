@@ -50,16 +50,12 @@
                 
                 <div class="header-actions">
                     <div id="scan-progress" class="scan-progress hidden">
-                        <div class="progress-info">
-                            <span id="scan-text">Scanning...</span>
+                        <span id="scan-text" class="scan-text">Scanning...</span>
+                        <div class="progress-bar-bg">
+                            <div id="progress-bar-fill" class="progress-bar-fill"></div>
                         </div>
-                        <div class="progress-row">
-                            <div class="progress-bar-bg">
-                                <div id="progress-bar-fill" class="progress-bar-fill"></div>
-                            </div>
-                            <span class="progress-numbers"><span id="scan-count">0</span> / <span id="scan-total">0</span></span>
-                            <button id="btn-stop-scan" class="btn-stop">Stop</button>
-                        </div>
+                        <span class="progress-numbers"><span id="scan-count">0</span> / <span id="scan-total">0</span></span>
+                        <button id="btn-stop-scan" class="btn-stop">Stop</button>
                     </div>
 
                     <button id="btn-scan" class="btn btn-action">
