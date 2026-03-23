@@ -25,12 +25,20 @@ const detailPath = document.getElementById("detail-path");
 const detailSize = document.getElementById("detail-size");
 const closeDetails = document.getElementById("close-details");
 
+// Progress Elements
+const scanProgress = document.getElementById("scan-progress");
+const scanCount = document.getElementById("scan-count");
+const scanTotal = document.getElementById("scan-total");
+const scanText = document.getElementById("scan-text");
+const progressBarFill = document.getElementById("progress-bar-fill");
+
 // Init
 document.addEventListener("DOMContentLoaded", () => {
     loadTags();
     loadFiles(true); // reset
     setupInfiniteScroll();
     setupEventListeners();
+    pollScanStatus(); // Start polling on load
 });
 
 function setupEventListeners() {
@@ -46,16 +54,19 @@ function setupEventListeners() {
 
     // Scan Button
     btnScan.addEventListener("click", async () => {
-        btnScan.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> <span>Scanning...</span>';
+        btnScan.disabled = true;
+        btnScan.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> <span>Triggering...</span>';
         try {
             await fetch("/api/scan", { method: "POST" });
+            // Immediately start polling
+            pollScanStatus();
             setTimeout(() => {
-                loadTags();
-                loadFiles(true);
-                btnScan.innerHTML = '<i class="fa-solid fa-sync"></i> <span>Scan Inbox</span>';
-            }, 3000); // Polling or wait
+                btnScan.disabled = false;
+                btnScan.innerHTML = '<i class="fa-solid fa-sync"></i> <span>Scan Library</span>';
+            }, 2000);
         } catch (e) {
             console.error(e);
+            btnScan.disabled = false;
         }
     });
 
@@ -180,4 +191,45 @@ function showDetails(file) {
     detailTags.innerHTML = file.tags.map(t => `<span class="detail-tag">${t}</span>`).join("");
     
     detailsOverlay.classList.add("active");
+}
+
+async function pollScanStatus() {
+    try {
+        const res = await fetch("/api/scan/status");
+        const status = await res.json();
+        
+        if (status.is_scanning) {
+            scanProgress.classList.remove("hidden");
+            scanCount.innerText = status.processed;
+            scanTotal.innerText = status.total;
+            
+            const percent = status.total > 0 ? (status.processed / status.total) * 100 : 0;
+            progressBarFill.style.width = `${percent}%`;
+            
+            if (status.current_file) {
+                // Shorten if file path is too long
+                const fileLabel = status.current_file.length > 20 
+                    ? status.current_file.substring(0, 17) + "..." 
+                    : status.current_file;
+                scanText.innerText = `Scanning: ${fileLabel}`;
+            } else {
+                scanText.innerText = "Scanning...";
+            }
+            
+            // Poll again in 1s
+            setTimeout(pollScanStatus, 1000);
+        } else {
+            const wasScanning = !scanProgress.classList.contains("hidden");
+            scanProgress.classList.add("hidden");
+            if (wasScanning) {
+                // Refresh list if scan just completed
+                loadFiles(true);
+                loadTags();
+            }
+        }
+    } catch (e) {
+        console.error("Failed to poll scan status", e);
+        // Retry polling later
+        setTimeout(pollScanStatus, 5000);
+    }
 }

@@ -21,3 +21,8 @@
 ## [2026-03-22] Server Lifecycle Management
 - **Feature**: Automatic Start and Stop Scripts
 - **Description**: Added `start.sh` and `stop.sh` scripts to safely run the FastAPI app in the background, logging outputs, and preventing redundant processes from locking the port.
+
+## [2026-03-22] Maintenance Layout Update
+- **Feature**: Directory Rename: Inbox to Library
+- **Description**: Renamed `inbox/` directory to `library/` to match media categorization naming style. Updated global references in `backend/` scripts and `.gitignore` configuration using absolute replacements to support continuous operations.
+- **Context for Future**: Database cache reset triggered on startup back-iteration setup accurately.
