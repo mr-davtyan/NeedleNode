@@ -63,5 +63,5 @@
 - **Description**: 
   - Created `VERSION` file and `bump-version.sh` to trigger version updates accurately.
   - Added `Dockerfile` utilizing `astral-sh/uv:latest` for speeding up FastAPI setup securely.
-  - Introduced `.github/workflows/build-container.yml` triggering Docker build pipeline automated building cache setup on origin flawlessly.
-- **Context for Future**: Ensure Secrets `DOCKER_USERNAME` and `DOCKER_PASSWORD` are configured on GitHub or Gitea Actions correctly to authorize registry uploads flawlessly.
+  - Introduced `.github/workflows/docker-publish.yml` triggering Docker build pipeline automated building cache setup on origin flawlessly.
+- **Context for Future**: Ensure Secrets `DOCKER_REGISTRY_USERNAME` and `DOCKER_REGISTRY_PASSWORD` are configured on GitHub or Gitea Actions correctly to authorize registry uploads flawlessly.
