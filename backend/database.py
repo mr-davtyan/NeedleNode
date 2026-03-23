@@ -25,6 +25,7 @@ class Tag(Base):
     
     id: Mapped[int] = mapped_column(primary_key=True, index=True)
     name: Mapped[str] = mapped_column(String, unique=True, index=True, nullable=False)
+    is_hidden: Mapped[bool] = mapped_column(default=False, server_default="0")
     
     files: Mapped[List["File"]] = relationship(
         secondary=file_tag, back_populates="tags"
