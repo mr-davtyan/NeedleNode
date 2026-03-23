@@ -5,4 +5,5 @@ __pycache__/
 embroidery.db
 library/
 frontend/app.js.map
-node_modules/
+node_modules/server.log
+.server.pid
