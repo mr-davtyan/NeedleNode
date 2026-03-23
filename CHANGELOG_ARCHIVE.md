@@ -51,3 +51,4 @@
 - **Feature**: Download and Action Bar toolbars
 - **Description**: Added explicit REST `/api/files/{id}/download` endpoint streams accurately. Created `.card-footer` styling grids mapping Star and Download actions concurrently inside cards and detail drawers layout flawlessly.
 \n## [2026-03-23] Units Conversion\n- **BugFix**: Divide dimensional bounds by 10.0\n- **Description**: Adjusted coordinate math mapping tenths-of-mm units correctly back to real absolute MM.
+\n## [2026-03-23] Persistent Hidden Tags\n- **Feature**: Sync hidden states with db\n- **Description**: Enabled  booleans inside sub-tag relations index fields to persist collapsed sets correctly back on memory backends accurately on demand.
