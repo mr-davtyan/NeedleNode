@@ -100,12 +100,36 @@ def process_file(file_path: str, db: Session) -> bool:
         print(f"Error processing {file_path}: {e}")
         return False
 
+def clean_orphaned_files(db: Session):
+    """
+    Removes database entries for files that no longer exist on disk.
+    """
+    files = db.query(File).all()
+    deleted_count = 0
+    for file in files:
+        if not os.path.exists(file.path):
+            # Delete thumbnail if exists
+            if file.thumbnail_path and os.path.exists(file.thumbnail_path):
+                try:
+                    os.remove(file.thumbnail_path)
+                except Exception:
+                    pass
+            db.delete(file)
+            deleted_count += 1
+    if deleted_count > 0:
+        db.commit()
+        print(f"Cleaned up {deleted_count} orphaned files from database.")
+
 def scan_directory(directory: str):
     """
     Recursively scans directory for `.pes` files and indexes them.
     """
     init_db()
     db = SessionLocal()
+    
+    # Clean up missing files first
+    clean_orphaned_files(db)
+    
     count = 0
     success_count = 0
     
