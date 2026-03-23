@@ -50,3 +50,4 @@
 ## [2026-03-22] Downloads & Expanded Actions
 - **Feature**: Download and Action Bar toolbars
 - **Description**: Added explicit REST `/api/files/{id}/download` endpoint streams accurately. Created `.card-footer` styling grids mapping Star and Download actions concurrently inside cards and detail drawers layout flawlessly.
+\n## [2026-03-23] Units Conversion\n- **BugFix**: Divide dimensional bounds by 10.0\n- **Description**: Adjusted coordinate math mapping tenths-of-mm units correctly back to real absolute MM.
