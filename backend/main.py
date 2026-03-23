@@ -45,7 +45,8 @@ def get_files(
     query = db.query(File)
     
     if search:
-        query = query.filter(File.name.icontains(search))
+        from sqlalchemy import or_
+        query = query.filter(or_(File.name.icontains(search), File.path.icontains(search)))
         
     if tag:
         query = query.join(File.tags).filter(Tag.name == tag.lower())
