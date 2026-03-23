@@ -46,3 +46,7 @@
 ## [2026-03-22] Scan Restart Fix
 - **BugFix**: reset `stop_requested` flag on Scan Trigger
 - **Description**: Enabled accurate start states inside `scan_directory` avoiding residual cancellation lock states from freezing subsequent crawls. Cleared residual flag overrides safely in loops accurately.
+
+## [2026-03-22] Downloads & Expanded Actions
+- **Feature**: Download and Action Bar toolbars
+- **Description**: Added explicit REST `/api/files/{id}/download` endpoint streams accurately. Created `.card-footer` styling grids mapping Star and Download actions concurrently inside cards and detail drawers layout flawlessly.

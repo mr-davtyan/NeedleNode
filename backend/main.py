@@ -88,7 +88,7 @@ def toggle_star(file_id: int, db: Session = Depends(get_db)):
 
 @app.get("/api/tags")
 def get_tags(db: Session = Depends(get_db)):
-    tags = db.query(Tag).all()
+    tags = db.query(Tag).join(Tag.files).distinct().all()
     return [t.name for t in tags]
 
 @app.get("/api/thumbnail/{file_id}")
