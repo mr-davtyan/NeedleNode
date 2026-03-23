@@ -5,6 +5,7 @@ let hasMore = true;
 let currentTag = "";
 let searchTerm = "";
 let currentStarred = false;
+let collapsedTags = JSON.parse(localStorage.getItem("collapsedTags")) || [];
 
 const gridContainer = document.getElementById("grid-container");
 const tagsList = document.getElementById("tags-list");
@@ -129,20 +130,64 @@ async function loadTags() {
     try {
         const res = await fetch("/api/tags");
         const tags = await res.json();
-        tagsList.innerHTML = tags.map(tag => 
-            `<div class="tag-item" data-tag="${tag}">${tag}</div>`
-        ).join("");
-
-        // Click Tag
-        document.querySelectorAll(".tag-item").forEach(el => {
-            el.addEventListener("click", () => {
+        
+        const tagsList = document.getElementById("tags-list");
+        const collapsedList = document.getElementById("collapsed-tags-list");
+        const collapsedCount = document.getElementById("collapsed-count");
+        
+        tagsList.innerHTML = "";
+        collapsedList.innerHTML = "";
+        let collapsedNum = 0;
+        
+        tags.forEach(tag => {
+            const isCollapsed = collapsedTags.includes(tag);
+            const div = document.createElement("div");
+            div.className = "tag-item";
+            div.setAttribute("data-tag", tag);
+            if (currentTag === tag) div.classList.add("active");
+            
+            div.innerHTML = `
+                <span class="tag-name">${tag}</span>
+                <button class="btn-toggle-tag" title="${isCollapsed ? 'Show' : 'Hide'}">${isCollapsed ? '<i class="fa-solid fa-plus"></i>' : '<i class="fa-solid fa-minus"></i>'}</button>
+            `;
+            
+            // Toggle Button Trigger
+            const toggle = div.querySelector(".btn-toggle-tag");
+            toggle.addEventListener("click", (e) => {
+                e.stopPropagation(); // prevent filtering
+                if (isCollapsed) {
+                    collapsedTags = collapsedTags.filter(t => t !== tag);
+                } else {
+                    collapsedTags.push(tag);
+                }
+                localStorage.setItem("collapsedTags", JSON.stringify(collapsedTags));
+                loadTags(); // Reload view
+            });
+            
+            // Tag Filter Trigger
+            div.addEventListener("click", () => {
+                if (isCollapsed) return; // ignore clicks on collapsed
                 document.querySelectorAll(".tag-item").forEach(t => t.classList.remove("active"));
                 document.getElementById("btn-all").classList.remove("active");
-                el.classList.add("active");
-                currentTag = el.getAttribute("data-tag");
+                document.getElementById("btn-starred").classList.remove("active");
+                div.classList.add("active");
+                currentTag = tag;
+                currentStarred = false;
                 loadFiles(true);
             });
+            
+            if (isCollapsed) {
+                div.style.background = "rgba(255,255,255,0.01)";
+                div.style.fontSize = "0.75rem";
+                collapsedList.appendChild(div);
+                collapsedNum++;
+            } else {
+                tagsList.appendChild(div);
+            }
         });
+        
+        if (collapsedCount) collapsedCount.innerText = collapsedNum;
+        
     } catch (e) {
         console.error("Failed to load tags", e);
     }
