@@ -34,3 +34,11 @@
 ## [2026-03-22] Scan Cancellation Support
 - **Feature**: Stop Scan Button
 - **Description**: Enabled a cancellation flag check (`stop_requested`) within background scanning loops to abort large directory crawlers safely on demand. Wired with a `POST /api/scan/stop` endpoint and a frontend click listener to improve batch operations management securely.
+
+## [2026-03-22] Starred Files Filter
+- **Feature**: Starred Category Support
+- **Description**: Added an `is_starred` column in the database with a REST toggle endpoint. Modified the frontend to display a Star marker toggle in cards and a "Starred" category in the sidebar layout for speedy curation.
+
+## [2026-03-22] UI Progress Alignment
+- **Feature**: Row structure for Scan Progress Bar and button
+- **Description**: Refactored the DOM inside `index.html` layout list row elements containing inline button padding constraints, avoiding redundant block stacked stack heights seamlessly.
