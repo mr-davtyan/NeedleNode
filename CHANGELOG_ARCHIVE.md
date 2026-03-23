@@ -50,5 +50,18 @@
 ## [2026-03-22] Downloads & Expanded Actions
 - **Feature**: Download and Action Bar toolbars
 - **Description**: Added explicit REST `/api/files/{id}/download` endpoint streams accurately. Created `.card-footer` styling grids mapping Star and Download actions concurrently inside cards and detail drawers layout flawlessly.
-\n## [2026-03-23] Units Conversion\n- **BugFix**: Divide dimensional bounds by 10.0\n- **Description**: Adjusted coordinate math mapping tenths-of-mm units correctly back to real absolute MM.
-\n## [2026-03-23] Persistent Hidden Tags\n- **Feature**: Sync hidden states with db\n- **Description**: Enabled  booleans inside sub-tag relations index fields to persist collapsed sets correctly back on memory backends accurately on demand.
+## [2026-03-23] Units Conversion
+- **BugFix**: Divide dimensional bounds by 10.0
+- **Description**: Adjusted coordinate math mapping tenths-of-mm units correctly back to real absolute MM.
+
+## [2026-03-23] Persistent Hidden Tags
+- **Feature**: Sync hidden states with db
+- **Description**: Enabled  booleans inside sub-tag relations index fields to persist collapsed sets correctly back on memory backends accurately on demand.
+
+## [2026-03-23] Dockerization & CI/CD Setup
+- **Feature**: automated container build & versioning
+- **Description**: 
+  - Created `VERSION` file and `bump-version.sh` to trigger version updates accurately.
+  - Added `Dockerfile` utilizing `astral-sh/uv:latest` for speeding up FastAPI setup securely.
+  - Introduced `.github/workflows/build-container.yml` triggering Docker build pipeline automated building cache setup on origin flawlessly.
+- **Context for Future**: Ensure Secrets `DOCKER_USERNAME` and `DOCKER_PASSWORD` are configured on GitHub or Gitea Actions correctly to authorize registry uploads flawlessly.
