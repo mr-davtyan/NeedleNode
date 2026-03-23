@@ -148,7 +148,14 @@ def scan_directory(directory: str):
         
         print(f"Starting scan in {directory}...")
         for root, _, files in os.walk(directory):
+            if scan_state.stop_requested:
+                print("Scan stopped by user request.")
+                break
+                
             for file in files:
+                if scan_state.stop_requested:
+                    break
+                    
                 if file.lower().endswith(".pes"):
                     file_path = os.path.join(root, file)
                     scan_state.current_file = file

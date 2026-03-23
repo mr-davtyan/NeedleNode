@@ -26,3 +26,7 @@
 - **Feature**: Directory Rename: Inbox to Library
 - **Description**: Renamed `inbox/` directory to `library/` to match media categorization naming style. Updated global references in `backend/` scripts and `.gitignore` configuration using absolute replacements to support continuous operations.
 - **Context for Future**: Database cache reset triggered on startup back-iteration setup accurately.
+
+## [2026-03-22] Live Scan Progress Tracking
+- **Feature**: Top bar Progress Indicator Dashboard
+- **Description**: Added a singleton `ScanState` tracker for background workers. Exposed details via new `/api/scan/status` updates polled asynchronously using `app.js` with client-side CSS progress updates rendering proportional loading bars correctly avoiding blind spots.
