@@ -118,3 +118,11 @@
 ## [2026-03-23] Multi-Arch CI Support
 - **BugFix**: Multi-Architecture support configuration 
 - **Description**: Added explicit `platforms: linux/amd64,linux/arm64` into the `docker-publish.yml` triggers fully enabling cross-build setups securely as documented.
+
+## [2026-03-23] Inline Editor Click Outside Fix
+- **Feature/BugFix**: Close inline editor on click outside
+- **Description**: 
+  - Added a global `activeInlineEditor` reference in `frontend/app.js` to manage multiple editors single-state natively.
+  - Updated `showInlineEditor` function with global `click` listener on `document` using `setTimeout` defer to avoid sync conflicts re-opening accurately.
+  - **BugFix**: Re-selected `row` node AFTER `cancel()` to avoid operating on a detached DOM node when switching editors from Main to Sub flawlessly.
+- **Context for Future**: Flawlessly safeguards multiple inputs rendering overlapping views concurrently without race cycles.
