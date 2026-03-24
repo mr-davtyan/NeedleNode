@@ -95,5 +95,7 @@
 - **Feature**: Automatic cleanup for orphaned tags. Moving file to trash triggers a prune action on tags that decrease to zero associations flawlessly.
 - **BugFix**: Wired up `loadTags()` refresh step inside the trash execution handlers flawlessly accurately synchronized sidebar counters instantly.
 - **BugFix**: Fixed `.tag-count` visibility on selection by removing inline styles and structuring hover dependencies inside style.css flawlessly.
+- **Feature**: Automatic cleanup for empty folders. Moving the last file in a category deletes its containing directory from `library/` flawlessly.
+- **BugFix**: Fixed folder cleanup condition robust to absolute/relative path agnostic structures flawlessly by splitting node components accurately.
 - **Context for Future**:
   - Validates folder creations iteratively safely avoiding collisions.
