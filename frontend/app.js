@@ -288,9 +288,36 @@ async function loadFiles(reset = false) {
         totalStats.innerText = `${data.total} Designs`;
 
         if (data.items.length === 0 && reset) {
-            gridContainer.innerHTML = '<div class="loading-state"><p>No designs found.</p></div>';
+            gridContainer.innerHTML = `
+                <div class="empty-state" style="text-align: center; padding: 40px; color: var(--text-secondary);">
+                    <i class="fa-solid fa-folder-open" style="font-size: 3rem; margin-bottom: 15px; opacity: 0.3;"></i>
+                    <p style="margin-bottom: 15px;">No designs found.</p>
+                    <button id="btn-clear-empty" class="btn btn-action" style="margin: 0 auto; font-size: 0.9rem;">Clear Filters</button>
+                </div>
+            `;
             hasMore = false;
             loading = false;
+            
+            const btnClearEmpty = gridContainer.querySelector("#btn-clear-empty");
+            if (btnClearEmpty) {
+                btnClearEmpty.addEventListener("click", () => {
+                    currentTags = [];
+                    currentStarred = false;
+                    searchTerm = "";
+                    const searchInput = document.getElementById("search-input");
+                    if (searchInput) searchInput.value = "";
+                    
+                    document.querySelectorAll(".tag-item").forEach(t => t.classList.remove("active"));
+                    const btnStarred = document.getElementById("btn-starred");
+                    if (btnStarred) btnStarred.classList.remove("active");
+                    document.getElementById("btn-all").classList.add("active");
+                    
+                    const btnClear = document.getElementById("btn-clear-tags");
+                    if (btnClear) btnClear.style.display = "none";
+                    
+                    loadFiles(true);
+                });
+            }
             return;
         }
 
