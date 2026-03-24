@@ -275,3 +275,12 @@
   - Added `COPY VERSION ./` inside the `Dockerfile` to ensure the version file is available inside the container.
   - This resolves an issue where the `/api/version` endpoint fell back to `0.0.1` because the `VERSION` file was missing from the image bundle flawlessly.
 - **Context for Future**: Ensure any other top-level static asset required by endpoints contains explicit copies directions during builds flawlessly.
+
+## [2026-03-24] Sidebar Tag Filtering Update
+- **Feature**: Exclusive and Inclusive Sidebar Tag Filters
+- **Description**: 
+  - Updated left sidebar to support cumulative and exclusive triggers flawlessly.
+  - Removed "Hidden Categories" pane and minus (-) buttons fully.
+  - Introduced inclusive filter `+` buttons inside both tag nodes and Starred navigation item structures flawlessly.
+  - Toggling item bodies conducts exclusive resets flawlessly while filter button merges streams smoothly.
+

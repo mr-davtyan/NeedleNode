@@ -177,17 +177,43 @@ function setupEventListeners() {
 
     // Starred Designs
     // Starred Designs
+    // Starred Designs (Exclusive)
     document.getElementById("btn-starred").addEventListener("click", (e) => {
         e.preventDefault();
-        const btn = document.getElementById("btn-starred");
-        currentStarred = !currentStarred;
-        btn.classList.toggle("active", currentStarred);
-        localStorage.setItem("selectedStarred", currentStarred);
-        document.getElementById("btn-all").classList.toggle("active", currentTags.length === 0 && !currentStarred);
+        currentStarred = true; // Exclusive
+        currentTags = []; // Clear tags
+        
+        document.getElementById("btn-starred").classList.add("active");
+        document.querySelectorAll(".tag-item").forEach(t => t.classList.remove("active"));
+        document.getElementById("btn-all").classList.remove("active");
+        
+        localStorage.setItem("selectedTags", JSON.stringify([]));
+        localStorage.setItem("selectedStarred", "true");
+        
         const clearBtn = document.getElementById("btn-clear-tags");
-        if (clearBtn) clearBtn.style.display = (currentTags.length > 0 || currentStarred) ? "block" : "none";
+        if (clearBtn) clearBtn.style.display = "block";
         loadFiles(true);
     });
+
+    // Starred Designs (Inclusive - Plus Button)
+    const btnStarredAdd = document.querySelector("#btn-starred .btn-toggle-tag");
+    if (btnStarredAdd) {
+        btnStarredAdd.addEventListener("click", (e) => {
+            e.stopPropagation();
+            e.preventDefault();
+            
+            if (!currentStarred) {
+                currentStarred = true;
+                document.getElementById("btn-starred").classList.add("active");
+                localStorage.setItem("selectedStarred", "true");
+                document.getElementById("btn-all").classList.remove("active");
+                
+                const clearBtn = document.getElementById("btn-clear-tags");
+                if (clearBtn) clearBtn.style.display = "block";
+                loadFiles(true);
+            }
+        });
+    }
 
     // Stop Scan Button
     const btnStopScan = document.getElementById("btn-stop-scan");
@@ -232,15 +258,9 @@ async function loadTags() {
         const tags = await res.json();
         
         const tagsList = document.getElementById("tags-list");
-        const collapsedList = document.getElementById("collapsed-tags-list");
-        const collapsedCount = document.getElementById("collapsed-count");
-        
         tagsList.innerHTML = "";
-        collapsedList.innerHTML = "";
-        let collapsedNum = 0;
         
         function createTagNode(tag) {
-            const isCollapsed = tag.is_hidden;
             const name = tag.name;
             const div = document.createElement("div");
             div.className = "tag-item";
@@ -249,34 +269,43 @@ async function loadTags() {
             
             div.innerHTML = `
                 <span class="tag-name">${name} <span class="tag-count">(${tag.count || 0})</span></span>
-                <button class="btn-toggle-tag" title="${isCollapsed ? 'Show' : 'Hide'}">${isCollapsed ? '<i class="fa-solid fa-plus"></i>' : '<i class="fa-solid fa-minus"></i>'}</button>
+                <button class="btn-toggle-tag" title="Add to filters"><i class="fa-solid fa-plus"></i></button>
             `;
             
-            // Toggle Button Trigger
             const toggle = div.querySelector(".btn-toggle-tag");
-            toggle.addEventListener("click", async (e) => {
-                e.stopPropagation(); // prevent filtering
-                try {
-                    await fetch(`/api/tags/${encodeURIComponent(name)}/toggle_hide`, { method: "POST" });
-                    loadTags(); // Reload view
-                } catch (e) {
-                    console.error("Toggle tag state failed", e);
-                }
-            });
-            
-            // Tag Filter Trigger
-            div.addEventListener("click", () => {
-                const clearBtn = document.getElementById("btn-clear-tags");
-                if (currentTags.includes(name)) {
-                    currentTags = currentTags.filter(t => t !== name);
-                    div.classList.remove("active");
-                } else {
+            // Inclusive Filter Trigger
+            toggle.addEventListener("click", (e) => {
+                e.stopPropagation(); // prevent exclusive filtering
+                if (!currentTags.includes(name)) {
                     currentTags.push(name);
                     div.classList.add("active");
+                    localStorage.setItem("selectedTags", JSON.stringify(currentTags));
                 }
-                localStorage.setItem("selectedTags", JSON.stringify(currentTags));
                 document.getElementById("btn-all").classList.toggle("active", currentTags.length === 0 && !currentStarred);
-                if (clearBtn) clearBtn.style.display = (currentTags.length > 0 || currentStarred) ? "block" : "none";
+                const btnClearTags = document.getElementById("btn-clear-tags");
+                if (btnClearTags) {
+                    btnClearTags.style.display = (currentTags.length > 0 || currentStarred) ? "block" : "none";
+                }
+                loadFiles(true);
+            });
+            
+            // Exclusive Filter Trigger
+            div.addEventListener("click", () => {
+                currentTags = [name]; // Exclusive!
+                currentStarred = false; // Reset starred
+                document.querySelectorAll(".tag-item").forEach(t => t.classList.remove("active"));
+                div.classList.add("active");
+                
+                const btnStarred = document.getElementById("btn-starred");
+                if (btnStarred) btnStarred.classList.remove("active");
+                
+                document.getElementById("btn-all").classList.remove("active");
+                localStorage.setItem("selectedTags", JSON.stringify(currentTags));
+                localStorage.setItem("selectedStarred", "false");
+                
+                const btnClearTags = document.getElementById("btn-clear-tags");
+                if (btnClearTags) btnClearTags.style.display = "block";
+                
                 loadFiles(true);
             });
             
@@ -287,21 +316,13 @@ async function loadTags() {
         if (tags.main) {
             tags.main.sort((a, b) => a.name.localeCompare(b.name));
             tags.main.forEach(tag => {
-                const div = createTagNode(tag);
-                if (tag.is_hidden) {
-                    collapsedList.appendChild(div);
-                    collapsedNum++;
-                } else {
-                    tagsList.appendChild(div);
-                }
+                tagsList.appendChild(createTagNode(tag));
             });
         }
 
-        // Add Divider if both main and sub have visible items
-        const hasVisibleMain = tags.main && tags.main.some(t => !t.is_hidden);
-        const hasVisibleSub = tags.sub && tags.sub.some(t => !t.is_hidden);
-        
-        if (hasVisibleMain && hasVisibleSub) {
+        const hasMain = tags.main && tags.main.length > 0;
+        const hasSub = tags.sub && tags.sub.length > 0;
+        if (hasMain && hasSub) {
             const hr = document.createElement("div");
             hr.className = "tag-divider";
             hr.style.height = "1px";
@@ -314,18 +335,9 @@ async function loadTags() {
         if (tags.sub) {
             tags.sub.sort((a, b) => a.name.localeCompare(b.name));
             tags.sub.forEach(tag => {
-                const div = createTagNode(tag);
-                if (tag.is_hidden) {
-                    collapsedList.appendChild(div);
-                    collapsedNum++;
-                } else {
-                    tagsList.appendChild(div);
-                }
+                tagsList.appendChild(createTagNode(tag));
             });
         }
-        
-        if (collapsedCount) collapsedCount.innerText = collapsedNum;
-        
     } catch (e) {
         console.error("Failed to load tags", e);
     }
