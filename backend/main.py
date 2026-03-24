@@ -10,6 +10,15 @@ from backend.scanner import scan_directory
 from backend.classify_inbox import process_inbox
 from backend.state import scan_state, import_state
 
+# Simple .env loader
+if os.path.exists(".env"):
+    with open(".env") as f:
+        for line in f:
+            line = line.strip()
+            if line and not line.startswith("#") and "=" in line:
+                k, v = line.split("=", 1)
+                os.environ[k.strip()] = v.strip().strip("'").strip('"')
+
 app = FastAPI(title="Embroidery Manager API")
 
 # Setup DB on startup
@@ -100,11 +109,6 @@ def get_tags(db: Session = Depends(get_db)):
     sub_tags = []
     
     for t in tags:
-        if len(t.files) == 1:
-            single_file = t.files[0]
-            if len(single_file.tags) > 1:
-                continue
-        
         tag_data = {"name": t.name, "is_hidden": t.is_hidden}
         if t.is_main:
             main_tags.append(tag_data)

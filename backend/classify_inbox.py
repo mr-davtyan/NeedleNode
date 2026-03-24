@@ -218,6 +218,17 @@ def process_inbox(dry_run=True, limit=None, batch_size=4):
                     break
 
     finally:
+        # Cleanup empty subdirectories in inbox
+        if not dry_run and os.path.exists(INBOX_DIR):
+            for root, dirs, files in os.walk(INBOX_DIR, topdown=False):
+                for d in dirs:
+                    dir_path = os.path.join(root, d)
+                    try:
+                        if not os.listdir(dir_path):
+                            os.rmdir(dir_path)
+                    except Exception:
+                        pass
+                        
         import_state.is_importing = False
         print(f"\n--- Summary ---")
         print(f"Processed: {success_count}")
