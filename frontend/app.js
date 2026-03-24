@@ -12,7 +12,6 @@ const tagsList = document.getElementById("tags-list");
 const totalStats = document.getElementById("total-stats");
 const searchInput = document.getElementById("search-input");
 const btnScan = document.getElementById("btn-scan");
-const btnImport = document.getElementById("btn-import");
 const scrollAnchor = document.getElementById("scroll-anchor");
 
 // Modal Elements
@@ -35,14 +34,6 @@ const scanTotal = document.getElementById("scan-total");
 const scanText = document.getElementById("scan-text");
 const progressBarFill = document.getElementById("progress-bar-fill");
 
-// Import Progress
-const importProgress = document.getElementById("import-progress");
-const importCount = document.getElementById("import-count");
-const importTotal = document.getElementById("import-total");
-const importText = document.getElementById("import-text");
-const importBarFill = document.getElementById("import-bar-fill");
-const btnStopImport = document.getElementById("btn-stop-import");
-
 // Init
 document.addEventListener("DOMContentLoaded", () => {
     loadTags();
@@ -50,7 +41,6 @@ document.addEventListener("DOMContentLoaded", () => {
     setupInfiniteScroll();
     setupEventListeners();
     pollScanStatus(); // Start polling on load
-    pollImportStatus(); // Start polling import on load
 });
 
 function setupEventListeners() {
@@ -382,102 +372,74 @@ function showDetails(file) {
 
 async function pollScanStatus() {
     try {
-        const res = await fetch("/api/scan/status");
-        const status = await res.json();
+        // 1. Check Import Status FIRST
+        const resImport = await fetch("/api/import/status");
+        const importStatus = await resImport.json();
+        const btnStopScan = document.getElementById("btn-stop-scan");
         
-        if (status.is_scanning) {
+        if (importStatus.is_importing) {
             scanProgress.classList.remove("hidden");
             if (btnScan) btnScan.classList.add("hidden");
-            scanCount.innerText = status.processed;
-            scanTotal.innerText = status.total;
             
-            const percent = status.total > 0 ? (status.processed / status.total) * 100 : 0;
+            scanCount.innerText = importStatus.processed;
+            scanTotal.innerText = importStatus.total;
+            const percent = importStatus.total > 0 ? (importStatus.processed / importStatus.total) * 100 : 0;
             progressBarFill.style.width = `${percent}%`;
             
-            if (status.current_file) {
-                // Shorten if file path is too long
-                const fileLabel = status.current_file.length > 20 
-                    ? status.current_file.substring(0, 17) + "..." 
-                    : status.current_file;
-                scanText.innerText = `Scanning: ${fileLabel}`;
-            } else {
-                scanText.innerText = "Scanning...";
-            }
-            
-            // Update Stop Button State
-            const btnStopScan = document.getElementById("btn-stop-scan");
+            scanText.innerText = importStatus.current_file 
+                ? `Importing: ${importStatus.current_file.substring(0, 17)}...` 
+                : "Importing from Inbox...";
+                
             if (btnStopScan) {
-                btnStopScan.disabled = status.stop_requested || false;
-                if (status.stop_requested) {
-                    btnStopScan.innerText = "Stopping...";
-                } else {
-                    btnStopScan.innerText = "Stop Scan 🛑";
-                }
+                btnStopScan.disabled = importStatus.stop_requested;
+                btnStopScan.innerText = importStatus.stop_requested ? "Stopping..." : "Stop Import";
+                btnStopScan.onclick = async () => {
+                    btnStopScan.disabled = true;
+                    await fetch("/api/import/stop", { method: "POST" });
+                };
             }
+            setTimeout(pollScanStatus, 1000);
+            return; // Exit, wait for import to finish
+        }
+
+        // 2. Check Scan Status IF NOT Importing
+        const resScan = await fetch("/api/scan/status");
+        const scanStatus = await resScan.json();
+        const wasActive = !scanProgress.classList.contains("hidden");
+        
+        if (scanStatus.is_scanning) {
+            scanProgress.classList.remove("hidden");
+            if (btnScan) btnScan.classList.add("hidden");
             
-            // Poll again in 1s
+            scanCount.innerText = scanStatus.processed;
+            scanTotal.innerText = scanStatus.total;
+            const percent = scanStatus.total > 0 ? (scanStatus.processed / scanStatus.total) * 100 : 0;
+            progressBarFill.style.width = `${percent}%`;
+            
+            scanText.innerText = scanStatus.current_file 
+                ? `Scanning: ${scanStatus.current_file.substring(0, 17)}...` 
+                : "Scanning Library...";
+                
+            if (btnStopScan) {
+                btnStopScan.disabled = scanStatus.stop_requested;
+                btnStopScan.innerText = scanStatus.stop_requested ? "Stopping..." : "Stop Scan";
+                btnStopScan.onclick = async () => {
+                    btnStopScan.disabled = true;
+                    await fetch("/api/scan/stop", { method: "POST" });
+                };
+            }
             setTimeout(pollScanStatus, 1000);
         } else {
-            const wasScanning = !scanProgress.classList.contains("hidden");
             scanProgress.classList.add("hidden");
             if (btnScan) btnScan.classList.remove("hidden");
-            if (wasScanning) {
-                // Refresh list if scan just completed
+            if (wasActive) {
+                // Refresh list if scan cycle just completed
                 loadFiles(true);
                 loadTags();
             }
         }
     } catch (e) {
-        console.error("Failed to poll scan status", e);
-        // Retry polling later
+        console.error("Failed to poll status", e);
         setTimeout(pollScanStatus, 5000);
-    }
-}
-
-async function pollImportStatus() {
-    try {
-        const res = await fetch("/api/import/status");
-        const status = await res.json();
-        
-        if (status.is_importing) {
-            importProgress.classList.remove("hidden");
-            if (btnImport) btnImport.classList.add("hidden");
-            importCount.innerText = status.processed;
-            importTotal.innerText = status.total;
-            
-            const percent = status.total > 0 ? (status.processed / status.total) * 100 : 0;
-            importBarFill.style.width = `${percent}%`;
-            
-            if (status.current_file) {
-                const fileLabel = status.current_file.length > 20 
-                    ? status.current_file.substring(0, 17) + "..." 
-                    : status.current_file;
-                importText.innerText = `Importing: ${fileLabel}`;
-            } else {
-                importText.innerText = "Importing...";
-            }
-            
-            if (btnStopImport) {
-                btnStopImport.disabled = status.stop_requested || false;
-                if (status.stop_requested) {
-                    btnStopImport.innerText = "Stopping...";
-                } else {
-                    btnStopImport.innerText = "Stop";
-                }
-            }
-            
-            setTimeout(pollImportStatus, 1000);
-        } else {
-            const wasImporting = !importProgress.classList.contains("hidden");
-            importProgress.classList.add("hidden");
-            if (btnImport) btnImport.classList.remove("hidden");
-            if (wasImporting) {
-                loadFiles(true);
-                loadTags();
-            }
-        }
-    } catch (e) {
-        console.error("Failed to poll import status", e);
-        setTimeout(pollImportStatus, 5000);
     }
 }

@@ -163,10 +163,22 @@ def trigger_import(background_tasks: BackgroundTasks):
     background_tasks.add_task(process_inbox, dry_run=False, batch_size=4)
     return {"status": "importing", "message": "Background import started"}
 
+def import_and_scan():
+    # 1. Process inbox (Live Run)
+    try:
+        process_inbox(dry_run=False, batch_size=4)
+    except Exception as e:
+        print(f"Chained Import failed: {e}")
+    # 2. Scan Library
+    try:
+        scan_directory("library")
+    except Exception as e:
+        print(f"Chained Scan failed: {e}")
+
 @app.post("/api/scan")
 def trigger_scan(background_tasks: BackgroundTasks):
-    background_tasks.add_task(scan_directory, "library")
-    return {"status": "scanning", "message": "Background scan started"}
+    background_tasks.add_task(import_and_scan)
+    return {"status": "scanning", "message": "Background Import & Scan started"}
 
 # Mount Frontend static files
 # Note: Ensure frontend/dist or frontend exists to avoid error on startup
