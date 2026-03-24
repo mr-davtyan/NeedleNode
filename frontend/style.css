@@ -343,6 +343,43 @@ body {
     gap: 20px;
 }
 
+/* Sort Selector */
+.sort-select-wrapper {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background: var(--search-bg);
+    padding: 8px 12px;
+    border-radius: 8px;
+    border: 1px solid transparent;
+    transition: border var(--transition-speed);
+}
+
+.sort-select-wrapper:focus-within {
+    border-color: var(--accent-color);
+}
+
+.sort-select-wrapper i {
+    color: var(--text-secondary);
+    font-size: 0.85rem;
+}
+
+.sort-select {
+    background: transparent;
+    border: none;
+    color: var(--text-primary);
+    font-family: inherit;
+    font-size: 0.85rem;
+    outline: none;
+    cursor: pointer;
+}
+
+.sort-select option {
+    background-color: var(--bg-color, #161b22);
+    color: var(--text-primary);
+}
+
+
 .btn {
     padding: 10px 20px;
     border-radius: 8px;

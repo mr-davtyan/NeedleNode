@@ -392,3 +392,14 @@
 - **Feature**: Extra Compact Header support for small screens
 - **Description**: Added explicit `@media (max-width: 480px)` breakpoint hiding non-essential `.accent-picker` and `.stats` navigation items flawlessly freeing up spacing for search controls neatly flawlessly.
 - **Context for Future**: No breaking changes; speeds up operations sequentially safely flawlessly.
+
+## [2026-03-24] Sort by Name and Date
+- **Feature**: Sorting support for files
+- **Description**: 
+  - Updated `backend/main.py` adding `/api/files?sort_by=...&order=...` support with secondary unique ID fallback for stable pagination.
+  - Updated `backend/scanner.py` `process_file` to reconcile and update timestamps on existing records if disk differs.
+  - Created `backend/fix_dates.py` standalone script resolving outdated dates for fast mass indexing fixes perfectly.
+  - Updated frontend layouts embedding small `.file-meta` date template tags displaying timestamps accurately.
+  - Wired header actions `.sort-select-wrapper` widget managing server states iteratively securely.
+- **Context for Future**: No breaking changes; backward-compatible flawlessly.
+

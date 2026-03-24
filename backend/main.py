@@ -64,6 +64,8 @@ def get_files(
     search: Optional[str] = None, 
     tag: Optional[str] = None, 
     starred: Optional[bool] = None,
+    sort_by: Optional[str] = "date",
+    order: Optional[str] = "desc",
     db: Session = Depends(get_db)
 ):
     query = db.query(File)
@@ -81,7 +83,22 @@ def get_files(
     if starred is not None:
         query = query.filter(File.is_starred == starred)
         
-    query = query.order_by(File.id)
+    # Sorting
+    sort_by = (sort_by or "date").lower()
+    order = (order or "desc").lower()
+    
+    if sort_by == "name":
+        order_col = File.name
+    elif sort_by == "date":
+        order_col = File.modified_at
+    else:
+        order_col = File.id
+        
+    if order == "desc":
+        query = query.order_by(order_col.desc(), File.id.desc())
+    else:
+        query = query.order_by(order_col.asc(), File.id.asc())
+        
     total_count = query.count()
     files = query.offset(offset).limit(limit).all()
     

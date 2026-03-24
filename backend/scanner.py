@@ -68,11 +68,24 @@ def process_file(file_path: str, db: Session) -> bool:
     """
     try:
         # Check if already exists in DB
+        stats = os.stat(file_path)
         existing = db.query(File).filter(File.path == file_path).first()
         if existing:
-            return False # Skip already processed files for now
-            
-        stats = os.stat(file_path)
+            # Update date if they look like defaults or differ
+            fs_create = datetime.fromtimestamp(stats.st_ctime)
+            fs_modify = datetime.fromtimestamp(stats.st_mtime)
+            changed = False
+            if abs((existing.created_at - fs_create).total_seconds()) > 2:
+                existing.created_at = fs_create
+                changed = True
+            if abs((existing.modified_at - fs_modify).total_seconds()) > 2:
+                existing.modified_at = fs_modify
+                changed = True
+            if changed:
+                db.commit()
+                return True
+            return False # Skip already processed and up-to-date files
+
         pattern = pyembroidery.read(file_path)
         if not pattern:
             return False

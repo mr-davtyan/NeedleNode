@@ -77,6 +77,16 @@
                 </div>
 
                 <div class="header-actions">
+                    <div class="sort-select-wrapper">
+                        <i class="fa-solid fa-sort"></i>
+                        <select id="sort-select" class="sort-select" title="Sort Designs">
+                            <option value="date:desc">Date (Newest)</option>
+                            <option value="date:asc">Date (Oldest)</option>
+                            <option value="name:asc">Name (A-Z)</option>
+                            <option value="name:desc">Name (Z-A)</option>
+                        </select>
+                    </div>
+
                     <div id="scan-progress" class="scan-progress hidden">
                         <span id="scan-text" class="scan-text">Scanning...</span>
                         <div class="progress-bar-bg">
