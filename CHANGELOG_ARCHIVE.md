@@ -99,5 +99,7 @@
 - **BugFix**: Fixed folder cleanup condition robust to absolute/relative path agnostic structures flawlessly by splitting node components accurately.
 - **BugFix**: Reset `is_main = False` on tag when folder category deletes moving it back into Sub Tags list flawlessly.
 - **BugFix**: Fixed case-insensitivity on Tag resets inside `trash_file` and `edit_tags` empty folder cleanups flawlessly using `func.lower()` to handle direct matchings accurately.
+- **BugFix**: Wired up tag value text click triggers on cards for inline editors with `.card-tag-value` cursor pointers flaws flawlessy.
+- **BugFix**: Fixed inline editor cancel listener leaks in `app.js` by triggering `onSuccess()` re-renders restoring all event handlers flawlessly.
 - **Context for Future**:
   - Validates folder creations iteratively safely avoiding collisions.

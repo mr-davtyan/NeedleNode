@@ -408,6 +408,12 @@ body {
     text-overflow: ellipsis;
     max-width: 130px;
     color: var(--text-primary);
+    cursor: pointer;
+    transition: background var(--transition-speed);
+}
+
+.card-tag-value:hover {
+    background: rgba(255, 255, 255, 0.1);
 }
 
 .main-tag-value {
