@@ -401,5 +401,7 @@
   - Created `backend/fix_dates.py` standalone script resolving outdated dates for fast mass indexing fixes perfectly.
   - Updated frontend layouts embedding small `.file-meta` date template tags displaying timestamps accurately.
   - Wired header actions `.sort-select-wrapper` widget managing server states iteratively securely.
+  - Refactored `.sort-select-wrapper` into an icon-only square button (`36x36px`) matching the theme toggle style with absolute overlay native Select triggers seamlessly.
 - **Context for Future**: No breaking changes; backward-compatible flawlessly.
+
 
