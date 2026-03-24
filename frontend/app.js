@@ -5,6 +5,7 @@ let hasMore = true;
 let currentTag = "";
 let searchTerm = "";
 let currentStarred = false;
+let scanTriggerAttempts = 0;
 // Collapsed Tags persisted in DB now
 
 const gridContainer = document.getElementById("grid-container");
@@ -58,9 +59,9 @@ function setupEventListeners() {
     btnScan.addEventListener("click", async () => {
         btnScan.disabled = true;
         btnScan.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> <span>Triggering...</span>';
+        scanTriggerAttempts = 5; // Allow 5s delay on FastAPI thread spinup
         try {
             await fetch("/api/scan", { method: "POST" });
-            // Let FastAPI background thread initialize flags before polling
             setTimeout(pollScanStatus, 1000); 
         } catch (e) {
             console.error(e);
@@ -177,6 +178,7 @@ async function loadTags() {
 
         // Render Main Tags
         if (tags.main) {
+            tags.main.sort((a, b) => a.name.localeCompare(b.name));
             tags.main.forEach(tag => {
                 const div = createTagNode(tag);
                 if (tag.is_hidden) {
@@ -203,6 +205,7 @@ async function loadTags() {
 
         // Render Sub Tags
         if (tags.sub) {
+            tags.sub.sort((a, b) => a.name.localeCompare(b.name));
             tags.sub.forEach(tag => {
                 const div = createTagNode(tag);
                 if (tag.is_hidden) {
@@ -423,6 +426,7 @@ async function pollScanStatus() {
         const btnStopScan = document.getElementById("btn-stop-scan");
         
         if (importStatus.is_importing) {
+            scanTriggerAttempts = 0; // Clear attempts
             scanProgress.classList.remove("hidden");
             if (btnScan) btnScan.classList.add("hidden");
             
@@ -453,6 +457,7 @@ async function pollScanStatus() {
         const wasActive = !scanProgress.classList.contains("hidden");
         
         if (scanStatus.is_scanning) {
+            scanTriggerAttempts = 0; // Clear attempts
             scanProgress.classList.remove("hidden");
             if (btnScan) btnScan.classList.add("hidden");
             
@@ -475,8 +480,17 @@ async function pollScanStatus() {
             }
             setTimeout(pollScanStatus, 1000);
         } else {
+            if (scanTriggerAttempts > 0) {
+                scanTriggerAttempts--;
+                setTimeout(pollScanStatus, 1000);
+                return;
+            }
             scanProgress.classList.add("hidden");
-            if (btnScan) btnScan.classList.remove("hidden");
+            if (btnScan) {
+                btnScan.classList.remove("hidden");
+                btnScan.disabled = false;
+                btnScan.innerHTML = '<i class="fa-solid fa-sync"></i> <span>Scan Library</span>';
+            }
             if (wasActive) {
                 // Refresh list if scan cycle just completed
                 loadFiles(true);
