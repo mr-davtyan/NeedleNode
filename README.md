@@ -38,3 +38,9 @@ A high-performance local web application to organize, tag, and browse thousands 
 -   `frontend/`: Single-page visual template containing clients interactions.
 -   `library/`: Context folders holding embroidery files to browse.
 -   `inbox/`: Incoming files buffer processing flawlessy.
+
+## AI Inbox Classification (Optional)
+
+The application includes an AI-powered inbox classifier (`backend/classify_inbox.py`) that organizes design archives from `inbox/` into `library/` flawlessly.
+-   **API Key Requirement**: This feature **requires a Gemini API Key** set inside your environment triggers (e.g. `export GEMINI_API_KEY="your_key"`).
+-   **Without the Key**: Desktop viewers, grid catalogs, editing nodes, infinite scrolls and intersecting Tag queries **will continue operating absolutely fine flawlessly**.
