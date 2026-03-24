@@ -114,3 +114,7 @@
 - **Context for Future**:
   - Run `docker compose up -d` to deploy.
   - Data volumes are mapped to local directories relative to `docker-compose.yml`.
+
+## [2026-03-23] Multi-Arch CI Support
+- **BugFix**: Multi-Architecture support configuration 
+- **Description**: Added explicit `platforms: linux/amd64,linux/arm64` into the `docker-publish.yml` triggers fully enabling cross-build setups securely as documented.
