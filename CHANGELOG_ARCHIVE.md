@@ -382,3 +382,13 @@
 - **Context for Future**: No breaking changes; speeds up operations sequentially safely.
 
 
+
+## [2026-03-24] Mobile Layout Responsiveness Fixes
+- **BugFix**: Sidebar Toggle squeezing & Header collapse
+- **Description**: 
+  - Added `flex-shrink: 0` to `.btn-sidebar-toggle` and `.header-actions` preventing elements from collapsing into unusable dimensions flawlessly.
+  - Added `min-width: 120px` to `.search-bar` guaranteeing search visibility at all times flawlessly.
+  - Optimized `.scan-progress` for mobile by hiding `.scan-text` and scaling down progress bar bars flawlessly.
+- **Feature**: Extra Compact Header support for small screens
+- **Description**: Added explicit `@media (max-width: 480px)` breakpoint hiding non-essential `.accent-picker` and `.stats` navigation items flawlessly freeing up spacing for search controls neatly flawlessly.
+- **Context for Future**: No breaking changes; speeds up operations sequentially safely flawlessly.

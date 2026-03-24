@@ -923,6 +923,7 @@ body.sidebar-open .sidebar-overlay {
         cursor: pointer;
         font-size: 1.1rem;
         transition: all 0.2s;
+        flex-shrink: 0; /* Prevent squeezing */
     }
 
     .top-header {
@@ -933,10 +934,31 @@ body.sidebar-open .sidebar-overlay {
     .search-bar {
         width: auto;
         flex: 1;
+        min-width: 120px; /* Ensure a minimum width to prevent collapsing */
     }
 
     .header-actions {
-        gap: 10px;
+        gap: 8px;
+        flex-shrink: 0;
+    }
+
+    /* Optimize Scan Progress for Mobile */
+    .scan-progress {
+        gap: 6px;
+        padding: 6px 10px;
+    }
+
+    .scan-text {
+        display: none; /* Hide 'Scanning...' text to save space */
+    }
+
+    .progress-numbers {
+        font-size: 0.7rem;
+    }
+
+    .progress-bar-bg {
+        width: 60px; /* Scale down progress bar */
+        height: 4px;
     }
 
     /* Hide text on some buttons to save space */
@@ -974,5 +996,25 @@ body.sidebar-open .sidebar-overlay {
 
     .details-image img {
         max-height: 220px;
+    }
+}
+
+/* Extra small devices (phones) */
+@media (max-width: 480px) {
+    .accent-picker,
+    .stats {
+        display: none !important; /* Hide non-essential elements to free space for search & scan */
+    }
+
+    .search-bar {
+        min-width: 80px;
+    }
+
+    .progress-bar-bg {
+        display: none; /* Hide progress bar, leave only numbers and Stop button */
+    }
+
+    .header-actions {
+        gap: 5px;
     }
 }
