@@ -386,6 +386,15 @@ body {
     color: var(--text-primary);
 }
 
+/* Force sort dropdown to render dark in dark themes */
+.sort-select {
+    color-scheme: dark;
+}
+
+body.light-theme .sort-select {
+    color-scheme: light;
+}
+
 
 .btn {
     padding: 10px 20px;
@@ -842,6 +851,15 @@ body.light-theme .btn-theme-toggle i {
     color: #c9d1d9;
 }
 
+/* Force format dropdown to render dark in dark themes */
+.select-format {
+    color-scheme: dark;
+}
+
+body.light-theme .select-format {
+    color-scheme: light;
+}
+
 body.light-theme .select-format option {
     background-color: #ffffff;
     color: #24292f;
@@ -1009,13 +1027,18 @@ body.sidebar-open .sidebar-overlay {
     }
 
     /* Hide text on some buttons to save space */
-    .btn-scan span {
-        display: none;
+    #btn-scan span {
+        display: none !important;
     }
 
-    .btn-scan {
-        padding: 10px;
+    #btn-scan {
+        width: 36px !important;
+        height: 36px !important;
+        min-width: 0 !important;
+        padding: 0 !important;
+        justify-content: center;
     }
+
 
     .stats {
         font-size: 0.8rem;
