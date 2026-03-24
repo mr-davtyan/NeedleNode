@@ -36,3 +36,4 @@ A high-performance local web application to organize, tag, and browse thousands 
 - **Light/Dark Theme**: Fluid theme switching via CSS Variables with `localStorage` persistence seamlessly.
 - **Offline Mode Support**: Embedded font families hosted inside static locations under `frontend/vendor/` natively seamlessly.
 - **Multi-Format Support**: Supports `.pes`, `.dst`, `.jef`, `.exp`, `.vp3`, `.hus`, `.pec`, `.vip`, `.shv`, and `.sew` formats flawlessly.
+- **Format Conversion**: Convert and download embroidery files into different formats directly from details drawer flawlessly.

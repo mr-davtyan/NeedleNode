@@ -218,13 +218,30 @@ def get_thumbnail(file_id: int, db: Session = Depends(get_db)):
     return FileResponse(file.thumbnail_path)
 
 @app.get("/api/files/{file_id}/download")
-def download_file(file_id: int, db: Session = Depends(get_db)):
+def download_file(file_id: int, background_tasks: BackgroundTasks, format: Optional[str] = None, db: Session = Depends(get_db)):
     file = db.query(File).filter(File.id == file_id).first()
     if not file:
         raise HTTPException(status_code=404, detail="File not found")
     if not os.path.exists(file.path):
         raise HTTPException(status_code=404, detail="File missing on disk")
         
+    if format and format.lower() != os.path.splitext(file.path)[1][1:].lower():
+        import pyembroidery
+        pattern = pyembroidery.read(file.path)
+        if not pattern:
+            raise HTTPException(status_code=500, detail="Failed to read embroidery pattern")
+            
+        target_format = format.lower()
+        temp_path = f"/tmp/converted_{file_id}.{target_format}"
+        try:
+            pyembroidery.write(pattern, temp_path)
+            if background_tasks:
+                background_tasks.add_task(os.remove, temp_path)
+            clean_name = os.path.splitext(os.path.basename(file.path))[0]
+            return FileResponse(temp_path, filename=f"{clean_name}.{target_format}")
+        except Exception as e:
+            raise HTTPException(status_code=500, detail=f"Conversion failed: {e}")
+            
     return FileResponse(file.path, filename=os.path.basename(file.path))
 
 @app.get("/api/import/status")

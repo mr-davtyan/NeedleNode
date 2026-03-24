@@ -203,3 +203,11 @@
   - Expands `.pes` scanner checks to include a tuple of formats: `.dst`, `.jef`, `.exp`, `.vp3`, `.hus`, `.pec`, `.vip`, `.shv`, and `.sew`.
   - Updated renaming algorithms to preserve original extension mappings flawlessly.
 - **Context for Future**: Eliminates strictly PES pipelines dependency cleanly.
+
+## [2026-03-23] Embroidery File Conversion Support
+- **Feature**: Convert and Download supported formats
+- **Description**: 
+  - Added `format` query parameter to `/api/files/{file_id}/download` endpoint.
+  - Generates converted temporary files leveraging `pyembroidery.write` and streams with fully automated `BackgroundTasks` removal flawlessly.
+  - Created selector list controllers and custom click bindings accurately inside Drawer nodes.
+- **Context for Future**: Eliminates strictly static formats setups cleanly.
