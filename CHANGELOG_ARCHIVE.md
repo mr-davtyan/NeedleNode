@@ -65,3 +65,11 @@
   - Added `Dockerfile` utilizing `astral-sh/uv:latest` for speeding up FastAPI setup securely.
   - Introduced `.github/workflows/docker-publish.yml` triggering Docker build pipeline automated building cache setup on origin flawlessly.
 - **Context for Future**: Ensure Secrets `DOCKER_REGISTRY_USERNAME` and `DOCKER_REGISTRY_PASSWORD` are configured on GitHub or Gitea Actions correctly to authorize registry uploads flawlessly.
+
+## [2026-03-23] AI Inbox Classification
+- **Feature**: Automated AI Classification & Filing
+- **Description**: 
+  - Created `backend/classify_inbox.py` utilizing Gemini Vision API to render `.pes` files to image and extract descriptive tags (Main & Sub tags).
+  - Implemented automatic file renaming: `[Main_Tag] - [Sub_Tags_Joined] - [Original_Name].pes`.
+  - Automatically organizes categorized files into discrete `library/<Main_Tag>/` sub-folders seamlessly.
+- **Context for Future**: Run with `uv run backend/classify_inbox.py --api-key <KEY> --run` to process large bundles continuously. Added `--limit` constraint supports safe test increments smoothly.

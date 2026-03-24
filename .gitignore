@@ -4,7 +4,10 @@ __pycache__/
 .cache/
 embroidery.db
 library/
+inbox/
+temp/
 frontend/app.js.map
 node_modules/server.log
 .server.pid
 server.log
+.temp*
