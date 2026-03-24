@@ -166,7 +166,6 @@ async function loadTags() {
             
             // Tag Filter Trigger
             div.addEventListener("click", () => {
-                if (isCollapsed) return; // ignore clicks on collapsed
                 document.querySelectorAll(".tag-item").forEach(t => t.classList.remove("active"));
                 document.getElementById("btn-all").classList.remove("active");
                 div.classList.add("active");
