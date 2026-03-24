@@ -254,3 +254,9 @@
 - **Description**: 
   - Added trigger updating `btn-all` active Class lists inside `DOMContentLoaded` in `app.js` flawlessly resolving highlights errors on restores.
 - **Context for Future**: Empowers fully synchronized layouts natively flawlessy.
+
+## [2026-03-23] Empty Grid Deletion Fix
+- **Feature**: Bug Fixes
+- **Description**: 
+  - Added `if (document.querySelectorAll(".file-card").length === 0) loadFiles(true);` into 4 `.remove()` trigger nodes inside `app.js` flawlessly resolving blank layouts errors on removals.
+- **Context for Future**: Promotes robust stateful syncs natively flawlessly.
