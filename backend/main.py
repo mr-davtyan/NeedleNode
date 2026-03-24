@@ -65,7 +65,9 @@ def get_files(
         query = query.filter(or_(File.name.icontains(search), File.path.icontains(search)))
         
     if tag:
-        query = query.join(File.tags).filter(Tag.name == tag.lower())
+        tag_list = [t.strip().lower() for t in tag.split(",") if t.strip()]
+        for t_name in tag_list:
+            query = query.filter(File.tags.any(Tag.name == t_name))
         
     if starred is not None:
         query = query.filter(File.is_starred == starred)
