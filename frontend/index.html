@@ -55,6 +55,15 @@
                 </div>
                 
                 <div class="header-actions">
+                    <div id="import-progress" class="scan-progress hidden" style="border-color: rgba(142, 45, 226, 0.3);">
+                        <span id="import-text" class="scan-text" style="color: #bc85ff;">Importing...</span>
+                        <div class="progress-bar-bg">
+                            <div id="import-bar-fill" class="progress-bar-fill" style="background: linear-gradient(to right, #8E2DE2, #4A00E0);"></div>
+                        </div>
+                        <span class="progress-numbers"><span id="import-count">0</span> / <span id="import-total">0</span></span>
+                        <button id="btn-stop-import" class="btn-stop">Stop</button>
+                    </div>
+
                     <div id="scan-progress" class="scan-progress hidden">
                         <span id="scan-text" class="scan-text">Scanning...</span>
                         <div class="progress-bar-bg">
@@ -63,6 +72,11 @@
                         <span class="progress-numbers"><span id="scan-count">0</span> / <span id="scan-total">0</span></span>
                         <button id="btn-stop-scan" class="btn-stop">Stop</button>
                     </div>
+
+                    <button id="btn-import" class="btn btn-action" style="background: linear-gradient(135deg, #6441A5, #2a0845); border: none;">
+                        <i class="fa-solid fa-file-import"></i>
+                        <span>Import Inbox</span>
+                    </button>
 
                     <button id="btn-scan" class="btn btn-action">
                         <i class="fa-solid fa-sync"></i>

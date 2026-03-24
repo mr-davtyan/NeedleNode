@@ -7,7 +7,8 @@ from typing import List, Optional
 
 from backend.database import get_db, init_db, File, Tag
 from backend.scanner import scan_directory
-from backend.state import scan_state
+from backend.classify_inbox import process_inbox
+from backend.state import scan_state, import_state
 
 app = FastAPI(title="Embroidery Manager API")
 
@@ -136,6 +137,31 @@ def download_file(file_id: int, db: Session = Depends(get_db)):
         raise HTTPException(status_code=404, detail="File missing on disk")
         
     return FileResponse(file.path, filename=os.path.basename(file.path))
+
+@app.get("/api/import/status")
+def get_import_status():
+    return {
+        "is_importing": import_state.is_importing,
+        "processed": import_state.processed,
+        "total": import_state.total,
+        "current_file": import_state.current_file,
+        "stop_requested": import_state.stop_requested
+    }
+
+@app.post("/api/import/stop")
+def stop_import():
+    if import_state.is_importing:
+        import_state.stop_requested = True
+        return {"status": "stopping", "message": "Import stop requested"}
+    return {"status": "idle", "message": "No import running"}
+
+@app.post("/api/import")
+def trigger_import(background_tasks: BackgroundTasks):
+    if import_state.is_importing:
+        raise HTTPException(status_code=400, detail="Import already in progress")
+    # Trigger live run in background
+    background_tasks.add_task(process_inbox, dry_run=False, batch_size=4)
+    return {"status": "importing", "message": "Background import started"}
 
 @app.post("/api/scan")
 def trigger_scan(background_tasks: BackgroundTasks):

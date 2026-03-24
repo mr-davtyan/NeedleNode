@@ -12,6 +12,7 @@ const tagsList = document.getElementById("tags-list");
 const totalStats = document.getElementById("total-stats");
 const searchInput = document.getElementById("search-input");
 const btnScan = document.getElementById("btn-scan");
+const btnImport = document.getElementById("btn-import");
 const scrollAnchor = document.getElementById("scroll-anchor");
 
 // Modal Elements
@@ -34,6 +35,14 @@ const scanTotal = document.getElementById("scan-total");
 const scanText = document.getElementById("scan-text");
 const progressBarFill = document.getElementById("progress-bar-fill");
 
+// Import Progress
+const importProgress = document.getElementById("import-progress");
+const importCount = document.getElementById("import-count");
+const importTotal = document.getElementById("import-total");
+const importText = document.getElementById("import-text");
+const importBarFill = document.getElementById("import-bar-fill");
+const btnStopImport = document.getElementById("btn-stop-import");
+
 // Init
 document.addEventListener("DOMContentLoaded", () => {
     loadTags();
@@ -41,6 +50,7 @@ document.addEventListener("DOMContentLoaded", () => {
     setupInfiniteScroll();
     setupEventListeners();
     pollScanStatus(); // Start polling on load
+    pollImportStatus(); // Start polling import on load
 });
 
 function setupEventListeners() {
@@ -60,7 +70,6 @@ function setupEventListeners() {
         btnScan.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> <span>Triggering...</span>';
         try {
             await fetch("/api/scan", { method: "POST" });
-            // Immediately start polling
             pollScanStatus();
             setTimeout(() => {
                 btnScan.disabled = false;
@@ -69,6 +78,23 @@ function setupEventListeners() {
         } catch (e) {
             console.error(e);
             btnScan.disabled = false;
+        }
+    });
+
+    // Import Button
+    btnImport.addEventListener("click", async () => {
+        btnImport.disabled = true;
+        btnImport.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> <span>Triggering...</span>';
+        try {
+            await fetch("/api/import", { method: "POST" });
+            pollImportStatus();
+            setTimeout(() => {
+                btnImport.disabled = false;
+                btnImport.innerHTML = '<i class="fa-solid fa-file-import"></i> <span>Import Inbox</span>';
+            }, 2000);
+        } catch (e) {
+            console.error(e);
+            btnImport.disabled = false;
         }
     });
 
@@ -113,6 +139,19 @@ function setupEventListeners() {
             console.error("Failed to stop scan", e);
             btnStopScan.disabled = false;
             btnStopScan.innerText = "Stop Scan 🛑";
+        }
+    });
+
+    // Stop Import Button
+    btnStopImport.addEventListener("click", async () => {
+        btnStopImport.innerText = "Stopping...";
+        btnStopImport.disabled = true;
+        try {
+            await fetch("/api/import/stop", { method: "POST" });
+        } catch (e) {
+            console.error("Failed to stop import", e);
+            btnStopImport.disabled = false;
+            btnStopImport.innerText = "Stop";
         }
     });
 }
@@ -392,5 +431,53 @@ async function pollScanStatus() {
         console.error("Failed to poll scan status", e);
         // Retry polling later
         setTimeout(pollScanStatus, 5000);
+    }
+}
+
+async function pollImportStatus() {
+    try {
+        const res = await fetch("/api/import/status");
+        const status = await res.json();
+        
+        if (status.is_importing) {
+            importProgress.classList.remove("hidden");
+            if (btnImport) btnImport.classList.add("hidden");
+            importCount.innerText = status.processed;
+            importTotal.innerText = status.total;
+            
+            const percent = status.total > 0 ? (status.processed / status.total) * 100 : 0;
+            importBarFill.style.width = `${percent}%`;
+            
+            if (status.current_file) {
+                const fileLabel = status.current_file.length > 20 
+                    ? status.current_file.substring(0, 17) + "..." 
+                    : status.current_file;
+                importText.innerText = `Importing: ${fileLabel}`;
+            } else {
+                importText.innerText = "Importing...";
+            }
+            
+            if (btnStopImport) {
+                btnStopImport.disabled = status.stop_requested || false;
+                if (status.stop_requested) {
+                    btnStopImport.innerText = "Stopping...";
+                } else {
+                    btnStopImport.innerText = "Stop";
+                }
+            }
+            
+            setTimeout(pollImportStatus, 1000);
+        } else {
+            const wasImporting = !importProgress.classList.contains("hidden");
+            importProgress.classList.add("hidden");
+            if (btnImport) btnImport.classList.remove("hidden");
+            if (wasImporting) {
+                loadFiles(true);
+                loadTags();
+            }
+        }
+    } catch (e) {
+        console.error("Failed to poll import status", e);
+        setTimeout(pollImportStatus, 5000);
     }
 }

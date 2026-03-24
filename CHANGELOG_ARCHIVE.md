@@ -73,3 +73,11 @@
   - Implemented automatic file renaming: `[Main_Tag] - [Sub_Tags_Joined] - [Original_Name].pes`.
   - Automatically organizes categorized files into discrete `library/<Main_Tag>/` sub-folders seamlessly.
 - **Context for Future**: Run with `uv run backend/classify_inbox.py --api-key <KEY> --run` to process large bundles continuously. Added `--limit` constraint supports safe test increments smoothly.
+
+## [2026-03-23] Inbox Classification GUI
+- **Feature**: Full Start/Stop operations over Dashboard
+- **Description**: 
+  - Created `ImportState` trackers in `backend/state.py` wireframe setup accurately.
+  - Added REST endpoints `/api/import/status` and `/api/import/stop` managing backend progress statuses flawlessly.
+  - Added Import Dashboard buttons with gradient highlights accurately controlling single-click automation loops smoothly.
+- **Context for Future**: Background triggers execute sequentially inside lists layout flawlessly avoiding CPU lockup freeze triggers accurately.

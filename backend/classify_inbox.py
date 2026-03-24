@@ -7,6 +7,7 @@ from PIL import Image
 from pydantic import BaseModel, Field
 from google import genai
 from google.genai import types
+from backend.state import import_state
 
 # Ensure we are running from project root
 INBOX_DIR = "inbox"
@@ -100,6 +101,9 @@ def process_inbox(dry_run=True, limit=None, batch_size=4):
         print(f"Inbox directory '{INBOX_DIR}' not found.")
         return
 
+    import_state.reset()
+    import_state.is_importing = True
+    
     # Counter
     success_count = 0
     fail_count = 0
@@ -109,100 +113,115 @@ def process_inbox(dry_run=True, limit=None, batch_size=4):
         print(f"Limit: {limit} files")
     print(f"Batch Size: {batch_size}")
 
-    # 1. Collect all files first to facilitate batching
-    all_files = []
-    for root, dirs, files in os.walk(INBOX_DIR):
-         for file in files:
-             if file.lower().endswith(".pes"):
-                 all_files.append((os.path.join(root, file), file))
+    try:
+        # 1. Collect all files first to facilitate batching
+        all_files = []
+        for root, dirs, files in os.walk(INBOX_DIR):
+             for file in files:
+                 if file.lower().endswith(".pes"):
+                     all_files.append((os.path.join(root, file), file))
 
-    if not all_files:
-        print("No .pes files found in inbox.")
-        return
+        if not all_files:
+            print("No .pes files found in inbox.")
+            return
 
-    print(f"Found {len(all_files)} files total in inbox.")
+        import_state.total = len(all_files)
+        print(f"Found {len(all_files)} files total in inbox.")
 
-    # 2. Process in batches
-    for i in range(0, len(all_files), batch_size):
-        if limit and success_count >= limit:
-             print(f"\nReached limit of {limit} files. Stopping.")
-             break
+        # 2. Process in batches
+        for i in range(0, len(all_files), batch_size):
+            if import_state.stop_requested:
+                 print("\nImport stopped by user request.")
+                 break
+                 
+            if limit and success_count >= limit:
+                 print(f"\nReached limit of {limit} files. Stopping.")
+                 break
 
-        current_batch_files = all_files[i : i + batch_size]
-        # Trim if limit would be exceeded
-        if limit and success_count + len(current_batch_files) > limit:
-             current_batch_files = current_batch_files[: limit - success_count]
+            current_batch_files = all_files[i : i + batch_size]
+            if limit and success_count + len(current_batch_files) > limit:
+                 current_batch_files = current_batch_files[: limit - success_count]
 
-        print(f"\n--- Processing Batch of {len(current_batch_files)} files ---")
-        
-        batch_images = []
-        valid_files_in_batch = []
-        
-        for pes_path, file in current_batch_files:
-            try:
-                img = render_pes_to_image(pes_path)
-                batch_images.append((img, file, pes_path))
-                valid_files_in_batch.append((pes_path, file))
-            except Exception as e:
-                print(f"  Error rendering {file}: {e}")
-                fail_count += 1
-
-        if not batch_images:
-            continue
-
-        try:
-            results = classify_embroidery_batch(client, batch_images)
-            results_dict = {r.filename: r for r in results}
+            print(f"\n--- Processing Batch of {len(current_batch_files)} files ---")
             
-            for pes_path, file in valid_files_in_batch:
-                classification = results_dict.get(file)
-                if not classification:
-                    print(f"  Warning: No classification returned for {file}")
+            batch_images = []
+            valid_files_in_batch = []
+            
+            for pes_path, file in current_batch_files:
+                import_state.current_file = file
+                try:
+                    img = render_pes_to_image(pes_path)
+                    batch_images.append((img, file, pes_path))
+                    valid_files_in_batch.append((pes_path, file))
+                except Exception as e:
+                    print(f"  Error rendering {file}: {e}")
                     fail_count += 1
-                    continue
 
-                main_tag = classification.main_tag.strip().replace(" ", "_").replace("/", "-")
-                sub_tags = [t.strip().replace(" ", "-") for t in classification.sub_tags]
+            if not batch_images:
+                continue
+
+            try:
+                results = classify_embroidery_batch(client, batch_images)
+                results_dict = {r.filename: r for r in results}
                 
-                if not main_tag:
-                    main_tag = "Unsorted"
-                    
-                print(f"\nFile: {file}")
-                print(f"  > Main Tag: {main_tag}")
-                print(f"  > Sub Tags: {sub_tags}")
-                
-                # Naming template: library/MainTag/MainTag (sub,tag,list) OriginalName.pes
-                sub_tags_str = ",".join(sub_tags)
-                orig_name_clean = os.path.splitext(file)[0]
-                
-                new_filename = f"{main_tag}"
-                if sub_tags_str:
-                     new_filename += f" ({sub_tags_str})"
-                new_filename += f" {orig_name_clean}.pes"
-                
-                target_dir = os.path.join(LIBRARY_DIR, main_tag)
-                target_path = os.path.join(target_dir, new_filename)
-                
-                print(f"  > Target: {target_path}")
-                
-                if not dry_run:
-                    os.makedirs(target_dir, exist_ok=True)
-                    if os.path.exists(target_path):
-                         print(f"  ! File already exists at target: {target_path}. Skipping.")
-                         fail_count += 1
-                         continue
+                for pes_path, file in valid_files_in_batch:
+                    if import_state.stop_requested:
+                         break
                          
-                    shutil.move(pes_path, target_path)
-                    print("  [MOVED]")
-                
-                success_count += 1
+                    classification = results_dict.get(file)
+                    if not classification:
+                        print(f"  Warning: No classification returned for {file}")
+                        fail_count += 1
+                        continue
 
-        except Exception as e:
-            print(f"Batch processing failed: {e}")
-            fail_count += len(current_batch_files)
-            if "429" in str(e) or "RESOURCE_EXHAUSTED" in str(e):
-                print("Quota exceeded or rate limited. Aborting further requests.")
-                break
+                    main_tag = classification.main_tag.strip().replace(" ", "_").replace("/", "-")
+                    sub_tags = [t.strip().replace(" ", "-") for t in classification.sub_tags]
+                    
+                    if not main_tag:
+                        main_tag = "Unsorted"
+                        
+                    print(f"\nFile: {file}")
+                    print(f"  > Main Tag: {main_tag}")
+                    print(f"  > Sub Tags: {sub_tags}")
+                    
+                    sub_tags_str = ",".join(sub_tags)
+                    orig_name_clean = os.path.splitext(file)[0]
+                    
+                    new_filename = f"{main_tag}"
+                    if sub_tags_str:
+                         new_filename += f" ({sub_tags_str})"
+                    new_filename += f" {orig_name_clean}.pes"
+                    
+                    target_dir = os.path.join(LIBRARY_DIR, main_tag)
+                    target_path = os.path.join(target_dir, new_filename)
+                    
+                    print(f"  > Target: {target_path}")
+                    
+                    if not dry_run:
+                        os.makedirs(target_dir, exist_ok=True)
+                        if os.path.exists(target_path):
+                             print(f"  ! File already exists at target: {target_path}. Skipping.")
+                             fail_count += 1
+                             continue
+                             
+                        shutil.move(pes_path, target_path)
+                        print("  [MOVED]")
+                    
+                    success_count += 1
+                    import_state.processed = success_count
+
+            except Exception as e:
+                print(f"Batch processing failed: {e}")
+                fail_count += len(current_batch_files)
+                if "429" in str(e) or "RESOURCE_EXHAUSTED" in str(e):
+                    print("Quota exceeded or rate limited. Aborting further requests.")
+                    break
+
+    finally:
+        import_state.is_importing = False
+        print(f"\n--- Summary ---")
+        print(f"Processed: {success_count}")
+        print(f"Failed:    {fail_count}")
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Classify embroidery files from inbox to library with AI.")
