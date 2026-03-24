@@ -67,6 +67,21 @@ document.addEventListener("DOMContentLoaded", () => {
     if (savedTags) {
         try { currentTags = JSON.parse(savedTags); } catch (e) {}
     }
+    const savedStarred = localStorage.getItem("selectedStarred");
+    if (savedStarred !== null) {
+        currentStarred = savedStarred === "true";
+        const btn = document.getElementById("btn-starred");
+        if (btn) btn.classList.toggle("active", currentStarred);
+    }
+    
+    // Update active highlight states on load
+    const isAllActive = currentTags.length === 0 && !currentStarred;
+    document.getElementById("btn-all").classList.toggle("active", isAllActive);
+    const btnClearTags = document.getElementById("btn-clear-tags");
+    if (btnClearTags) {
+        btnClearTags.style.display = (!isAllActive) ? "block" : "none";
+    }
+    
     initTheme();
     loadVersion();
     loadTags();
@@ -134,6 +149,7 @@ function setupEventListeners() {
         currentTags = [];
         localStorage.setItem("selectedTags", JSON.stringify([]));
         currentStarred = false;
+        localStorage.setItem("selectedStarred", "false");
         document.querySelectorAll(".tag-item").forEach(t => t.classList.remove("active"));
         document.getElementById("btn-starred").classList.remove("active");
         document.getElementById("btn-all").classList.add("active");
@@ -150,6 +166,7 @@ function setupEventListeners() {
             currentTags = [];
             localStorage.setItem("selectedTags", JSON.stringify([]));
             currentStarred = false;
+            localStorage.setItem("selectedStarred", "false");
             document.querySelectorAll(".tag-item").forEach(t => t.classList.remove("active"));
             document.getElementById("btn-starred").classList.remove("active");
             document.getElementById("btn-all").classList.add("active");
@@ -165,6 +182,7 @@ function setupEventListeners() {
         const btn = document.getElementById("btn-starred");
         currentStarred = !currentStarred;
         btn.classList.toggle("active", currentStarred);
+        localStorage.setItem("selectedStarred", currentStarred);
         document.getElementById("btn-all").classList.toggle("active", currentTags.length === 0 && !currentStarred);
         const clearBtn = document.getElementById("btn-clear-tags");
         if (clearBtn) clearBtn.style.display = (currentTags.length > 0 || currentStarred) ? "block" : "none";
@@ -353,7 +371,9 @@ async function loadFiles(reset = false) {
             if (btnClearEmpty) {
                 btnClearEmpty.addEventListener("click", () => {
                     currentTags = [];
+                    localStorage.setItem("selectedTags", JSON.stringify([]));
                     currentStarred = false;
+                    localStorage.setItem("selectedStarred", "false");
                     searchTerm = "";
                     const searchInput = document.getElementById("search-input");
                     if (searchInput) searchInput.value = "";

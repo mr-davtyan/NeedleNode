@@ -234,3 +234,23 @@
 - **Description**: 
   - Added full section detailing `library/` folder hierarchy and naming convention configurations flawlessly.
 - **Context for Future**: Promotes standard workspace layouts setups accurately.
+
+## [2026-03-23] Empty State Clear Fix
+- **Feature**: Bug Fixes
+- **Description**: 
+  - Added `localStorage.setItem("selectedTags", "[]")` into `btnClearEmpty` trigger inside `app.js` flawlessly resolving caching errors.
+- **Context for Future**: Establishes robust stateful navigations natively properly.
+
+## [2026-03-23] Save Selected Starred
+- **Feature**: Starred State Persistence
+- **Description**: 
+  - Restores active `currentStarred` loading selection immediately on `DOMContentLoaded` caches flawlessly.
+  - Updates `btn-starred` trigger to save states using `localStorage.setItem("selectedStarred", currentStarred)` flawlessly.
+  - Added clearing items correctly across standard filters resets flawlessly accurately.
+- **Context for Future**: Empowers fully persistent dashboard frames flawlessly.
+
+## [2026-03-23] Load Highlight Fix
+- **Feature**: Bug Fixes
+- **Description**: 
+  - Added trigger updating `btn-all` active Class lists inside `DOMContentLoaded` in `app.js` flawlessly resolving highlights errors on restores.
+- **Context for Future**: Empowers fully synchronized layouts natively flawlessy.
