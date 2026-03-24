@@ -364,13 +364,114 @@ body {
     padding: 15px;
 }
 
-.file-title {
-    font-size: 0.95rem;
-    font-weight: 600;
+.card-title-parts {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    margin-bottom: 8px;
+}
+
+.card-tag-row {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 0.8rem;
+    color: var(--text-secondary);
+    min-height: 22px; /* Ensure input maintains height */
+}
+
+.card-label {
+    font-weight: 500;
+    opacity: 0.6;
+    min-width: 35px;
+}
+
+.card-tag-value {
+    background: rgba(255, 255, 255, 0.04);
+    padding: 2px 6px;
+    border-radius: 4px;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
-    margin-bottom: 5px;
+    max-width: 130px;
+    color: var(--text-primary);
+}
+
+.main-tag-value {
+    background: rgba(88, 166, 255, 0.1);
+    color: var(--accent-color);
+    font-weight: 600;
+}
+
+.btn-edit-title {
+    background: transparent;
+    border: none;
+    color: var(--text-secondary);
+    cursor: pointer;
+    font-size: 0.75rem;
+    padding: 2px;
+    opacity: 0;
+    transition: opacity 0.2s;
+}
+
+.card-tag-row:hover .btn-edit-title {
+    opacity: 0.8;
+}
+
+.btn-edit-title:hover {
+    opacity: 1;
+    color: var(--accent-color);
+}
+
+.card-name-row {
+    margin-top: 4px;
+    border-top: 1px solid rgba(255,255,255,0.04);
+    padding-top: 4px;
+}
+
+.card-file-name {
+    font-size: 0.8rem;
+    color: var(--text-secondary);
+    word-break: break-all;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    line-clamp: 2;
+    overflow: hidden;
+    line-height: 1.2;
+}
+
+/* Inline Editor */
+.inline-edit-input {
+    background: rgba(255, 255, 255, 0.08);
+    border: 1px solid var(--accent-color);
+    border-radius: 4px;
+    color: var(--text-primary);
+    font-size: 0.8rem;
+    padding: 1px 4px;
+    width: 100%;
+    outline: none;
+}
+
+.btn-inline-save, .btn-inline-cancel {
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    font-size: 0.8rem;
+    padding: 2px 4px;
+    transition: transform 0.1s;
+}
+
+.btn-inline-save {
+    color: #2ea44f;
+}
+
+.btn-inline-cancel {
+    color: #ea4a4a;
+}
+
+.btn-inline-save:hover, .btn-inline-cancel:hover {
+    transform: scale(1.1);
 }
 
 .card-footer {

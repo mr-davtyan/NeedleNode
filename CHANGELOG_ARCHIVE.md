@@ -81,3 +81,15 @@
   - Added REST endpoints `/api/import/status` and `/api/import/stop` managing backend progress statuses flawlessly.
   - Added Import Dashboard buttons with gradient highlights accurately controlling single-click automation loops smoothly.
 - **Context for Future**: Background triggers execute sequentially inside lists layout flawlessly avoiding CPU lockup freeze triggers accurately.
+
+## [2026-03-23] Card Title Edit & Rename
+- **Feature**: Split Title display & Inline Editing
+- **Description**:
+  - Updated `/api/files` to return separate `main_tags` and `sub_tags` explicitly.
+  - Added `POST /api/files/{file_id}/edit_tags` endpoint supporting absolute file-renames on disk safely with robust regex cleaning support flawlessly.
+  - Refactored `app.js` card structures integrating inline inputs edits supportive layouts natively alongside Pure CSS style additions.
+- **BugFix**: Fixed `TypeError: file.tags is undefined` in `showDetails` by combining `main_tags` and `sub_tags` for modal rendering.
+- **BugFix**: Fixed incorrect Main Tag on card displaying from global `is_main` collisions binding main tag explicitly to path authoritative folders location flawlessly.
+- **BugFix**: Normalized AI classification to prevent singular/plural collisions (e.g., Frame/Frames) by appending authoritative lists of historical categories into prompts forcing singular base-forms reuse flawlessly.
+- **Context for Future**:
+  - Validates folder creations iteratively safely avoiding collisions.
