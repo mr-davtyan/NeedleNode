@@ -184,3 +184,14 @@
   - Added theme toggle button with Smooth transition effects inside dashboard header.
   - Implemented client-side switching script integrating `localStorage` memory supports seamlessly.
 - **Context for Future**: Backward-compatible without impacting residual background rendering pipelines.
+
+## [2026-03-23] Font Warning Fix
+- **Maintenance**: Update Font Awesome from 6.4.0 to 6.5.1
+- **Description**: Resolved "Glyph bbox was incorrect" console noise on dashboard renders smoothly.
+
+## [2026-03-23] Local Font Embedding (Offline Capability)
+- **Feature**: Offline Fonts Support
+- **Description**: 
+  - Downloaded `@fortawesome/fontawesome-free` and `@fontsource/outfit` locally.
+  - Placed items inside `frontend/vendor/` and updated static static bindings in `index.html` flawlessly.
+- **Context for Future**: Empowers air-gapped container networks natively.
