@@ -62,6 +62,11 @@ async function loadVersion() {
 }
 
 document.addEventListener("DOMContentLoaded", () => {
+    // Restore selected tags
+    const savedTags = localStorage.getItem("selectedTags");
+    if (savedTags) {
+        try { currentTags = JSON.parse(savedTags); } catch (e) {}
+    }
     initTheme();
     loadVersion();
     loadTags();
@@ -127,6 +132,7 @@ function setupEventListeners() {
     document.getElementById("btn-all").addEventListener("click", (e) => {
         e.preventDefault();
         currentTags = [];
+        localStorage.setItem("selectedTags", JSON.stringify([]));
         currentStarred = false;
         document.querySelectorAll(".tag-item").forEach(t => t.classList.remove("active"));
         document.getElementById("btn-starred").classList.remove("active");
@@ -142,6 +148,7 @@ function setupEventListeners() {
         btnClearTags.addEventListener("click", (e) => {
             e.preventDefault();
             currentTags = [];
+            localStorage.setItem("selectedTags", JSON.stringify([]));
             currentStarred = false;
             document.querySelectorAll(".tag-item").forEach(t => t.classList.remove("active"));
             document.getElementById("btn-starred").classList.remove("active");
@@ -249,6 +256,7 @@ async function loadTags() {
                     currentTags.push(name);
                     div.classList.add("active");
                 }
+                localStorage.setItem("selectedTags", JSON.stringify(currentTags));
                 document.getElementById("btn-all").classList.toggle("active", currentTags.length === 0 && !currentStarred);
                 if (clearBtn) clearBtn.style.display = (currentTags.length > 0 || currentStarred) ? "block" : "none";
                 loadFiles(true);
