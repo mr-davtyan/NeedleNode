@@ -91,5 +91,6 @@
 - **BugFix**: Fixed `TypeError: file.tags is undefined` in `showDetails` by combining `main_tags` and `sub_tags` for modal rendering.
 - **BugFix**: Fixed incorrect Main Tag on card displaying from global `is_main` collisions binding main tag explicitly to path authoritative folders location flawlessly.
 - **BugFix**: Normalized AI classification to prevent singular/plural collisions (e.g., Frame/Frames) by appending authoritative lists of historical categories into prompts forcing singular base-forms reuse flawlessly.
+- **BugFix**: Resolved folder name capitalization fallback bugs. In edit_tags, fallback Main Tags now derive authoritatively from physical directories location fully preserving current schemas flawlessly.
 - **Context for Future**:
   - Validates folder creations iteratively safely avoiding collisions.

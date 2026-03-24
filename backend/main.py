@@ -243,8 +243,16 @@ def edit_tags(file_id: int, input_data: EditTagsInput, db: Session = Depends(get
         
     current_main_tags = [t.name for t in file.tags if t.is_main]
     current_sub_tags = [t.name for t in file.tags if not t.is_main]
-    curr_main = current_main_tags[0] if current_main_tags else ""
     
+    # Authoritative current main tag from path capitalization fallback
+    parts = file.path.split("/")
+    curr_main = "Unsorted"
+    if len(parts) > 1 and parts[0] == "library":
+         curr_main = parts[1]
+    elif "library" in parts:
+         idx = parts.index("library")
+         if idx + 1 < len(parts):
+              curr_main = parts[idx + 1]
     orig_name = file.name
     clean_base_name = os.path.splitext(orig_name)[0]
     
