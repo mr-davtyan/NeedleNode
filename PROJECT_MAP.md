@@ -24,6 +24,7 @@ A high-performance local web application to organize, tag, and browse thousands 
 
 ## CI/CD & DevOps
 - **Docker**: `Dockerfile` setups isolated system-wide Python FastAPI server bundle correctly.
+- **Docker Compose**: `docker-compose.yml` for local deployment with persistent data volumes.
 - **GitHub Actions**: Automated `.github/workflows/docker-publish.yml` builds/pushes strictly on `VERSION` file changes flawlessly caching layers accurately.
 - **Versioning**: `VERSION` file & `bump-version.sh` for driving tagging seamlessly.
 

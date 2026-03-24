@@ -105,3 +105,12 @@
 - **Feature**: Generated and installed custom needle-node Favicon asset for fully polished aesthetics flawlessly.
 - **Context for Future**:
   - Validates folder creations iteratively safely avoiding collisions.
+
+## [2026-03-23] Docker Compose Deployment
+- **Feature**: Docker Compose Configuration
+- **Description**: 
+  - Modified `backend/database.py` to read `DATABASE_URL` from environment variables, enabling flexible SQLite database paths.
+  - Created `docker-compose.yml` defining necessary persistent volume mounts for `library/`, `inbox/`, `trash/`, `.cache/`, and `/app/data/` (for database).
+- **Context for Future**:
+  - Run `docker compose up -d` to deploy.
+  - Data volumes are mapped to local directories relative to `docker-compose.yml`.
