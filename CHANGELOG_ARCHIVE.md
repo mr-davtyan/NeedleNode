@@ -284,3 +284,10 @@
   - Introduced inclusive filter `+` buttons inside both tag nodes and Starred navigation item structures flawlessly.
   - Toggling item bodies conducts exclusive resets flawlessly while filter button merges streams smoothly.
 
+
+## [2026-03-24] Batch Classification Key Collisions Fix
+- **Feature**: Duplicate Filename Support during Import
+- **Description**: 
+  - Updated `backend/classify_inbox.py` batching mapping to use file relative paths instead of only the file basenames.
+  - This resolves key overwrites inside the Pydantic dict loop when processing images with generic names (e.g., `01.pes`) across nested folders flawlessly.
+
