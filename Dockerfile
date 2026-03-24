@@ -18,6 +18,7 @@ RUN uv pip install --system -r backend/requirements.txt
 # Copy application files
 COPY backend/ ./backend/
 COPY frontend/ ./frontend/
+COPY VERSION ./
 
 # Expose ports
 EXPOSE 8000

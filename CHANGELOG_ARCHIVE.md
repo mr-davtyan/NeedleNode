@@ -268,3 +268,10 @@
   - Increased default process batch parameters limits from `4` to `12` reducing sequential API request setups overhead flawlessly.
   - Aligned triggers inside `/api/import` endpoints execution payloads flawlessly natively within `backend/main.py`.
 - **Context for Future**: No breaking changes; speeds up operations sequentially safely.
+
+## [2026-03-23] Fix Docker Version Display
+- **BugFix**: Copy VERSION file into Dockerfile
+- **Description**: 
+  - Added `COPY VERSION ./` inside the `Dockerfile` to ensure the version file is available inside the container.
+  - This resolves an issue where the `/api/version` endpoint fell back to `0.0.1` because the `VERSION` file was missing from the image bundle flawlessly.
+- **Context for Future**: Ensure any other top-level static asset required by endpoints contains explicit copies directions during builds flawlessly.
