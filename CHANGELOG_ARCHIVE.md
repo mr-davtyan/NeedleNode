@@ -126,3 +126,10 @@
   - Updated `showInlineEditor` function with global `click` listener on `document` using `setTimeout` defer to avoid sync conflicts re-opening accurately.
   - **BugFix**: Re-selected `row` node AFTER `cancel()` to avoid operating on a detached DOM node when switching editors from Main to Sub flawlessly.
 - **Context for Future**: Flawlessly safeguards multiple inputs rendering overlapping views concurrently without race cycles.
+
+## [2026-03-23] File Name Inline Editor
+- **Feature**: Inline editing for file names
+- **Description**: 
+  - Updated backend `EditTagsInput` and `edit_tags` in `main.py` supporting absolute `name` overrides flawlessly.
+  - Updated frontend `app.js` integrating file name selector rows within list nodes flawlessly, wiring trigger clicks efficiently.
+- **Context for Future**: Safeguards original extensions accurately preserving backend string mappings.

@@ -280,8 +280,10 @@ async function loadFiles(reset = false) {
                                 <span class="card-tag-value sub-tags-value" title="${subTags}">${subTags}</span>
                                 <button class="btn-edit-title btn-edit-sub" title="Edit Sub Tags"><i class="fa-solid fa-pen"></i></button>
                             </div>
-                            <div class="card-name-row">
-                                <span class="card-file-name" title="${file.name}">${cleanName}</span>
+                            <div class="card-tag-row card-name-row">
+                                <span class="card-label">Name:</span>
+                                <span class="card-tag-value card-file-name" title="${file.name}">${cleanName}</span>
+                                <button class="btn-edit-title btn-edit-name" title="Edit Name"><i class="fa-solid fa-pen"></i></button>
                             </div>
                         </div>
                         <div class="card-footer">
@@ -313,10 +315,20 @@ async function loadFiles(reset = false) {
                     showInlineEditor(card, file, "sub", renderCardContent);
                 };
                 
+                const btnEditName = card.querySelector(".btn-edit-name");
+                const txtName = card.querySelector(".card-file-name");
+                
+                const triggerNameEdit = (e) => {
+                    e.stopPropagation();
+                    showInlineEditor(card, file, "name", renderCardContent);
+                };
+                
                 if (btnEditMain) btnEditMain.addEventListener("click", triggerMainEdit);
                 if (txtMain) txtMain.addEventListener("click", triggerMainEdit);
                 if (btnEditSub) btnEditSub.addEventListener("click", triggerSubEdit);
                 if (txtSub) txtSub.addEventListener("click", triggerSubEdit);
+                if (btnEditName) btnEditName.addEventListener("click", triggerNameEdit);
+                if (txtName) txtName.addEventListener("click", triggerNameEdit);
                 
                 const star = card.querySelector(".btn-star");
                 star.addEventListener("click", async (e) => {
@@ -556,7 +568,10 @@ function getCleanFileName(name) {
 }
 
 function showInlineEditor(card, file, type, onSuccess) {
-    let row = type === "main" ? card.querySelector(".card-main-row") : card.querySelector(".card-sub-row");
+    let row;
+    if (type === "main") row = card.querySelector(".card-main-row");
+    else if (type === "sub") row = card.querySelector(".card-sub-row");
+    else row = card.querySelector(".card-name-row");
     const valueSpan = row.querySelector(".card-tag-value");
     
     if (!valueSpan) return;
@@ -565,15 +580,16 @@ function showInlineEditor(card, file, type, onSuccess) {
 
     if (activeInlineEditor) {
         activeInlineEditor.cancel();
-        // Re-select row since cancel() replaces card.innerHTML
-        row = type === "main" ? card.querySelector(".card-main-row") : card.querySelector(".card-sub-row");
+        if (type === "main") row = card.querySelector(".card-main-row");
+        else if (type === "sub") row = card.querySelector(".card-sub-row");
+        else row = card.querySelector(".card-name-row");
     }
     
     const input = document.createElement("input");
     input.type = "text";
     input.className = "inline-edit-input";
     input.value = currentValue;
-    input.placeholder = type === "main" ? "Main Tag" : "sub,tags";
+    input.placeholder = type === "main" ? "Main Tag" : (type === "sub" ? "sub,tags" : "File Name");
     
     const btnSave = document.createElement("button");
     btnSave.className = "btn-inline-save";
@@ -619,8 +635,10 @@ function showInlineEditor(card, file, type, onSuccess) {
         let payload = {};
         if (type === "main") {
              payload.main_tag = newValue;
-        } else {
+        } else if (type === "sub") {
              payload.sub_tags = newValue ? newValue.split(",").map(t => t.trim()) : [];
+        } else {
+             payload.name = newValue;
         }
         
         try {

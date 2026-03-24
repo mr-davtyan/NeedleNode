@@ -14,6 +14,7 @@ from pydantic import BaseModel
 class EditTagsInput(BaseModel):
     main_tag: Optional[str] = None
     sub_tags: Optional[List[str]] = None
+    name: Optional[str] = None
 
 # Simple .env loader
 if os.path.exists(".env"):
@@ -293,6 +294,14 @@ def edit_tags(file_id: int, input_data: EditTagsInput, db: Session = Depends(get
               
     if not clean_base_name.strip():
          clean_base_name = "unnamed"
+         
+    if input_data.name is not None:
+         clean_base_name = input_data.name.strip()
+         if clean_base_name.lower().endswith(".pes"):
+              clean_base_name = clean_base_name[:-4]
+         if not clean_base_name:
+              clean_base_name = "unnamed"
+              
     new_main = (input_data.main_tag or curr_main or "Unsorted").strip()
     new_sub_list = [t.strip().lower() for t in (input_data.sub_tags if input_data.sub_tags is not None else current_sub_tags)]
     new_sub_str = ",".join(new_sub_list)
