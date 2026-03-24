@@ -213,3 +213,10 @@
   - Fixed `.select-format option` styles resolving grey-on-dark contrast issues in dark theme flawlessly.
   - Removed border restrictions from `.select-format` correcting white highlights around selector widgets flawlessly.
 - **Context for Future**: Eliminates strictly static formats setups cleanly.
+
+## [2026-03-23] Light Theme Default
+- **Feature**: Default to Light Mode
+- **Description**: 
+  - Added inline script immediately inside `index.html` `<body>` adding `.light-theme` conditionally before rendering flawlessly.
+  - Updated `app.js::initTheme()` default string literal from `"dark"` mapped to `"light"` seamlessly.
+- **Context for Future**: Promotes standard dashboard templates styling alignments natively.

@@ -38,11 +38,14 @@ const progressBarFill = document.getElementById("progress-bar-fill");
 
 // Theme Management
 function initTheme() {
-    const savedTheme = localStorage.getItem("theme") || "dark";
+    const savedTheme = localStorage.getItem("theme") || "light";
     const btnIcon = document.querySelector("#btn-theme-toggle i");
     if (savedTheme === "light") {
          document.body.classList.add("light-theme");
          if (btnIcon) btnIcon.className = "fa-solid fa-sun";
+    } else {
+         document.body.classList.remove("light-theme");
+         if (btnIcon) btnIcon.className = "fa-solid fa-moon";
     }
 }
 
