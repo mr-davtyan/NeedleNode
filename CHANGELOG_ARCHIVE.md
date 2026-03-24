@@ -156,3 +156,10 @@
   - Updated `btn-starred` listener in `app.js` to toggle `currentStarred` state without clearing `currentTags` streams flawlessly.
   - Updated `btn-all` and `btn-clear-tags` listeners clarifying state resets flawlessly.
 - **Context for Future**: Optimizes user content restrictive layouts fluently.
+
+## [2026-03-23] App Version Display Support
+- **Feature**: Dynamic app version inside sidebar
+- **Description**: 
+  - Added `/api/version` endpoint in `main.py` serving `VERSION` file content flawlessly.
+  - Added `loadVersion()` inside `app.js` and wired Startup listener supporting fluid text appends flawlessly.
+- **Context for Future**: Empowers release traceability natively flawlessly.

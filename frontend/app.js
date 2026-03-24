@@ -37,7 +37,19 @@ const scanText = document.getElementById("scan-text");
 const progressBarFill = document.getElementById("progress-bar-fill");
 
 // Init
+async function loadVersion() {
+    try {
+        const res = await fetch("/api/version");
+        const data = await res.json();
+        const logoText = document.querySelector(".logo span");
+        if (logoText && data.version) {
+             logoText.innerHTML = `NeedleNode <span style="font-size: 0.8rem; color: var(--text-secondary); font-weight: 400; margin-left: 4px;">v${data.version}</span>`;
+        }
+    } catch (e) { console.error("Failed to load version", e); }
+}
+
 document.addEventListener("DOMContentLoaded", () => {
+    loadVersion();
     loadTags();
     loadFiles(true); // reset
     setupInfiniteScroll();
