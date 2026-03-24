@@ -138,7 +138,16 @@ def trash_file(file_id: int, db: Session = Depends(get_db)):
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Failed to move file: {e}")
         
+    tags_to_check = list(file.tags)
     db.delete(file)
+    db.flush() # trigger cascades for file_tag junction
+    
+    from backend.database import file_tag
+    for t in tags_to_check:
+         count = db.query(file_tag).filter(file_tag.c.tag_id == t.id).count()
+         if count == 0:
+              db.delete(t)
+              
     db.commit()
     return {"status": "success", "message": "Moved to trash"}
 

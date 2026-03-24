@@ -147,7 +147,7 @@ async function loadTags() {
             if (currentTag === name) div.classList.add("active");
             
             div.innerHTML = `
-                <span class="tag-name">${name} <span class="tag-count" style="font-size: 0.75rem; color: var(--text-secondary); opacity: 0.6; margin-left: 5px;">(${tag.count || 0})</span></span>
+                <span class="tag-name">${name} <span class="tag-count">(${tag.count || 0})</span></span>
                 <button class="btn-toggle-tag" title="${isCollapsed ? 'Show' : 'Hide'}">${isCollapsed ? '<i class="fa-solid fa-plus"></i>' : '<i class="fa-solid fa-minus"></i>'}</button>
             `;
             
@@ -339,6 +339,7 @@ async function loadFiles(reset = false) {
                     try {
                         await fetch(`/api/files/${file.id}/trash`, { method: "POST" });
                         card.remove();
+                        if (typeof loadTags === "function") loadTags(); // Refresh sidebar tags count
                         const totalStats = document.getElementById("total-stats");
                         if (totalStats) {
                              const current = parseInt(totalStats.innerText);

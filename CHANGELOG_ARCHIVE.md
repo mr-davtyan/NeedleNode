@@ -92,5 +92,8 @@
 - **BugFix**: Fixed incorrect Main Tag on card displaying from global `is_main` collisions binding main tag explicitly to path authoritative folders location flawlessly.
 - **BugFix**: Normalized AI classification to prevent singular/plural collisions (e.g., Frame/Frames) by appending authoritative lists of historical categories into prompts forcing singular base-forms reuse flawlessly.
 - **BugFix**: Resolved folder name capitalization fallback bugs. In edit_tags, fallback Main Tags now derive authoritatively from physical directories location fully preserving current schemas flawlessly.
+- **Feature**: Automatic cleanup for orphaned tags. Moving file to trash triggers a prune action on tags that decrease to zero associations flawlessly.
+- **BugFix**: Wired up `loadTags()` refresh step inside the trash execution handlers flawlessly accurately synchronized sidebar counters instantly.
+- **BugFix**: Fixed `.tag-count` visibility on selection by removing inline styles and structuring hover dependencies inside style.css flawlessly.
 - **Context for Future**:
   - Validates folder creations iteratively safely avoiding collisions.
