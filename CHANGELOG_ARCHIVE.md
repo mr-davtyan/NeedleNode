@@ -210,4 +210,6 @@
   - Added `format` query parameter to `/api/files/{file_id}/download` endpoint.
   - Generates converted temporary files leveraging `pyembroidery.write` and streams with fully automated `BackgroundTasks` removal flawlessly.
   - Created selector list controllers and custom click bindings accurately inside Drawer nodes.
+  - Fixed `.select-format option` styles resolving grey-on-dark contrast issues in dark theme flawlessly.
+  - Removed border restrictions from `.select-format` correcting white highlights around selector widgets flawlessly.
 - **Context for Future**: Eliminates strictly static formats setups cleanly.
