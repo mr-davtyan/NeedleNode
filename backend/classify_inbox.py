@@ -13,6 +13,8 @@ from backend.state import import_state
 INBOX_DIR = "inbox"
 LIBRARY_DIR = "library"
 
+SUPPORTED_EXTENSIONS = (".pes", ".dst", ".jef", ".exp", ".vp3", ".hus", ".pec", ".vip", ".shv", ".sew")
+
 # Validate API Key
 if not os.environ.get("GEMINI_API_KEY"):
     print("WARNING: GEMINI_API_KEY environment variable not set. Script may fail.")
@@ -25,16 +27,16 @@ class FileClassification(BaseModel):
 class BatchClassification(BaseModel):
     results: list[FileClassification]
 
-def render_pes_to_image(pes_path: str) -> Image.Image:
+def render_embroidery_to_image(emb_path: str) -> Image.Image:
     """
-    Renders a .pes file to a PIL Image using pyembroidery.
+    Renders an embroidery file to a PIL Image using pyembroidery.
     """
-    pattern = pyembroidery.read(pes_path)
+    pattern = pyembroidery.read(emb_path)
     if not pattern:
-        raise ValueError(f"Could not read pattern from {pes_path}")
+        raise ValueError(f"Could not read pattern from {emb_path}")
         
     # Temporary file for pyembroidery to write to
-    temp_png = f".temp_{os.path.basename(pes_path)}.png"
+    temp_png = f".temp_{os.path.basename(emb_path)}.png"
     try:
         pyembroidery.write_png(pattern, temp_png)
         img = Image.open(temp_png).convert("RGBA")
@@ -132,11 +134,11 @@ def process_inbox(dry_run=True, limit=None, batch_size=4):
         all_files = []
         for root, dirs, files in os.walk(INBOX_DIR):
              for file in files:
-                 if file.lower().endswith(".pes"):
+                 if file.lower().endswith(SUPPORTED_EXTENSIONS):
                      all_files.append((os.path.join(root, file), file))
 
         if not all_files:
-            print("No .pes files found in inbox.")
+            print("No supported embroidery files found in inbox.")
             return
 
         import_state.total = len(all_files)
@@ -164,7 +166,7 @@ def process_inbox(dry_run=True, limit=None, batch_size=4):
             for pes_path, file in current_batch_files:
                 import_state.current_file = file
                 try:
-                    img = render_pes_to_image(pes_path)
+                    img = render_embroidery_to_image(pes_path)
                     batch_images.append((img, file, pes_path))
                     valid_files_in_batch.append((pes_path, file))
                 except Exception as e:
@@ -200,11 +202,12 @@ def process_inbox(dry_run=True, limit=None, batch_size=4):
                     
                     sub_tags_str = ",".join(sub_tags)
                     orig_name_clean = os.path.splitext(file)[0]
+                    orig_ext = os.path.splitext(file)[1]
                     
                     new_filename = f"{main_tag}"
                     if sub_tags_str:
                          new_filename += f" ({sub_tags_str})"
-                    new_filename += f" {orig_name_clean}.pes"
+                    new_filename += f" {orig_name_clean}{orig_ext}"
                     
                     target_dir = os.path.join(LIBRARY_DIR, main_tag)
                     target_path = os.path.join(target_dir, new_filename)

@@ -196,3 +196,10 @@
   - Placed items inside `frontend/vendor/` and updated static static bindings in `index.html` flawlessly.
   - Replaced external image fallback URL with inline data:image SVG for 100% offline support accurately.
 - **Context for Future**: Empowers air-gapped container networks natively.
+
+## [2026-03-23] Multi-Format Embroidery Support
+- **Feature**: Extended Format support
+- **Description**: 
+  - Expands `.pes` scanner checks to include a tuple of formats: `.dst`, `.jef`, `.exp`, `.vp3`, `.hus`, `.pec`, `.vip`, `.shv`, and `.sew`.
+  - Updated renaming algorithms to preserve original extension mappings flawlessly.
+- **Context for Future**: Eliminates strictly PES pipelines dependency cleanly.
