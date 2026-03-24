@@ -60,14 +60,12 @@ function setupEventListeners() {
         btnScan.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> <span>Triggering...</span>';
         try {
             await fetch("/api/scan", { method: "POST" });
-            pollScanStatus();
-            setTimeout(() => {
-                btnScan.disabled = false;
-                btnScan.innerHTML = '<i class="fa-solid fa-sync"></i> <span>Scan Library</span>';
-            }, 2000);
+            // Let FastAPI background thread initialize flags before polling
+            setTimeout(pollScanStatus, 1000); 
         } catch (e) {
             console.error(e);
             btnScan.disabled = false;
+            btnScan.innerHTML = '<i class="fa-solid fa-sync"></i> <span>Scan Library</span>';
         }
     });
 
