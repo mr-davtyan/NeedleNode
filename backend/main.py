@@ -96,17 +96,22 @@ def get_tags(db: Session = Depends(get_db)):
         selectinload(Tag.files).selectinload(File.tags)
     ).join(Tag.files).distinct().all()
     
-    result = []
+    main_tags = []
+    sub_tags = []
+    
     for t in tags:
         if len(t.files) == 1:
             single_file = t.files[0]
             if len(single_file.tags) > 1:
-                # Skip tag if it has 1 file and that file belongs to multiple tags
                 continue
-        # Return object containing is_hidden state
-        result.append({"name": t.name, "is_hidden": t.is_hidden})
         
-    return result
+        tag_data = {"name": t.name, "is_hidden": t.is_hidden}
+        if t.is_main:
+            main_tags.append(tag_data)
+        else:
+            sub_tags.append(tag_data)
+            
+    return {"main": main_tags, "sub": sub_tags}
 
 @app.post("/api/tags/{tag_name}/toggle_hide")
 def toggle_tag_hide(tag_name: str, db: Session = Depends(get_db)):

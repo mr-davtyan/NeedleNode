@@ -168,7 +168,7 @@ async function loadTags() {
         collapsedList.innerHTML = "";
         let collapsedNum = 0;
         
-        tags.forEach(tag => {
+        function createTagNode(tag) {
             const isCollapsed = tag.is_hidden;
             const name = tag.name;
             const div = document.createElement("div");
@@ -198,22 +198,53 @@ async function loadTags() {
                 if (isCollapsed) return; // ignore clicks on collapsed
                 document.querySelectorAll(".tag-item").forEach(t => t.classList.remove("active"));
                 document.getElementById("btn-all").classList.remove("active");
-                document.getElementById("btn-starred").classList.remove("active");
                 div.classList.add("active");
                 currentTag = name;
                 currentStarred = false;
                 loadFiles(true);
             });
             
-            if (isCollapsed) {
-                div.style.background = "rgba(255,255,255,0.01)";
-                div.style.fontSize = "0.75rem";
-                collapsedList.appendChild(div);
-                collapsedNum++;
-            } else {
-                tagsList.appendChild(div);
-            }
-        });
+            return div;
+        }
+
+        // Render Main Tags
+        if (tags.main) {
+            tags.main.forEach(tag => {
+                const div = createTagNode(tag);
+                if (tag.is_hidden) {
+                    collapsedList.appendChild(div);
+                    collapsedNum++;
+                } else {
+                    tagsList.appendChild(div);
+                }
+            });
+        }
+
+        // Add Divider if both main and sub have visible items
+        const hasVisibleMain = tags.main && tags.main.some(t => !t.is_hidden);
+        const hasVisibleSub = tags.sub && tags.sub.some(t => !t.is_hidden);
+        
+        if (hasVisibleMain && hasVisibleSub) {
+            const hr = document.createElement("div");
+            hr.className = "tag-divider";
+            hr.style.height = "1px";
+            hr.style.background = "rgba(255,255,255,0.06)";
+            hr.style.margin = "8px 5px";
+            tagsList.appendChild(hr);
+        }
+
+        // Render Sub Tags
+        if (tags.sub) {
+            tags.sub.forEach(tag => {
+                const div = createTagNode(tag);
+                if (tag.is_hidden) {
+                    collapsedList.appendChild(div);
+                    collapsedNum++;
+                } else {
+                    tagsList.appendChild(div);
+                }
+            });
+        }
         
         if (collapsedCount) collapsedCount.innerText = collapsedNum;
         

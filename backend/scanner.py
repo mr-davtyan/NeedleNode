@@ -27,31 +27,37 @@ def should_keep_tag(w: str) -> bool:
          
     return True
 
-def extract_tags(file_path: str) -> set[str]:
+import re
+
+def extract_tags(file_path: str) -> tuple[set[str], set[str]]:
     """
     Extracts tags from file path and folder structure.
+    Returns (main_tags, sub_tags)
     """
-    tags = set()
+    main_tags = set()
+    sub_tags = set()
+    
     parts = file_path.split("/")
     
-    # Skip 'library/' and look at directories
-    for part in parts[1:-1]:
-        # Clean up common grouping symbols
-        clean_part = part.replace("_", " ").replace("-", " ").replace("(", " ").replace(")", " ")
-        for word in clean_part.split():
-            word = word.strip().lower()
-            if should_keep_tag(word):
-                tags.add(word)
+    if len(parts) > 2:
+        # library/<MainTag>/...
+        # The folder name directly under library is the Main Tag
+        main_tag = parts[1].strip()
+        if should_keep_tag(main_tag.lower()):
+            main_tags.add(main_tag.lower())
+
+    # Also process filename for sub-tags inside parentheses group (chicken,swimsuit,...)
+    filename = parts[-1]
+    
+    match = re.search(r'\((.*?)\)', filename)
+    if match:
+        tag_string = match.group(1)
+        for t in tag_string.split(","):
+            t = t.strip().lower()
+            if should_keep_tag(t):
+                sub_tags.add(t)
                 
-    # Also process filename (excluding extension)
-    filename = parts[-1].rsplit(".", 1)[0]
-    clean_filename = filename.replace("_", " ").replace("-", " ").replace("(", " ").replace(")", " ")
-    for word in clean_filename.split():
-        word = word.strip().lower()
-        if should_keep_tag(word):
-            tags.add(word)
-            
-    return tags
+    return main_tags, sub_tags
 
 def process_file(file_path: str, db: Session) -> bool:
     """
@@ -103,14 +109,27 @@ def process_file(file_path: str, db: Session) -> bool:
         db.flush() # Ensure db_file has an ID and is in session
         
         # Tags processing
-        tags_set = extract_tags(file_path)
-        for tag_name in tags_set:
+        main_tags, sub_tags = extract_tags(file_path)
+        
+        for tag_name in main_tags:
             tag = db.query(Tag).filter(Tag.name == tag_name).first()
             if not tag:
-                tag = Tag(name=tag_name)
+                tag = Tag(name=tag_name, is_main=True)
                 db.add(tag)
-                db.flush() # get tag.id
-            db_file.tags.append(tag)
+                db.flush()
+            else:
+                tag.is_main = True # Update back if overlap found
+            if tag not in db_file.tags:
+                db_file.tags.append(tag)
+                
+        for tag_name in sub_tags:
+            tag = db.query(Tag).filter(Tag.name == tag_name).first()
+            if not tag:
+                tag = Tag(name=tag_name, is_main=False)
+                db.add(tag)
+                db.flush()
+            if tag not in db_file.tags:
+                db_file.tags.append(tag)
             
         db.commit()
         return True
