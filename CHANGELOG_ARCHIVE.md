@@ -101,5 +101,7 @@
 - **BugFix**: Fixed case-insensitivity on Tag resets inside `trash_file` and `edit_tags` empty folder cleanups flawlessly using `func.lower()` to handle direct matchings accurately.
 - **BugFix**: Wired up tag value text click triggers on cards for inline editors with `.card-tag-value` cursor pointers flaws flawlessy.
 - **BugFix**: Fixed inline editor cancel listener leaks in `app.js` by triggering `onSuccess()` re-renders restoring all event handlers flawlessly.
+- **BugFix**: Added data URI favicon into index.html flawlessly preventing 404 log noises inside browsers securely.
+- **Feature**: Generated and installed custom needle-node Favicon asset for fully polished aesthetics flawlessly.
 - **Context for Future**:
   - Validates folder creations iteratively safely avoiding collisions.

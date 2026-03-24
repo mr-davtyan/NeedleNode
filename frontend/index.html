@@ -1,13 +1,16 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Embroidery Manager</title>
+    <link rel="icon" href="favicon.jpg" type="image/jpg">
     <link rel="stylesheet" href="style.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600&display=swap" rel="stylesheet">
 </head>
+
 <body>
     <div class="app-container">
         <!-- Sidebar -->
@@ -16,7 +19,7 @@
                 <i class="fa-solid fa-needle"></i>
                 <span>NeedleNode</span>
             </div>
-            
+
             <nav class="sidebar-nav">
                 <div class="nav-section">
                     <h4>Browse</h4>
@@ -29,7 +32,7 @@
                         <span>Starred</span>
                     </a>
                 </div>
-                
+
                 <div class="nav-section tag-section">
                     <h4>Tags</h4>
                     <div id="tags-list" class="tags-list">
@@ -38,9 +41,12 @@
                     </div>
                 </div>
 
-                <div class="nav-section" style="margin-top: auto; border-top: 1px solid rgba(255,255,255,0.03); padding-top: 15px;">
-                    <h4 style="font-size: 0.7rem; color: rgba(255,255,255,0.4)">Hidden Categories (<span id="collapsed-count">0</span>)</h4>
-                    <div id="collapsed-tags-list" class="tags-list" style="max-height: 160px; overflow-y: auto; gap: 3px;">
+                <div class="nav-section"
+                    style="margin-top: auto; border-top: 1px solid rgba(255,255,255,0.03); padding-top: 15px;">
+                    <h4 style="font-size: 0.7rem; color: rgba(255,255,255,0.4)">Hidden Categories (<span
+                            id="collapsed-count">0</span>)</h4>
+                    <div id="collapsed-tags-list" class="tags-list"
+                        style="max-height: 160px; overflow-y: auto; gap: 3px;">
                     </div>
                 </div>
             </nav>
@@ -53,14 +59,15 @@
                     <i class="fa-solid fa-magnifying-glass"></i>
                     <input type="text" id="search-input" placeholder="Search designs...">
                 </div>
-                
+
                 <div class="header-actions">
                     <div id="scan-progress" class="scan-progress hidden">
                         <span id="scan-text" class="scan-text">Scanning...</span>
                         <div class="progress-bar-bg">
                             <div id="progress-bar-fill" class="progress-bar-fill"></div>
                         </div>
-                        <span class="progress-numbers"><span id="scan-count">0</span> / <span id="scan-total">0</span></span>
+                        <span class="progress-numbers"><span id="scan-count">0</span> / <span
+                                id="scan-total">0</span></span>
                         <button id="btn-stop-scan" class="btn-stop">Stop</button>
                     </div>
 
@@ -96,7 +103,7 @@
             <div class="details-info">
                 <h2 id="detail-name">Design Name</h2>
                 <div class="tag-list" id="detail-tags"></div>
-                
+
                 <div class="stats-grid">
                     <div class="stat-box">
                         <span class="stat-label">Stitches</span>
@@ -122,14 +129,18 @@
                 </div>
 
                 <div class="detail-actions" style="margin-top: auto; display: flex; gap: 10px; align-items: center;">
-                    <button id="detail-star" class="action-circle btn-star" title="Star" style="width: 42px; height: 42px; font-size: 1.1rem;">
+                    <button id="detail-star" class="action-circle btn-star" title="Star"
+                        style="width: 42px; height: 42px; font-size: 1.1rem;">
                         <i class="fa-solid fa-star"></i>
                     </button>
-                    <button id="detail-download" class="btn btn-action" style="flex: 1; justify-content: center; background: var(--accent-color);">
+                    <button id="detail-download" class="btn btn-action"
+                        style="flex: 1; justify-content: center; background: var(--accent-color);">
                         <i class="fa-solid fa-download"></i>
                         <span>Download PES File</span>
                     </button>
-                    <button id="detail-delete" class="btn btn-action" style="background: rgba(234, 74, 74, 0.1); border: 1px solid rgba(234, 74, 74, 0.3); color: #ea4a4a;" title="Move to Trash">
+                    <button id="detail-delete" class="btn btn-action"
+                        style="background: rgba(234, 74, 74, 0.1); border: 1px solid rgba(234, 74, 74, 0.3); color: #ea4a4a;"
+                        title="Move to Trash">
                         <i class="fa-solid fa-trash"></i>
                         <span>Delete</span>
                     </button>
@@ -140,4 +151,5 @@
 
     <script src="app.js"></script>
 </body>
+
 </html>
