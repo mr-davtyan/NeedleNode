@@ -3,6 +3,7 @@ import hashlib
 import pyembroidery
 from datetime import datetime
 from sqlalchemy.orm import Session
+from PIL import Image
 from backend.database import SessionLocal, File, Tag, init_db
 
 THUMBNAIL_DIR = ".cache/thumbnails"
@@ -91,6 +92,12 @@ def process_file(file_path: str, db: Session) -> bool:
         
         # write_png can render view
         pyembroidery.write_png(pattern, thumb_path)
+        
+        # Add white background to thumbnail
+        img = Image.open(thumb_path).convert("RGBA")
+        background = Image.new("RGB", img.size, (255, 255, 255))
+        background.paste(img, (0, 0), img)
+        background.save(thumb_path)
         
         # Database entry
         db_file = File(
