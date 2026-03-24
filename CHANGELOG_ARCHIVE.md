@@ -291,3 +291,13 @@
   - Updated `backend/classify_inbox.py` batching mapping to use file relative paths instead of only the file basenames.
   - This resolves key overwrites inside the Pydantic dict loop when processing images with generic names (e.g., `01.pes`) across nested folders flawlessly.
 
+
+- **Feature**: Toggle Support for Inclusive Sidebar Filters
+- **Description**: 
+  - Updated inclusive `+` buttons to toggle off filters if clicked again when already active flawlessly for both Tags and Starred navigation nodes concurrently.
+
+
+- **BugFix**: Fix Style Inconsistency of Starred Plus Button
+- **Description**: 
+  - Absolute inline styles on the Starred Nav `+` button inside `index.html` were pruned, allowing it to correctly inherit `.btn-toggle-tag` parameters from `style.css` flawlessly.
+
