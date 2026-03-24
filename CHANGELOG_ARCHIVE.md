@@ -149,3 +149,10 @@
   - Updated frontend `index.html` structure introducing `#btn-clear-tags` layouts natively.
   - Refactored `app.js` using `currentTags = []` streaming arrays, enabling fluid and/or selection triggers flawlessly.
 - **Context for Future**: Enhances content discovery workflows flawlessly keeping backwards-compatibility flawless.
+
+## [2026-03-23] Toggleable Starred Filter Support
+- **Feature**: Toggleable starred filter over tags
+- **Description**: 
+  - Updated `btn-starred` listener in `app.js` to toggle `currentStarred` state without clearing `currentTags` streams flawlessly.
+  - Updated `btn-all` and `btn-clear-tags` listeners clarifying state resets flawlessly.
+- **Context for Future**: Optimizes user content restrictive layouts fluently.

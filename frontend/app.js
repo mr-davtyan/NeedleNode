@@ -87,6 +87,7 @@ function setupEventListeners() {
         currentTags = [];
         currentStarred = false;
         document.querySelectorAll(".tag-item").forEach(t => t.classList.remove("active"));
+        document.getElementById("btn-starred").classList.remove("active");
         document.getElementById("btn-all").classList.add("active");
         const btnClear = document.getElementById("btn-clear-tags");
         if (btnClear) btnClear.style.display = "none";
@@ -99,7 +100,9 @@ function setupEventListeners() {
         btnClearTags.addEventListener("click", (e) => {
             e.preventDefault();
             currentTags = [];
+            currentStarred = false;
             document.querySelectorAll(".tag-item").forEach(t => t.classList.remove("active"));
+            document.getElementById("btn-starred").classList.remove("active");
             document.getElementById("btn-all").classList.add("active");
             btnClearTags.style.display = "none";
             loadFiles(true);
@@ -107,14 +110,15 @@ function setupEventListeners() {
     }
 
     // Starred Designs
+    // Starred Designs
     document.getElementById("btn-starred").addEventListener("click", (e) => {
         e.preventDefault();
-        currentTags = [];
-        currentStarred = true;
-        searchTerm = ""; // Clear Search filter
-        document.getElementById("search-input").value = ""; // sync DOM input
-        document.querySelectorAll(".nav-item").forEach(t => t.classList.remove("active"));
-        document.getElementById("btn-starred").classList.add("active");
+        const btn = document.getElementById("btn-starred");
+        currentStarred = !currentStarred;
+        btn.classList.toggle("active", currentStarred);
+        document.getElementById("btn-all").classList.toggle("active", currentTags.length === 0 && !currentStarred);
+        const clearBtn = document.getElementById("btn-clear-tags");
+        if (clearBtn) clearBtn.style.display = (currentTags.length > 0 || currentStarred) ? "block" : "none";
         loadFiles(true);
     });
 
@@ -190,9 +194,8 @@ async function loadTags() {
                     currentTags.push(name);
                     div.classList.add("active");
                 }
-                currentStarred = false;
-                document.getElementById("btn-all").classList.toggle("active", currentTags.length === 0);
-                if (clearBtn) clearBtn.style.display = currentTags.length > 0 ? "block" : "none";
+                document.getElementById("btn-all").classList.toggle("active", currentTags.length === 0 && !currentStarred);
+                if (clearBtn) clearBtn.style.display = (currentTags.length > 0 || currentStarred) ? "block" : "none";
                 loadFiles(true);
             });
             
