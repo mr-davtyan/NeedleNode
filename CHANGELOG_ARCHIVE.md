@@ -176,3 +176,11 @@
 - **Description**: 
   - Created `README.md` at root disclosing Vision and Startup wrappers flawlessy.
 - **Context for Future**: Drives repository readability natively.
+
+## [2026-03-23] Light/Dark Theme Support
+- **Feature**: Dynamic theme switching with persistence
+- **Description**: 
+  - Added CSS variables in `style.css` supporting both dark (default) and light themes.
+  - Added theme toggle button with Smooth transition effects inside dashboard header.
+  - Implemented client-side switching script integrating `localStorage` memory supports seamlessly.
+- **Context for Future**: Backward-compatible without impacting residual background rendering pipelines.
