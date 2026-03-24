@@ -163,3 +163,10 @@
   - Added `/api/version` endpoint in `main.py` serving `VERSION` file content flawlessly.
   - Added `loadVersion()` inside `app.js` and wired Startup listener supporting fluid text appends flawlessly.
 - **Context for Future**: Empowers release traceability natively flawlessly.
+
+## [2026-03-23] Clear Search Button Support
+- **Feature**: Toggleable "X" button inside search bar layout
+- **Description**: 
+  - Added `#btn-clear-search` in `index.html` flawlessly.
+  - Added `input` and `click` listeners toggling absolute cleanup trigger workflows flawlessly in `app.js`.
+- **Context for Future**: Enriched dashboard discoverability natively flawlessly.
