@@ -260,3 +260,11 @@
 - **Description**: 
   - Added `if (document.querySelectorAll(".file-card").length === 0) loadFiles(true);` into 4 `.remove()` trigger nodes inside `app.js` flawlessly resolving blank layouts errors on removals.
 - **Context for Future**: Promotes robust stateful syncs natively flawlessly.
+
+## [2026-03-23] AI Classification Optimization
+- **Feature**: Optimized Batch Size and Image Scaling
+- **Description**: 
+  - Reduced rendering thumbnail dimensions in `backend/classify_inbox.py` from `1024x1024` to `512x512` for faster upload streaming rates.
+  - Increased default process batch parameters limits from `4` to `12` reducing sequential API request setups overhead flawlessly.
+  - Aligned triggers inside `/api/import` endpoints execution payloads flawlessly natively within `backend/main.py`.
+- **Context for Future**: No breaking changes; speeds up operations sequentially safely.
