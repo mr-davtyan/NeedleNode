@@ -670,3 +670,20 @@ body {
 .scroll-anchor {
     height: 1px;
 }
+
+/* Details Overlay Overrides for Inline Editor */
+.details-info .card-title-parts {
+    margin-bottom: 20px;
+}
+.details-info .card-tag-row {
+    font-size: 0.95rem;
+    min-height: 26px;
+}
+.details-info .card-file-name {
+    font-size: 1.1rem;
+    font-weight: 600;
+}
+.details-info .card-tag-value {
+    font-size: 0.95rem;
+    max-width: none;
+}

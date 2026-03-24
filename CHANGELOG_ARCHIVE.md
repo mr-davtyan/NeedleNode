@@ -133,3 +133,11 @@
   - Updated backend `EditTagsInput` and `edit_tags` in `main.py` supporting absolute `name` overrides flawlessly.
   - Updated frontend `app.js` integrating file name selector rows within list nodes flawlessly, wiring trigger clicks efficiently.
 - **Context for Future**: Safeguards original extensions accurately preserving backend string mappings.
+
+## [2026-03-23] Modal Inline Editors Support
+- **Feature**: Inline editors for file details modal
+- **Description**: 
+  - Refactored `showDetails` in `frontend/app.js` to dynamically build layout row triggers mirroring tile grid item structures flawlessly.
+  - Extended re-trigger hooks ensuring synchronizations accurately refresh nodes triggers natively accurately.
+  - Standardized `.card-title-parts` context overrides inside `style.css` scaling viewport formatting flawlessly for larger overlays flawlessly.
+- **Context for Future**: Flawlessly safe multi-stage re-renderings bridge dialog and card synchronizations efficiently.

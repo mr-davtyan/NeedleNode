@@ -371,6 +371,7 @@ async function loadFiles(reset = false) {
             
             renderCardContent();
             file.cardNode = card;
+            file.renderCard = renderCardContent;
             card.addEventListener("click", () => showDetails(file));
             gridContainer.appendChild(card);
         });
@@ -386,8 +387,9 @@ async function loadFiles(reset = false) {
 }
 
 function showDetails(file) {
+    const detailsInfo = document.querySelector(".details-info");
+    
     detailImg.src = `/api/thumbnail/${file.id}`;
-    detailName.innerText = file.name;
     detailPath.innerText = file.path;
     detailSize.innerText = `${(file.size / 1024).toFixed(1)} KB`;
     detailStitches.innerText = file.stitches || "-";
@@ -395,8 +397,65 @@ function showDetails(file) {
     detailWidth.innerText = file.width ? `${file.width.toFixed(1)} mm` : "-";
     detailHeight.innerText = file.height ? `${file.height.toFixed(1)} mm` : "-";
     
-    const combinedTags = [file.main_tag, ...(file.sub_tags || [])].filter(Boolean);
-    detailTags.innerHTML = combinedTags.map(t => `<span class="detail-tag">${t}</span>`).join("");
+    function renderDetailsContent() {
+        const mainTag = file.main_tag || 'Unsorted';
+        const subTags = file.sub_tags && file.sub_tags.length > 0 ? file.sub_tags.join(', ') : '-';
+        const cleanName = getCleanFileName(file.name);
+        
+        let titleParts = detailsInfo.querySelector(".card-title-parts");
+        if (!titleParts) {
+             titleParts = document.createElement("div");
+             titleParts.className = "card-title-parts";
+             detailsInfo.insertBefore(titleParts, detailsInfo.firstChild);
+        }
+        
+        titleParts.innerHTML = `
+            <div class="card-tag-row card-main-row">
+                <span class="card-label">Main:</span>
+                <span class="card-tag-value main-tag-value" title="${mainTag}">${mainTag}</span>
+                <button class="btn-edit-title btn-edit-main" title="Edit Main Tag"><i class="fa-solid fa-pen"></i></button>
+            </div>
+            <div class="card-tag-row card-sub-row">
+                <span class="card-label">Sub:</span>
+                <span class="card-tag-value sub-tags-value" title="${subTags}">${subTags}</span>
+                <button class="btn-edit-title btn-edit-sub" title="Edit Sub Tags"><i class="fa-solid fa-pen"></i></button>
+            </div>
+            <div class="card-tag-row card-name-row">
+                <span class="card-label">Name:</span>
+                <span class="card-tag-value card-file-name" title="${file.name}">${cleanName}</span>
+                <button class="btn-edit-title btn-edit-name" title="Edit Name"><i class="fa-solid fa-pen"></i></button>
+            </div>
+        `;
+        
+        const oldName = detailsInfo.querySelector("#detail-name");
+        const oldTags = detailsInfo.querySelector("#detail-tags");
+        if (oldName) oldName.remove();
+        if (oldTags) oldTags.remove();
+
+        const btnEditMain = titleParts.querySelector(".btn-edit-main");
+        const txtMain = titleParts.querySelector(".main-tag-value");
+        const btnEditSub = titleParts.querySelector(".btn-edit-sub");
+        const txtSub = titleParts.querySelector(".sub-tags-value");
+        const btnEditName = titleParts.querySelector(".btn-edit-name");
+        const txtName = titleParts.querySelector(".card-file-name");
+        
+        const triggerEdit = (type) => (e) => {
+             e.stopPropagation();
+             showInlineEditor(detailsInfo, file, type, () => {
+                  renderDetailsContent();
+                  if (file.renderCard) file.renderCard();
+             });
+        };
+        
+        if (btnEditMain) btnEditMain.addEventListener("click", triggerEdit("main"));
+        if (txtMain) txtMain.addEventListener("click", triggerEdit("main"));
+        if (btnEditSub) btnEditSub.addEventListener("click", triggerEdit("sub"));
+        if (txtSub) txtSub.addEventListener("click", triggerEdit("sub"));
+        if (btnEditName) btnEditName.addEventListener("click", triggerEdit("name"));
+        if (txtName) txtName.addEventListener("click", triggerEdit("name"));
+    }
+
+    renderDetailsContent();
     
     // Wire up star button
     const detailStar = document.getElementById("detail-star");
@@ -413,9 +472,7 @@ function showDetails(file) {
             try {
                 const res = await fetch(`/api/files/${file.id}/star`, { method: "POST" });
                 const result = await res.json();
-                
                 const originalStar = file.cardNode ? file.cardNode.querySelector(".btn-star") : null;
-                
                 if (result.is_starred) {
                     newStar.classList.add("active");
                     file.is_starred = true;
@@ -424,7 +481,7 @@ function showDetails(file) {
                     newStar.classList.remove("active");
                     file.is_starred = false;
                     if (originalStar) originalStar.classList.remove("active");
-                    if (currentStarred && file.cardNode) file.cardNode.remove(); // Remove immediately if viewing Starred Filter viewport
+                    if (currentStarred && file.cardNode) file.cardNode.remove();
                 }
             } catch (e) { console.error("Toggle star inside details failed", e); }
         });
@@ -451,13 +508,10 @@ function showDetails(file) {
                   await fetch(`/api/files/${file.id}/trash`, { method: "POST" });
                   detailsOverlay.classList.remove("active");
                   if (file.cardNode) file.cardNode.remove();
-                  
                   const totalStats = document.getElementById("total-stats");
                   if (totalStats) {
                        const current = parseInt(totalStats.innerText);
-                       if (!isNaN(current)) {
-                            totalStats.innerText = `${current - 1} Designs`;
-                       }
+                       if (!isNaN(current)) totalStats.innerText = `${current - 1} Designs`;
                   }
               } catch (e) { console.error("Trash from details failed", e); }
         });
