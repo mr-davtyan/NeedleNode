@@ -375,7 +375,7 @@ async function loadFiles(reset = false) {
                 
                 card.innerHTML = `
                     <div class="card-preview">
-                        <img src="/api/thumbnail/${file.id}" alt="${file.name}" loading="lazy" onerror="this.src='https://via.placeholder.com/200?text=Error'">
+                        <img src="/api/thumbnail/${file.id}" alt="${file.name}" loading="lazy" onerror="this.onerror=null;this.src='data:image/svg+xml;utf8,<svg xmlns=%22http://www.w3.org/2000/svg%22 width=%22200%22 height=%22200%22><rect width=%22100%25%22 height=%22100%25%22 fill=%22transparent%22/><text x=%2250%25%22 y=%2250%25%22 font-family=%22sans-serif%22 font-size=%2214%22 fill=%22%238b949e%22 text-anchor=%22middle%22 dy=%22.3em%22>No Preview</text></svg>'">
                     </div>
                     <div class="card-info">
                         <div class="card-title-parts">
