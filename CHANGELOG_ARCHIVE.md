@@ -340,5 +340,7 @@
 - **BugFix**: Infinite Scroll Resilience & Scoped Observer Root
   - Added `try-catch` guard around inner `data.items.forEach` card rendering loops inside `app.js` guaranteeing single items metadata corruptions don't halt full page lists layout iterations prematurely.
   - Set explicit `root: document.querySelector('.main-content')` inside `setupInfiniteScroll` ensuring scrolling inside relative scope container bounds accurately triggers IntersectionObserver callbacks without scoping drops natively.
+- **BugFix**: Clear Filters Clears Search input
+  - Updated `btn-all` and `btn-clear-tags` listeners inside `app.js` to explicitly reset `searchTerm = ""` and empty the `#search-input` text, ensuring global filter resets fully accurately.
 - **Context for Future**: Promotes extremely robust continuous navigations supports scales impeccably flawlessly.
 
