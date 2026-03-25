@@ -440,3 +440,12 @@
 - **Optimization**: Main category folders always fully included; padded with popular sub-tags if under 50
 - **Description**: Updated `backend/classify_inbox.py::process_inbox` to always include ALL library subfolder names (main categories) in the prompt — critical for preventing the AI from creating duplicate or variant categories (e.g., "Flower" vs "Flowers"). If the total main tag count is below 50, the remaining slots are filled by querying the DB for the most-associated non-main tags (`is_main=False`), ordered by file count descending. Imports `SessionLocal`, `Tag`, `file_tag`, and `sqlalchemy.func` added.
 - **Context for Future**: The 50-entry cap on `existing_list_str` (in `classify_embroidery_batch`) still applies to trim the final prompt string if main tags exceed 50.
+
+## [2026-03-24] Unify Scan Progress Styling
+- **Feature**: Universal compact scan progress bar
+- **Description**: 
+  - Updated `.scan-progress` in `style.css` to use compact styling (`gap: 6px`, `padding: 6px 10px`) by default.
+  - Hides `.scan-text` (`display: none`) and shrunk `.progress-bar-bg` (`width: 60px`, `height: 4px`) globally.
+  - Removed now-redundant responsive overrides inside the mobile media query.
+- **Context for Future**: No breaking changes; promotes clean header layout for all screen size frames natively.
+
