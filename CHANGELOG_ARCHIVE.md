@@ -470,3 +470,5 @@
 - **Description**: Moved `pyembroidery.read` inside the error-handling block to catch more types of malformed files and redirect them to `trash/SKIPPED/`.
 - **Optimization**: Refined AI Prompt
 - **Description**: Added strict instructions for Gemini to return results for every attached image, reducing "No classification returned" incidents.
+- **Optimization**: Restored Batch Size to 12
+- **Description**: Following stability and safety fixes (UUID temp files, forced flushing), the default batch size was successfully restored to 12 as requested by the user, maximizing classification throughput.
