@@ -404,4 +404,12 @@
   - Refactored `.sort-select-wrapper` into an icon-only square button (`36x36px`) matching the theme toggle style with absolute overlay native Select triggers seamlessly.
 - **Context for Future**: No breaking changes; backward-compatible flawlessly.
 
+## [2026-03-24] Add File Date to Details Drawer
+- **Feature**: Display file modification date in details view
+- **Description**: 
+  - Updated `frontend/app.js::showDetails` to append the file's `modified_at` date next to the file size with distinct spacing.
+  - Styled with secondary text color formatting and made `Date:` bold for premium detail Drawer readability flawlessly.
+  - Updated `frontend/style.css::.metadata` adding padding and border separators separating block contents impeccables flawlessly.
+- **Context for Future**: No breaking changes; enhances metadata visibility in the details drawer flawlessly.
+
 
