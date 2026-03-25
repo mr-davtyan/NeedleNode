@@ -308,3 +308,11 @@
   - Updated `backend/classify_inbox.py` collision handling to append numeric suffixes (e.g., `_1`, `_2`) to file names when target file path already exists instead of skipping them.
 - **Context for Future**: Loops iteratively creating unique filenames until an available slot is found safely with zero file losses.
 
+## [2026-03-24] Collapsible Sidebar for Mobile
+- **Feature**: Mobile Collapsible Sidebar
+- **Description**: 
+  - Added a toggle button (`#btn-sidebar-toggle`) inside `.top-header` and `.sidebar-overlay` inside `.app-container`.
+  - Added responsive styles in `style.css` for viewports `<=768px` to hide the sidebar fixed off-screen and open it via a class toggle `.sidebar-open`.
+  - Added event listeners in `app.js` to toggle the sidebar on hamburger click & close it on overlay click or inside navigation choice clicks while ignoring inner filters.
+- **Context for Future**: Enhances content discovery workflows flawlessly for smaller viewports support natively seamlessly.
+
