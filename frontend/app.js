@@ -289,6 +289,51 @@ function setupEventListeners() {
         }
     });
 
+    // Upload Files
+    const btnUploadFiles = document.getElementById("btn-upload-files");
+    const fileUploadInput = document.getElementById("file-upload-input");
+
+    if (btnUploadFiles && fileUploadInput) {
+        btnUploadFiles.addEventListener("click", (e) => {
+            e.preventDefault();
+            fileUploadInput.click();
+        });
+
+        fileUploadInput.addEventListener("change", async (e) => {
+            if (!e.target.files || e.target.files.length === 0) return;
+
+            const files = Array.from(e.target.files);
+            const formData = new FormData();
+            files.forEach(f => formData.append("files", f));
+
+            const originalText = btnUploadFiles.innerHTML;
+            btnUploadFiles.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> <span>Uploading...</span>';
+            btnUploadFiles.disabled = true;
+
+            try {
+                const res = await fetch("/api/upload", {
+                    method: "POST",
+                    body: formData
+                });
+
+                if (res.ok) {
+                    // Trigger scan automatically
+                    if (btnScan) btnScan.click();
+                } else {
+                    console.error("Upload failed", await res.text());
+                    alert("Failed to upload files.");
+                }
+            } catch (err) {
+                console.error("Error uploading files", err);
+                alert("Error during upload.");
+            } finally {
+                btnUploadFiles.innerHTML = originalText;
+                btnUploadFiles.disabled = false;
+                fileUploadInput.value = ""; // Reset input
+            }
+        });
+    }
+
     // Theme Toggle
     const btnTheme = document.getElementById("btn-theme-toggle");
     if (btnTheme) {

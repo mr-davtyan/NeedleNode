@@ -412,4 +412,11 @@
   - Updated `frontend/style.css::.metadata` adding padding and border separators separating block contents impeccables flawlessly.
 - **Context for Future**: No breaking changes; enhances metadata visibility in the details drawer flawlessly.
 
-
+## [2026-03-24] File Upload Feature
+- **Feature**: Direct file upload to inbox
+- **Description**: 
+  - Added `python-multipart` to `backend/requirements.txt` to support `multipart/form-data` uploads.
+  - Added new `POST /api/upload` endpoint in `backend/main.py` allowing multiple file uploads directly into the `inbox` directory.
+  - Added UI "Upload Files" button and hidden input element in `frontend/index.html` above the Browse section.
+  - Wired frontend event listeners in `frontend/app.js` using `FormData` to handle POST requests and trigger backend scanning automatically upon successful upload.
+- **Context for Future**: Enables adding new designs immediately from the browser interface safely.
