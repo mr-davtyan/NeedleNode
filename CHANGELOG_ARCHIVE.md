@@ -370,5 +370,6 @@
   - Updated `backend/classify_inbox.py` to extract up to 4 dominant colors using Gemini Vision Structured Output.
   - Updated `FileClassification` model adding `main_colors` and updated prompt instructions accordingly.
   - Combines `sub_tags` and `main_colors` together as comma-separated items inside parentheses in renamed outputs directly, automatically enabling scanner backends to ingest colors as tags natively flawlessly.
+  - Added string deduplication to `combined_tags` using `list(dict.fromkeys(sub_tags + main_colors))` guaranteeing output sets contain unique values flawlessly.
 - **Context for Future**: 
   - Backward-compatible structure supporting seamless dashboard navigations flawlessly.
