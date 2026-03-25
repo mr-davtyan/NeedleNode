@@ -1,7 +1,9 @@
 import os
 import shutil
+import tempfile
 import warnings
 import hashlib
+import uuid
 import pyembroidery
 from datetime import datetime
 from sqlalchemy.orm import Session
@@ -110,26 +112,29 @@ def process_file(file_path: str, db: Session) -> bool:
         os.makedirs(shard_dir, exist_ok=True)
         thumb_path = os.path.join(shard_dir, f"{path_hash}.png")
         
-        # write_png can render view
-        pyembroidery.write_png(pattern, thumb_path)
-        
-        # Add white background to thumbnail
+        # Unique temporary file for pyembroidery to write to
+        temp_id = str(uuid.uuid4())
+        temp_png = os.path.join(tempfile.gettempdir(), f".temp_scan_{temp_id}.png")
         try:
+            pyembroidery.write_png(pattern, temp_png)
             with warnings.catch_warnings():
                 warnings.simplefilter('error', Image.DecompressionBombWarning)
-                img = Image.open(thumb_path).convert("RGBA")
-                
+                try:
+                    img = Image.open(temp_png).convert("RGBA")
+                except (Image.DecompressionBombError, Image.DecompressionBombWarning):
+                    # Move huge files to SKIPPED folder
+                    SKIPPED_DIR = "trash/SKIPPED"
+                    os.makedirs(SKIPPED_DIR, exist_ok=True)
+                    shutil.move(file_path, os.path.join(SKIPPED_DIR, os.path.basename(file_path)))
+                    print(f"  Skipping large image and moving to trash/SKIPPED: {os.path.basename(file_path)}", flush=True)
+                    return False # Return False to indicate failure to process
+            
             background = Image.new("RGB", img.size, (255, 255, 255))
             background.paste(img, (0, 0), img)
             background.save(thumb_path)
-        except (Image.DecompressionBombError, Image.DecompressionBombWarning):
-            print(f"Skipping large image: {file_path}")
-            if os.path.exists(thumb_path):
-                os.remove(thumb_path)
-            SKIPPED_DIR = "trash/SKIPPED"
-            os.makedirs(SKIPPED_DIR, exist_ok=True)
-            shutil.move(file_path, os.path.join(SKIPPED_DIR, os.path.basename(file_path)))
-            return False
+        finally:
+            if os.path.exists(temp_png):
+                os.remove(temp_png)
         
         # Database entry
         db_file = File(
@@ -174,7 +179,7 @@ def process_file(file_path: str, db: Session) -> bool:
         return True
     except Exception as e:
         db.rollback()
-        print(f"Error processing {file_path}: {e}")
+        print(f"  Error processing {os.path.basename(file_path)}: {e}", flush=True)
         return False
 
 from backend.state import scan_state
@@ -197,7 +202,7 @@ def clean_orphaned_files(db: Session):
             deleted_count += 1
     if deleted_count > 0:
         db.commit()
-        print(f"Cleaned up {deleted_count} orphaned files from database.")
+        print(f"Cleaned up {deleted_count} orphaned files from database.", flush=True)
 
 def scan_directory(directory: str):
     """
@@ -224,10 +229,10 @@ def scan_directory(directory: str):
         count = 0
         success_count = 0
         
-        print(f"Starting scan in {directory}...")
+        print(f"Starting scan in {directory}...", flush=True)
         for root, _, files in os.walk(directory):
             if scan_state.stop_requested:
-                print("Scan stopped by user request.")
+                print("Scan stopped by user request.", flush=True)
                 break
                 
             for file in files:
@@ -243,9 +248,11 @@ def scan_directory(directory: str):
                     scan_state.processed = count
                     
                     if count % 100 == 0:
-                        print(f"Scanned {count} / {total_files} files... ({success_count} added)")
+                        print(f"Scanned {count} / {total_files} files... ({success_count} added)", flush=True)
                         
-        print(f"Scan complete. Found {count} files, Added {success_count} new entries.")
+        print(f"\n--- Scan Summary ---", flush=True)
+        print(f"Total processed: {count}", flush=True)
+        print(f"Successfully indexed: {success_count}", flush=True)
     finally:
         scan_state.is_scanning = False
         db.close()
