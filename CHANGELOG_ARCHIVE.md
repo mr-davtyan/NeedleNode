@@ -456,3 +456,7 @@
   - Utilized `:has(.scan-progress:not(.hidden))` on `.top-header` to dynamically expand `padding-bottom` and `height: 114px` preventing upward UI shifting when active.
   - Restored `.progress-bar-bg` visibility in the phone view by removing `display: none`.
 - **Context for Future**: Promotes an unobtrusive responsive loading banner layout natively avoiding header component squishing on tiny viewports.
+## [2026-03-25] Skip & Trash Large Embroidery Designs
+- **Feature**: Automatically skip and trash oversized embroidery designs
+- **Description**: Reverted `Image.MAX_IMAGE_PIXELS` limit increase. Instead, implemented logic in `backend/scanner.py` and `backend/classify_inbox.py` to catch Pillow's `DecompressionBombWarning` (as an error) during thumbnail rendering. Files that result in images exceeding the safety limit (~89M pixels) are now automatically moved to `trash/SKIPPED/` to avoid processing overhead and resource exhaustion.
+- **Context for Future**: Safely handles corrupted or exceptionally large designs without crashing the background workers.

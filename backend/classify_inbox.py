@@ -3,6 +3,7 @@ import shutil
 import argparse
 import io
 import tempfile
+import warnings
 import pyembroidery
 from PIL import Image
 from pydantic import BaseModel, Field
@@ -15,6 +16,9 @@ from sqlalchemy import func
 # Ensure we are running from project root
 INBOX_DIR = "inbox"
 LIBRARY_DIR = "library"
+
+class SkipLargeImageError(Exception):
+    pass
 
 SUPPORTED_EXTENSIONS = (".pes", ".dst", ".jef", ".exp", ".vp3", ".hus", ".pec", ".vip", ".shv", ".sew")
 
@@ -43,7 +47,13 @@ def render_embroidery_to_image(emb_path: str) -> Image.Image:
     temp_png = os.path.join(tempfile.gettempdir(), f".temp_{os.path.basename(emb_path)}.png")
     try:
         pyembroidery.write_png(pattern, temp_png)
-        img = Image.open(temp_png).convert("RGBA")
+        with warnings.catch_warnings():
+            warnings.simplefilter('error', Image.DecompressionBombWarning)
+            try:
+                img = Image.open(temp_png).convert("RGBA")
+            except (Image.DecompressionBombError, Image.DecompressionBombWarning):
+                raise SkipLargeImageError(f"Image too large: {os.path.basename(emb_path)}")
+                
         background = Image.new("RGB", img.size, (255, 255, 255))
         background.paste(img, (0, 0), img) # Paste with mask
         img = background
@@ -221,6 +231,12 @@ def process_inbox(dry_run=True, limit=None, batch_size=12):
                     img = render_embroidery_to_image(pes_path)
                     batch_images.append((img, rel_path, pes_path))
                     valid_files_in_batch.append((pes_path, file, rel_path))
+                except SkipLargeImageError as e:
+                    print(f"  {e}")
+                    SKIPPED_DIR = "trash/SKIPPED"
+                    os.makedirs(SKIPPED_DIR, exist_ok=True)
+                    shutil.move(pes_path, os.path.join(SKIPPED_DIR, os.path.basename(pes_path)))
+                    fail_count += 1
                 except Exception as e:
                     print(f"  Error rendering {file}: {e}")
                     fail_count += 1
