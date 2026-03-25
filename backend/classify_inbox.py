@@ -2,6 +2,7 @@ import os
 import shutil
 import argparse
 import io
+import tempfile
 import pyembroidery
 from PIL import Image
 from pydantic import BaseModel, Field
@@ -36,7 +37,7 @@ def render_embroidery_to_image(emb_path: str) -> Image.Image:
         raise ValueError(f"Could not read pattern from {emb_path}")
         
     # Temporary file for pyembroidery to write to
-    temp_png = f".temp_{os.path.basename(emb_path)}.png"
+    temp_png = os.path.join(tempfile.gettempdir(), f".temp_{os.path.basename(emb_path)}.png")
     try:
         pyembroidery.write_png(pattern, temp_png)
         img = Image.open(temp_png).convert("RGBA")

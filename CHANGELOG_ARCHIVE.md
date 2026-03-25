@@ -346,3 +346,13 @@
   - Added pre-filtering filters inside `loadTags` mapping in `app.js` to skip rendering tags where `count <= 1`, keeping the sidebar clean of singular associations.
 - **Context for Future**: Promotes extremely robust continuous navigations supports scales impeccably flawlessly.
 
+## [2026-03-24] Docker Non-Root User Execution
+- **BugFix**: Run Docker container as non-root user (1000:1000)
+- **Description**: 
+  - Added `user: "1000:1000"` to `docker-compose.yml` for the `needlenode` service.
+  - Resolves issue where files moved from `inbox` to `library` were created with `root` ownership on the host.
+  - **BugFix**: Updated `backend/classify_inbox.py` to create temporary files in `tempfile.gettempdir()` (`/tmp`) instead of the current directory, preventing `Permission denied` errors for non-root users.
+- **Context for Future**: 
+  - If applied to an existing setup, existing volume folders may need ownership adjustment on the host: `sudo chown -R 1000:1000 ./library ./inbox ./data ./cache`.
+
+
