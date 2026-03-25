@@ -364,8 +364,11 @@
   - Database stores full paths natively so existing entries remain valid while new files auto-bucket perfectly.
   - **Maintenance**: Added `backend/migrate_thumbnails.py` script to reorganize existing flat thumbnails into sharded buckets on demand flawlessly.
   - **Maintenance**: Integrated `migrate()` execution into `backend/main.py` startup handlers for fully automated reorganizing on container boots flawlessly.
-
-
-
-
-
+## [2026-03-24] AI Classifer Main Colors Support
+- **Feature**: AI Classifer Main Colors Support
+- **Description**: 
+  - Updated `backend/classify_inbox.py` to extract up to 4 dominant colors using Gemini Vision Structured Output.
+  - Updated `FileClassification` model adding `main_colors` and updated prompt instructions accordingly.
+  - Combines `sub_tags` and `main_colors` together as comma-separated items inside parentheses in renamed outputs directly, automatically enabling scanner backends to ingest colors as tags natively flawlessly.
+- **Context for Future**: 
+  - Backward-compatible structure supporting seamless dashboard navigations flawlessly.

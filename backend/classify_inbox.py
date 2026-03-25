@@ -24,6 +24,7 @@ class FileClassification(BaseModel):
     filename: str = Field(description="The exact filename of the image being classified. Used to match classification back to the file.")
     main_tag: str = Field(description="The single most descriptive primary category (e.g., Animals, Floral, Christmas). Capitalize first letter.")
     sub_tags: list[str] = Field(description="List of 3-5 descriptive tags (e.g., ['dog', 'outline']). All lowercase.")
+    main_colors: list[str] = Field(description="List of up to 4 dominant colors (e.g., ['red', 'gold']). All lowercase.")
 
 class BatchClassification(BaseModel):
     results: list[FileClassification]
@@ -83,6 +84,7 @@ def classify_embroidery_batch(client: genai.Client, images_with_filenames: list[
        - **Existing Categories**: {existing_list_str}
        - **Rule**: If the image fits well into ONE of the Existing Categories listed above, REUSE THAT CATEGORY EXACTLY to avoid duplicates. Otherwise, create a new singular category.
     2. Identify **Sub-tags** (Descriptive keywords).
+    3. Identify **Main Colors** (Up to 4 dominant colors).
     
     Return a structured JSON match containing a list of classification results.
     """
@@ -215,6 +217,7 @@ def process_inbox(dry_run=True, limit=None, batch_size=12):
 
                     main_tag = classification.main_tag.strip().replace(" ", "_").replace("/", "-")
                     sub_tags = [t.strip().replace(" ", "-") for t in classification.sub_tags]
+                    main_colors = [c.strip().replace(" ", "-") for c in classification.main_colors] if hasattr(classification, "main_colors") else []
                     
                     if not main_tag:
                         main_tag = "Unsorted"
@@ -222,8 +225,10 @@ def process_inbox(dry_run=True, limit=None, batch_size=12):
                     print(f"\nFile: {file}")
                     print(f"  > Main Tag: {main_tag}")
                     print(f"  > Sub Tags: {sub_tags}")
+                    print(f"  > Colors: {main_colors}")
                     
-                    sub_tags_str = ",".join(sub_tags)
+                    combined_tags = sub_tags + main_colors
+                    sub_tags_str = ",".join(combined_tags)
                     orig_name_clean = os.path.splitext(file)[0]
                     orig_ext = os.path.splitext(file)[1]
                     
