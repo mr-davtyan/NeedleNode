@@ -301,3 +301,10 @@
 - **Description**: 
   - Absolute inline styles on the Starred Nav `+` button inside `index.html` were pruned, allowing it to correctly inherit `.btn-toggle-tag` parameters from `style.css` flawlessly.
 
+
+## [2026-03-24] Import Filename Deduplication
+- **Feature**: Filename Deduplication Support during Import
+- **Description**: 
+  - Updated `backend/classify_inbox.py` collision handling to append numeric suffixes (e.g., `_1`, `_2`) to file names when target file path already exists instead of skipping them.
+- **Context for Future**: Loops iteratively creating unique filenames until an available slot is found safely with zero file losses.
+
