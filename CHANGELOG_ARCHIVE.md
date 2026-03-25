@@ -456,7 +456,13 @@
   - Utilized `:has(.scan-progress:not(.hidden))` on `.top-header` to dynamically expand `padding-bottom` and `height: 114px` preventing upward UI shifting when active.
   - Restored `.progress-bar-bg` visibility in the phone view by removing `display: none`.
 - **Context for Future**: Promotes an unobtrusive responsive loading banner layout natively avoiding header component squishing on tiny viewports.
-## [2026-03-25] Skip & Trash Large Embroidery Designs
+## [2026-03-25] Skip & Trash Large Embroidery Designs (Revised)
 - **Feature**: Automatically skip and trash oversized embroidery designs
 - **Description**: Reverted `Image.MAX_IMAGE_PIXELS` limit increase. Instead, implemented logic in `backend/scanner.py` and `backend/classify_inbox.py` to catch Pillow's `DecompressionBombWarning` (as an error) during thumbnail rendering. Files that result in images exceeding the safety limit (~89M pixels) are now automatically moved to `trash/SKIPPED/` to avoid processing overhead and resource exhaustion.
 - **Context for Future**: Safely handles corrupted or exceptionally large designs without crashing the background workers.
+
+## [2026-03-25] Classification Path & Render Fixes
+- **BugFix**: Sanitize sub-tags and colors to prevent invalid file paths
+- **Description**: Slashes in AI-generated tags (like "9/11") are now automatically replaced with dashes. This prevents `shutil.move` from failing due to non-existent subdirectories in the target filename.
+- **BugFix**: Robust rendering error handling
+- **Description**: Added broad exception handling (catching `TypeError`, etc.) during `pyembroidery` rendering. Files that crash the renderer (e.g., malformed PES files) are now treated as "skipped" and moved to `trash/SKIPPED/` instead of failing the entire batch process.
