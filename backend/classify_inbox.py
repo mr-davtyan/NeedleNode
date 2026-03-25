@@ -39,13 +39,13 @@ def render_embroidery_to_image(emb_path: str) -> Image.Image:
     """
     Renders an embroidery file to a PIL Image using pyembroidery.
     """
-    pattern = pyembroidery.read(emb_path)
-    if not pattern:
-        raise ValueError(f"Could not read pattern from {emb_path}")
-        
     # Temporary file for pyembroidery to write to
     temp_png = os.path.join(tempfile.gettempdir(), f".temp_{os.path.basename(emb_path)}.png")
     try:
+        pattern = pyembroidery.read(emb_path)
+        if not pattern:
+            raise ValueError(f"Could not read pattern from {emb_path}")
+            
         pyembroidery.write_png(pattern, temp_png)
         with warnings.catch_warnings():
             warnings.simplefilter('error', Image.DecompressionBombWarning)
@@ -91,8 +91,8 @@ def classify_embroidery_batch(client: genai.Client, images_with_filenames: list[
     You are an expert at organizing embroidery designs.
     Analyze the attached embroidery pattern images.
     
-    There are {len(images_with_filenames)} images attached, in the order of the files: {", ".join(filenames_list)}.
-    Please classify EACH image. Ensure the `filename` in your response matches the exact filenames provided.
+    CRITICAL: There are EXACTLY {len(images_with_filenames)} images attached. You MUST return a classification for EVERY SINGLE ONE of them. 
+    The file order is: {", ".join(filenames_list)}.
     
     For each image:
     1. Identify the **Main Tag** (Primary Category).
@@ -102,7 +102,7 @@ def classify_embroidery_batch(client: genai.Client, images_with_filenames: list[
     2. Identify **Sub-tags** (Descriptive keywords).
     3. Identify **Main Colors** (Up to 4 dominant colors).
     
-    Return a structured JSON match containing a list of classification results.
+    Return a structured JSON match containing a list of classification results. Verify that the length of the results list is {len(images_with_filenames)}.
     """
     contents.append(prompt)
 
@@ -144,7 +144,7 @@ def get_unique_target_path(target_dir: str, main_tag: str, sub_tags_str: str, or
          
     return target_path, new_filename
 
-def process_inbox(dry_run=True, limit=None, batch_size=12):
+def process_inbox(dry_run=True, limit=None, batch_size=6):
     client = genai.Client() # Uses GEMINI_API_KEY
     
     if not os.path.exists(INBOX_DIR):
@@ -241,9 +241,12 @@ def process_inbox(dry_run=True, limit=None, batch_size=12):
                     os.makedirs(SKIPPED_DIR, exist_ok=True)
                     shutil.move(pes_path, os.path.join(SKIPPED_DIR, os.path.basename(pes_path)))
                     fail_count += 1
+                    # Progress still counts as "processed" for UI
+                    import_state.processed += 1
                 except Exception as e:
                     print(f"  Error rendering {file}: {e}")
                     fail_count += 1
+                    import_state.processed += 1
 
             if not batch_images:
                 continue
@@ -259,7 +262,9 @@ def process_inbox(dry_run=True, limit=None, batch_size=12):
                     classification = results_dict.get(rel_path)
                     if not classification:
                         print(f"  Warning: No classification returned for {file}")
+                        print(f"  Gemini returned: {[r.filename for r in results]}")
                         fail_count += 1
+                        import_state.processed += 1
                         continue
 
                     main_tag = classification.main_tag.strip().replace(" ", "_").replace("/", "-")
@@ -299,11 +304,13 @@ def process_inbox(dry_run=True, limit=None, batch_size=12):
                         print("  [MOVED]")
                     
                     success_count += 1
-                    import_state.processed = success_count
+                    import_state.processed += 1
 
             except Exception as e:
                 print(f"Batch processing failed: {e}")
-                fail_count += len(current_batch_files)
+                batch_len = len(current_batch_files)
+                fail_count += batch_len
+                import_state.processed += batch_len
                 if "429" in str(e) or "RESOURCE_EXHAUSTED" in str(e):
                     print("Quota exceeded or rate limited. Aborting further requests.")
                     break
@@ -330,7 +337,7 @@ if __name__ == "__main__":
     parser.add_argument("--run", action="store_true", help="Perform actual file moving (defaults to dry-run)")
     parser.add_argument("--dry-run", action="store_true", help="Dry run mode (default)")
     parser.add_argument("--limit", type=int, help="Limit number of files to process")
-    parser.add_argument("--batch-size", type=int, default=12, help="Number of files to process per Gemini call")
+    parser.add_argument("--batch-size", type=int, default=6, help="Number of files to process per Gemini call")
     parser.add_argument("--api-key", type=str, help="Gemini API Key")
     args = parser.parse_args()
 

@@ -461,8 +461,12 @@
 - **Description**: Reverted `Image.MAX_IMAGE_PIXELS` limit increase. Instead, implemented logic in `backend/scanner.py` and `backend/classify_inbox.py` to catch Pillow's `DecompressionBombWarning` (as an error) during thumbnail rendering. Files that result in images exceeding the safety limit (~89M pixels) are now automatically moved to `trash/SKIPPED/` to avoid processing overhead and resource exhaustion.
 - **Context for Future**: Safely handles corrupted or exceptionally large designs without crashing the background workers.
 
-## [2026-03-25] Classification Path & Render Fixes
-- **BugFix**: Sanitize sub-tags and colors to prevent invalid file paths
-- **Description**: Slashes in AI-generated tags (like "9/11") are now automatically replaced with dashes. This prevents `shutil.move` from failing due to non-existent subdirectories in the target filename.
-- **BugFix**: Robust rendering error handling
-- **Description**: Added broad exception handling (catching `TypeError`, etc.) during `pyembroidery` rendering. Files that crash the renderer (e.g., malformed PES files) are now treated as "skipped" and moved to `trash/SKIPPED/` instead of failing the entire batch process.
+## [2026-03-25] Batch Classification Reliability & Progress Fixes
+- **Optimization**: Reduced default batch size from 12 to 6
+- **Description**: Smaller batches improve Gemini Vision's accuracy and prevent "missed" files in the structured JSON response.
+- **Feature**: Real-time progress tracking for all files
+- **Description**: The `import_state.processed` counter now increments for every file attempted, including those that fail rendering or classification. This ensures the UI progress bar remains accurate even during errors.
+- **BugFix**: Improved Render Error Handling
+- **Description**: Moved `pyembroidery.read` inside the error-handling block to catch more types of malformed files and redirect them to `trash/SKIPPED/`.
+- **Optimization**: Refined AI Prompt
+- **Description**: Added strict instructions for Gemini to return results for every attached image, reducing "No classification returned" incidents.
