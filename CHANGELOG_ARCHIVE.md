@@ -324,3 +324,11 @@
   - Added early hydration script in `index.html` to prevent flash of style.
   - Integrated persistence in `app.js` using `localStorage.setItem("accent", value)`.
 - **Context for Future**: No breaking changes; speeds up operations sequentially safely with accurate synchronization framework presets natively.
+
+## [2026-03-24] Sidebar Plus Icon Size Update
+- **Feature**: Larger Plus Icon in Sidebar
+- **Description**: 
+  - Increased font-size of `.btn-toggle-tag` in `style.css` from `0.75rem` to `1rem`.
+  - This makes the inclusive filter `+` buttons inside both tag nodes and Starred navigation item structures larger and easier to click.
+- **Context for Future**: No breaking changes; speeds up operations sequentially safely.
+
