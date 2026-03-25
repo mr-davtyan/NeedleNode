@@ -1128,13 +1128,29 @@ body.sidebar-open .sidebar-overlay {
         min-width: 80px;
     }
 
-    .progress-bar-bg {
-        display: none;
-        /* Hide progress bar, leave only numbers and Stop button */
-    }
-
     .header-actions {
         gap: 5px;
+    }
+
+    .top-header:has(.scan-progress:not(.hidden)) {
+        padding-bottom: 44px;
+        height: 114px;
+        transition: padding-bottom 0.2s, height 0.2s;
+    }
+
+    .scan-progress {
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        border-radius: 0;
+        border-left: none;
+        border-right: none;
+        border-bottom: none;
+        border-top: 1px solid var(--border-color);
+        background: var(--item-subtle-bg);
+        justify-content: center;
+        margin: 0;
     }
 }
 

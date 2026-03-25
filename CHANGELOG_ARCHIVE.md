@@ -449,3 +449,10 @@
   - Removed now-redundant responsive overrides inside the mobile media query.
 - **Context for Future**: No breaking changes; promotes clean header layout for all screen size frames natively.
 
+## [2026-03-25] Mobile Layout for Scan Progress
+- **Feature**: Wrap scan progress to second line below search field on phone screens
+- **Description**: 
+  - Updated `@media (max-width: 480px)` in `style.css` to absolutely position `.scan-progress` below the main header.
+  - Utilized `:has(.scan-progress:not(.hidden))` on `.top-header` to dynamically expand `padding-bottom` and `height: 114px` preventing upward UI shifting when active.
+  - Restored `.progress-bar-bg` visibility in the phone view by removing `display: none`.
+- **Context for Future**: Promotes an unobtrusive responsive loading banner layout natively avoiding header component squishing on tiny viewports.
