@@ -373,3 +373,12 @@
   - Added string deduplication to `combined_tags` using `list(dict.fromkeys(sub_tags + main_colors))` guaranteeing output sets contain unique values flawlessly.
 - **Context for Future**: 
   - Backward-compatible structure supporting seamless dashboard navigations flawlessly.
+
+## [2026-03-24] Remove Startup Thumbnail Migration
+- **Maintenance**: Disable automatic thumbnail migration on app startup & remove script
+- **Description**: 
+  - Removed the `migrate()` call from the `@app.on_event("startup")` handler in `backend/main.py` to stop automatic thumbnail sharding reorganize iterations every time the FastAPI container boots flawlessly.
+  - Deleted `backend/migrate_thumbnails.py` script entirely as its automated sharding execution cycle is no longer required natively.
+- **Context for Future**: No breaking changes; speeds up operations sequentially safely.
+
+
