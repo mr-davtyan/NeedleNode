@@ -27,6 +27,7 @@ if not os.environ.get("GEMINI_API_KEY"):
     print("WARNING: GEMINI_API_KEY environment variable not set. Script may fail.")
 
 class FileClassification(BaseModel):
+    batch_index: int = Field(description="The 0-based index of the image in the current batch (0, 1, 2, ...).")
     filename: str = Field(description="The exact filename of the image being classified. Used to match classification back to the file.")
     main_tag: str = Field(description="The single most descriptive primary category (e.g., Animals, Floral, Christmas). Capitalize first letter.")
     sub_tags: list[str] = Field(description="List of 3-5 descriptive tags (e.g., ['dog', 'outline']). All lowercase.")
@@ -92,15 +93,18 @@ def classify_embroidery_batch(client: genai.Client, images_with_filenames: list[
     Analyze the attached embroidery pattern images.
     
     CRITICAL: There are EXACTLY {len(images_with_filenames)} images attached. You MUST return a classification for EVERY SINGLE ONE of them. 
-    The file order is: {", ".join(filenames_list)}.
+    The file order (with 0-based indexes) is:
+    {chr(10).join([f"{idx}: {name}" for idx, name in enumerate(filenames_list)])}
     
     For each image:
-    1. Identify the **Main Tag** (Primary Category).
+    1. Identify the **batch_index** (0, 1, 2, ...).
+    2. Identify the **filename** (for verification).
+    3. Identify the **Main Tag** (Primary Category).
        - ALWAYS use the **Singular** form where applicable (e.g., use 'Frame' instead of 'Frames', 'Fairy' instead of 'Fairies', 'Flower' instead of 'Flowers').
        - **Existing Categories**: {existing_list_str}
        - **Rule**: If the image fits well into ONE of the Existing Categories listed above, REUSE THAT CATEGORY EXACTLY to avoid duplicates. Otherwise, create a new singular category.
-    2. Identify **Sub-tags** (Descriptive keywords).
-    3. Identify **Main Colors** (Up to 4 dominant colors).
+    4. Identify **Sub-tags** (Descriptive keywords).
+    5. Identify **Main Colors** (Up to 4 dominant colors).
     
     Return a structured JSON match containing a list of classification results. Verify that the length of the results list is {len(images_with_filenames)}.
     """
@@ -251,18 +255,21 @@ def process_inbox(dry_run=True, limit=None, batch_size=6):
             if not batch_images:
                 continue
 
+            import time
+            time.sleep(1) # Small delay to prevent resource exhaustion
+            
             try:
                 results = classify_embroidery_batch(client, batch_images, existing_main_tags=existing_main_tags)
-                results_dict = {r.filename: r for r in results}
+                results_dict = {r.batch_index: r for r in results}
                 
-                for pes_path, file, rel_path in valid_files_in_batch:
+                for idx_in_batch, (pes_path, file, rel_path) in enumerate(valid_files_in_batch):
                     if import_state.stop_requested:
                          break
                          
-                    classification = results_dict.get(rel_path)
+                    classification = results_dict.get(idx_in_batch)
                     if not classification:
-                        print(f"  Warning: No classification returned for {file}")
-                        print(f"  Gemini returned: {[r.filename for r in results]}")
+                        print(f"  Warning: No classification returned for index {idx_in_batch} ({file})")
+                        print(f"  Gemini returned indexes: {[r.batch_index for r in results]}")
                         fail_count += 1
                         import_state.processed += 1
                         continue
@@ -328,7 +335,7 @@ def process_inbox(dry_run=True, limit=None, batch_size=6):
                         pass
                         
         import_state.is_importing = False
-        print(f"\n--- Summary ---")
+        print(f"\n--- Inbox Processing Complete ---")
         print(f"Processed: {success_count}")
         print(f"Failed:    {fail_count}")
 
