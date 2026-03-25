@@ -610,7 +610,7 @@ body.light-theme {
 }
 
 .file-meta {
-    font-size: 0.75rem;
+    font-size: 0.60rem;
     color: var(--text-secondary);
     display: flex;
     flex-direction: column;
@@ -1160,4 +1160,70 @@ body.sidebar-open .sidebar-overlay {
     .header-actions {
         gap: 5px;
     }
+}
+
+/* Undo Toast Notification */
+.undo-toast-container {
+    position: fixed;
+    bottom: 30px;
+    left: 20px;
+    right: 20px;
+    display: flex;
+    justify-content: center;
+    transform: translateY(150px);
+    z-index: 9999;
+    transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    pointer-events: none;
+}
+
+.undo-toast-container.active {
+    transform: translateY(0);
+}
+
+.undo-toast {
+    background: var(--bg-color, #0d1117);
+    border: 1px solid var(--accent-color);
+    box-shadow: 0 15px 40px rgba(0, 0, 0, 0.8);
+    border-radius: 12px;
+    padding: 12px 20px;
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    color: var(--text-primary, #c9d1d9);
+    pointer-events: auto;
+    width: 100%;
+    max-width: 400px;
+    justify-content: space-between;
+}
+
+@media (max-width: 768px) {
+    .undo-toast-container {
+        bottom: 80px;
+    }
+}
+
+.undo-toast-msg {
+    font-size: 0.9rem;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 250px;
+}
+
+.btn-undo {
+    background: transparent;
+    border: 1px solid var(--accent-color);
+    color: var(--accent-color);
+    border-radius: 4px;
+    padding: 6px 12px;
+    cursor: pointer;
+    font-weight: 600;
+    font-size: 0.85rem;
+    transition: all 0.2s;
+    white-space: nowrap;
+}
+
+.btn-undo:hover {
+    background: var(--accent-color);
+    color: #fff;
 }

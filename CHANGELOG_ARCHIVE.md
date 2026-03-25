@@ -420,3 +420,13 @@
   - Added UI "Upload Files" button and hidden input element in `frontend/index.html` above the Browse section.
   - Wired frontend event listeners in `frontend/app.js` using `FormData` to handle POST requests and trigger backend scanning automatically upon successful upload.
 - **Context for Future**: Enables adding new designs immediately from the browser interface safely.
+
+## [2026-03-24] Delayed Soft Deletion
+- **Feature**: Replaced deletion confirmations with a 5-second undo toast
+- **Description**: 
+  - Updated `frontend/app.js` to optimistically hide deleted items from the grid and details drawer.
+  - Implemented a `showUndoToast` countdown notification.
+  - Defer the `fetch(..., {method: "POST"})` trash API call until the 5 second countdown completes.
+  - Canceling the deletion via the "Undo" button instantly restores the item to the UI and aborts the API call smoothly.
+  - Appended `.undo-toast` styling variables to `frontend/style.css`.
+- **Context for Future**: Eliminates blocking confirmation dialogs, significantly speeding up curation flow safely.
