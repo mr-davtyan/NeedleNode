@@ -430,3 +430,13 @@
   - Canceling the deletion via the "Undo" button instantly restores the item to the UI and aborts the API call smoothly.
   - Appended `.undo-toast` styling variables to `frontend/style.css`.
 - **Context for Future**: Eliminates blocking confirmation dialogs, significantly speeding up curation flow safely.
+
+## [2026-03-24] AI Token Cost Optimization
+- **Optimization**: Reduce rendered image size for AI classification from 512×512 to 256×256
+- **Description**: Updated `backend/classify_inbox.py::render_embroidery_to_image` to call `img.thumbnail((256, 256))` instead of `(512, 512)`. Since Gemini charges image tokens quadratically with pixel count, this reduces image token cost by approximately 75% per file. Embroidery designs are simple monochrome line art and are fully recognizable at 256px resolution.
+- **Context for Future**: Further savings possible by switching to `gemini-1.5-flash-8b` model or capping the `existing_main_tags` list sent in the prompt.
+
+## [2026-03-24] AI Prompt Tag List — Always Include Main Tags + Pad with Popular Sub-tags
+- **Optimization**: Main category folders always fully included; padded with popular sub-tags if under 50
+- **Description**: Updated `backend/classify_inbox.py::process_inbox` to always include ALL library subfolder names (main categories) in the prompt — critical for preventing the AI from creating duplicate or variant categories (e.g., "Flower" vs "Flowers"). If the total main tag count is below 50, the remaining slots are filled by querying the DB for the most-associated non-main tags (`is_main=False`), ordered by file count descending. Imports `SessionLocal`, `Tag`, `file_tag`, and `sqlalchemy.func` added.
+- **Context for Future**: The 50-entry cap on `existing_list_str` (in `classify_embroidery_batch`) still applies to trim the final prompt string if main tags exceed 50.

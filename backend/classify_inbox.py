@@ -9,6 +9,8 @@ from pydantic import BaseModel, Field
 from google import genai
 from google.genai import types
 from backend.state import import_state
+from backend.database import SessionLocal, Tag, file_tag
+from sqlalchemy import func
 
 # Ensure we are running from project root
 INBOX_DIR = "inbox"
@@ -45,7 +47,7 @@ def render_embroidery_to_image(emb_path: str) -> Image.Image:
         background = Image.new("RGB", img.size, (255, 255, 255))
         background.paste(img, (0, 0), img) # Paste with mask
         img = background
-        img.thumbnail((512, 512))
+        img.thumbnail((256, 256))
         return img
     finally:
         if os.path.exists(temp_png):
@@ -69,7 +71,7 @@ def classify_embroidery_batch(client: genai.Client, images_with_filenames: list[
         ))
         filenames_list.append(name)
 
-    existing_list_str = ", ".join([f"'{t}'" for t in existing_main_tags]) if existing_main_tags else "None"
+    existing_list_str = ", ".join([f"'{t}'" for t in existing_main_tags[:50]]) if existing_main_tags else "None"
     
     prompt = f"""
     You are an expert at organizing embroidery designs.
@@ -151,7 +153,32 @@ def process_inbox(dry_run=True, limit=None, batch_size=12):
         # 0. Get existing main tags for prompt context to avoid singular/plural conflicts
         existing_main_tags = []
         if os.path.exists(LIBRARY_DIR):
-             existing_main_tags = [d for d in os.listdir(LIBRARY_DIR) if os.path.isdir(os.path.join(LIBRARY_DIR, d))]
+             # Always include ALL main category folders (prevents duplicate category creation)
+             existing_main_tags = [
+                 d for d in os.listdir(LIBRARY_DIR)
+                 if os.path.isdir(os.path.join(LIBRARY_DIR, d))
+             ]
+             
+             # If under 50, pad with the most popular sub-tags from the DB
+             if len(existing_main_tags) < 50:
+                 needed = 50 - len(existing_main_tags)
+                 main_tags_set = set(t.lower() for t in existing_main_tags)
+                 db = SessionLocal()
+                 try:
+                     popular_subtags = (
+                         db.query(Tag.name, func.count(file_tag.c.file_id).label("cnt"))
+                         .join(file_tag, Tag.id == file_tag.c.tag_id)
+                         .filter(Tag.is_main == False)
+                         .group_by(Tag.id)
+                         .order_by(func.count(file_tag.c.file_id).desc())
+                         .limit(needed * 2)  # overfetch to allow dedup
+                         .all()
+                     )
+                     for tag_name, _ in popular_subtags:
+                         if tag_name.lower() not in main_tags_set and len(existing_main_tags) < 50:
+                             existing_main_tags.append(tag_name)
+                 finally:
+                     db.close()
              
         # 1. Collect all files first to facilitate batching
         all_files = []
