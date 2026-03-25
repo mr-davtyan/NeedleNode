@@ -472,3 +472,12 @@
 - **Description**: Added strict instructions for Gemini to return results for every attached image, reducing "No classification returned" incidents.
 - **Optimization**: Restored Batch Size to 12
 - **Description**: Following stability and safety fixes (UUID temp files, forced flushing), the default batch size was successfully restored to 12 as requested by the user, maximizing classification throughput.
+
+## [2026-03-25] Parallel Batch Import Execution
+- **Feature**: Parallel Batch Execution for AI Classification
+- **Description**: 
+  - Updated `backend/classify_inbox.py` to use `concurrent.futures.ThreadPoolExecutor` to process multiple image batches concurrently.
+  - Added a `--max-workers` CLI argument and `MAX_WORKERS` environment variable (defaults to 1) to natively scale API throughput safely.
+  - Added `MAX_WORKERS=1` to `docker-compose.yml` to allow easy configuration.
+  - Implemented `threading.Lock()` to secure singleton `import_state` counters and file moving operations, avoiding any race conditions when processing files in parallel safely.
+- **Context for Future**: Drastically speeds up the `.pes` visual classification process. Keep `MAX_WORKERS=1` as default to avoid exhausting Gemini Vision API's rate limits (HTTP 429) natively without explicit overrides.

@@ -6,6 +6,8 @@ import tempfile
 import warnings
 import json
 import uuid
+import threading
+from concurrent.futures import ThreadPoolExecutor, as_completed
 from typing import Optional
 import pyembroidery
 from PIL import Image
@@ -155,7 +157,9 @@ def get_unique_target_path(target_dir: str, main_tag: str, sub_tags_str: str, or
          
     return target_path, new_filename
 
-def process_inbox(dry_run=True, limit=None, batch_size=12):
+def process_inbox(dry_run=True, limit=None, batch_size=12, max_workers=None):
+    if max_workers is None:
+        max_workers = int(os.environ.get("MAX_WORKERS", 1))
     client = genai.Client() # Uses GEMINI_API_KEY
     
     if not os.path.exists(INBOX_DIR):
@@ -218,32 +222,37 @@ def process_inbox(dry_run=True, limit=None, batch_size=12):
             print("No supported embroidery files found in inbox.", flush=True)
             return
         all_files = sorted(all_files, key=lambda x: x[0])
+        
+        if limit:
+            all_files = all_files[:limit]
+            
         import_state.total = len(all_files)
-        print(f"Found {len(all_files)} files total in inbox.", flush=True)
+        print(f"Found {len(all_files)} files total to process.", flush=True)
 
         # 2. Process in batches
+        batches = []
         for i in range(0, len(all_files), batch_size):
-            if import_state.stop_requested:
-                 print("\nImport stopped by user request.", flush=True)
-                 break
-                 
-            if limit and success_count >= limit:
-                 print(f"\nReached limit of {limit} files. Stopping.", flush=True)
-                 break
+            batches.append(all_files[i : i + batch_size])
 
-            current_batch_files = all_files[i : i + batch_size]
-            if limit and success_count + len(current_batch_files) > limit:
-                 current_batch_files = current_batch_files[: limit - success_count]
+        state_lock = threading.Lock()
+
+        def process_batch(current_batch_files):
+            nonlocal success_count, fail_count
+            
+            if import_state.stop_requested:
+                return
 
             print(f"\n--- Processing Batch of {len(current_batch_files)} files ---", flush=True)
             
             batch_images = []
             valid_files_in_batch = []
+            local_success = 0
+            local_fail = 0
             
             for idx_in_batch, (pes_path, file, rel_path) in enumerate(current_batch_files):
-                import_state.current_file = file
+                with state_lock:
+                    import_state.current_file = file
                 try:
-                    # print(f"  Rendering {file}...", flush=True)
                     img = render_embroidery_to_image(pes_path)
                     batch_images.append((img, rel_path, pes_path))
                     valid_files_in_batch.append((pes_path, file, rel_path))
@@ -252,16 +261,19 @@ def process_inbox(dry_run=True, limit=None, batch_size=12):
                     SKIPPED_DIR = "trash/SKIPPED"
                     os.makedirs(SKIPPED_DIR, exist_ok=True)
                     shutil.move(pes_path, os.path.join(SKIPPED_DIR, os.path.basename(pes_path)))
-                    fail_count += 1
-                    # Progress still counts as "processed" for UI
-                    import_state.processed += 1
+                    local_fail += 1
+                    with state_lock:
+                        import_state.processed += 1
                 except Exception as e:
                     print(f"  Error rendering {file}: {e}", flush=True)
-                    fail_count += 1
-                    import_state.processed += 1
+                    local_fail += 1
+                    with state_lock:
+                        import_state.processed += 1
 
             if not batch_images:
-                continue
+                with state_lock:
+                    fail_count += local_fail
+                return
 
             import time
             time.sleep(1) # Small delay to prevent resource exhaustion
@@ -277,9 +289,9 @@ def process_inbox(dry_run=True, limit=None, batch_size=12):
                     classification = results_dict.get(idx_in_batch)
                     if not classification:
                         print(f"  Warning: No classification returned for index {idx_in_batch} ({file})", flush=True)
-                        print(f"  Gemini returned indexes: {[r.batch_index for r in results]}", flush=True)
-                        fail_count += 1
-                        import_state.processed += 1
+                        local_fail += 1
+                        with state_lock:
+                            import_state.processed += 1
                         continue
 
                     main_tag = classification.main_tag.strip().replace(" ", "_").replace("/", "-")
@@ -289,46 +301,45 @@ def process_inbox(dry_run=True, limit=None, batch_size=12):
                     if not main_tag:
                         main_tag = "Unsorted"
                         
-                    print(f"\nFile: {file}")
-                    print(f"  > Main Tag: {main_tag}")
-                    print(f"  > Sub Tags: {sub_tags}")
-                    print(f"  > Colors: {main_colors}")
-                    
                     combined_tags = list(dict.fromkeys(sub_tags + main_colors))
                     sub_tags_str = ",".join(combined_tags)
                     orig_name_clean = os.path.splitext(file)[0]
                     orig_ext = os.path.splitext(file)[1]
                     
                     target_dir = os.path.join(LIBRARY_DIR, main_tag)
-                    target_path, new_filename = get_unique_target_path(target_dir, main_tag, sub_tags_str, orig_name_clean, orig_ext)
                     
-                    print(f"  > Target: {target_path}")
-                    
-                    # Log rename for collisions
-                    initial_filename = f"{main_tag}"
-                    if sub_tags_str:
-                         initial_filename += f" ({sub_tags_str})"
-                    initial_filename += f" {orig_name_clean}{orig_ext}"
-                    
-                    if new_filename != initial_filename:
-                         print(f"  -> Renamed to avoid collision: {new_filename}")
-                    
-                    if not dry_run:
-                        os.makedirs(target_dir, exist_ok=True)
-                        shutil.move(pes_path, target_path)
-                        print("  [MOVED]", flush=True)
-                    
-                    success_count += 1
-                    import_state.processed += 1
+                    with state_lock:
+                        target_path, new_filename = get_unique_target_path(target_dir, main_tag, sub_tags_str, orig_name_clean, orig_ext)
+                        if not dry_run:
+                            os.makedirs(target_dir, exist_ok=True)
+                            shutil.move(pes_path, target_path)
+                            print(f"  [MOVED] {file} -> {new_filename}", flush=True)
+                        else:
+                            print(f"  [DRY-RUN] {file} -> {new_filename}", flush=True)
+                            
+                        local_success += 1
+                        import_state.processed += 1
 
             except Exception as e:
                 print(f"Batch processing failed: {e}", flush=True)
-                batch_len = len(current_batch_files)
-                fail_count += batch_len
-                import_state.processed += batch_len
+                local_fail += len(batch_images)
+                with state_lock:
+                    import_state.processed += len(batch_images)
                 if "429" in str(e) or "RESOURCE_EXHAUSTED" in str(e):
                     print("Quota exceeded or rate limited. Aborting further requests.", flush=True)
-                    break
+                    import_state.stop_requested = True
+                    
+            with state_lock:
+                success_count += local_success
+                fail_count += local_fail
+
+        with ThreadPoolExecutor(max_workers=max_workers) as executor:
+            futures = [executor.submit(process_batch, batch) for batch in batches]
+            for future in as_completed(futures):
+                try:
+                    future.result()
+                except Exception as e:
+                    print(f"Thread Error: {e}", flush=True)
 
     finally:
         # Cleanup empty subdirectories in inbox
@@ -353,6 +364,7 @@ if __name__ == "__main__":
     parser.add_argument("--dry-run", action="store_true", help="Dry run mode (default)")
     parser.add_argument("--limit", type=int, help="Limit number of files to process")
     parser.add_argument("--batch-size", type=int, default=12, help="Number of files to process per Gemini call")
+    parser.add_argument("--max-workers", type=int, default=None, help="Number of concurrent batches to run in parallel (defaults to MAX_WORKERS env var or 1)")
     parser.add_argument("--api-key", type=str, help="Gemini API Key")
     args = parser.parse_args()
 
@@ -360,4 +372,4 @@ if __name__ == "__main__":
         os.environ["GEMINI_API_KEY"] = args.api_key
 
     is_dry = args.dry_run or (not args.run)
-    process_inbox(dry_run=is_dry, limit=args.limit, batch_size=args.batch_size)
+    process_inbox(dry_run=is_dry, limit=args.limit, batch_size=args.batch_size, max_workers=args.max_workers)
