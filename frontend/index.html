@@ -17,6 +17,10 @@
         if (savedTheme === "light") {
             document.body.classList.add("light-theme");
         }
+        const savedAccent = localStorage.getItem("accent") || "green";
+        if (savedAccent !== "green") {
+            document.body.classList.add(`accent-${savedAccent}`);
+        }
     </script>
     <div class="app-container">
         <div class="sidebar-overlay" id="sidebar-overlay"></div>
@@ -81,6 +85,12 @@
                         <span class="progress-numbers"><span id="scan-count">0</span> / <span
                                 id="scan-total">0</span></span>
                         <button id="btn-stop-scan" class="btn-stop">Stop</button>
+                    </div>
+
+                    <div class="accent-picker" id="accent-picker">
+                        <div class="accent-dot dot-green" data-accent="green" title="Green Accent"></div>
+                        <div class="accent-dot dot-blue" data-accent="blue" title="Blue Accent"></div>
+                        <div class="accent-dot dot-orange" data-accent="orange" title="Orange Accent"></div>
                     </div>
 
                     <button id="btn-theme-toggle" class="btn-theme-toggle" title="Toggle Theme">
