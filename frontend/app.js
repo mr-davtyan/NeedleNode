@@ -339,6 +339,10 @@ async function loadTags() {
         const res = await fetch("/api/tags");
         const tags = await res.json();
         
+        // Hide tags with only 1 file
+        if (tags.main) tags.main = tags.main.filter(t => (t.count || 0) > 1);
+        if (tags.sub) tags.sub = tags.sub.filter(t => (t.count || 0) > 1);
+        
         const tagsList = document.getElementById("tags-list");
         tagsList.innerHTML = "";
         

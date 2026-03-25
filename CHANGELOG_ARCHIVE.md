@@ -342,5 +342,7 @@
   - Set explicit `root: document.querySelector('.main-content')` inside `setupInfiniteScroll` ensuring scrolling inside relative scope container bounds accurately triggers IntersectionObserver callbacks without scoping drops natively.
 - **BugFix**: Clear Filters Clears Search input
   - Updated `btn-all` and `btn-clear-tags` listeners inside `app.js` to explicitly reset `searchTerm = ""` and empty the `#search-input` text, ensuring global filter resets fully accurately.
+- **Feature**: Hide Single-File Tags in Sidebar
+  - Added pre-filtering filters inside `loadTags` mapping in `app.js` to skip rendering tags where `count <= 1`, keeping the sidebar clean of singular associations.
 - **Context for Future**: Promotes extremely robust continuous navigations supports scales impeccably flawlessly.
 
