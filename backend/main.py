@@ -72,13 +72,15 @@ def get_files(
         query = query.filter(or_(File.name.icontains(search), File.path.icontains(search)))
         
     if tag:
+        from sqlalchemy import func
         tag_list = [t.strip().lower() for t in tag.split(",") if t.strip()]
         for t_name in tag_list:
-            query = query.filter(File.tags.any(Tag.name == t_name))
+            query = query.filter(File.tags.any(func.lower(Tag.name) == t_name))
         
     if starred is not None:
         query = query.filter(File.is_starred == starred)
         
+    query = query.order_by(File.id)
     total_count = query.count()
     files = query.offset(offset).limit(limit).all()
     

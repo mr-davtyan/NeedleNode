@@ -332,3 +332,13 @@
   - This makes the inclusive filter `+` buttons inside both tag nodes and Starred navigation item structures larger and easier to click.
 - **Context for Future**: No breaking changes; speeds up operations sequentially safely.
 
+## [2026-03-24] Fix Tag File Loading Limit
+- **BugFix**: Case-Insensitive Tag Lookup & Scroll Continuity
+  - Updated `backend/main.py::get_files` to use `func.lower(Tag.name) == t_name` in `.any()` junction block, preventing mixed-case entries in the DB from escaping list pagination lookups natively.
+  - Added `.order_by(File.id)` into `get_files` query providing stable deterministic row slices for `offset/limit` counters.
+  - Updated `frontend/app.js::loadFiles` introducing explicit viewport checking against `#scroll-anchor` automatically triggering iterative loads incrementally until tall containers fill perfectly preventing screen fitting stalls.
+- **BugFix**: Infinite Scroll Resilience & Scoped Observer Root
+  - Added `try-catch` guard around inner `data.items.forEach` card rendering loops inside `app.js` guaranteeing single items metadata corruptions don't halt full page lists layout iterations prematurely.
+  - Set explicit `root: document.querySelector('.main-content')` inside `setupInfiniteScroll` ensuring scrolling inside relative scope container bounds accurately triggers IntersectionObserver callbacks without scoping drops natively.
+- **Context for Future**: Promotes extremely robust continuous navigations supports scales impeccably flawlessly.
+

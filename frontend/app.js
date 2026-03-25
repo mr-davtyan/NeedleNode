@@ -315,7 +315,10 @@ function setupInfiniteScroll() {
         if (entries[0].isIntersecting && !loading && hasMore) {
             loadFiles(false);
         }
-    }, { rootMargin: "200px" });
+    }, { 
+        root: document.querySelector('.main-content'),
+        rootMargin: "200px" 
+    });
     observer.observe(scrollAnchor);
 }
 
@@ -478,132 +481,145 @@ async function loadFiles(reset = false) {
         }
 
         data.items.forEach(file => {
-            const card = document.createElement("div");
-            card.className = "file-card";
-            
-            function renderCardContent() {
-                const cleanName = getCleanFileName(file.name);
-                const mainTag = file.main_tag || 'Unsorted';
-                const subTags = file.sub_tags && file.sub_tags.length > 0 ? file.sub_tags.join(', ') : '-';
+            try {
+                const card = document.createElement("div");
+                card.className = "file-card";
                 
-                card.innerHTML = `
-                    <div class="card-preview">
-                        <img src="/api/thumbnail/${file.id}" alt="${file.name}" loading="lazy" onerror="this.onerror=null;this.src='data:image/svg+xml;utf8,<svg xmlns=%22http://www.w3.org/2000/svg%22 width=%22200%22 height=%22200%22><rect width=%22100%25%22 height=%22100%25%22 fill=%22transparent%22/><text x=%2250%25%22 y=%2250%25%22 font-family=%22sans-serif%22 font-size=%2214%22 fill=%22%238b949e%22 text-anchor=%22middle%22 dy=%22.3em%22>No Preview</text></svg>'">
-                    </div>
-                    <div class="card-info">
-                        <div class="card-title-parts">
-                            <div class="card-tag-row card-main-row">
-                                <span class="card-label">Main:</span>
-                                <span class="card-tag-value main-tag-value" title="${mainTag}">${mainTag}</span>
-                                <button class="btn-edit-title btn-edit-main" title="Edit Main Tag"><i class="fa-solid fa-pen"></i></button>
+                function renderCardContent() {
+                    const cleanName = getCleanFileName(file.name);
+                    const mainTag = file.main_tag || 'Unsorted';
+                    const subTags = file.sub_tags && file.sub_tags.length > 0 ? file.sub_tags.join(', ') : '-';
+                    
+                    card.innerHTML = `
+                        <div class="card-preview">
+                            <img src="/api/thumbnail/${file.id}" alt="${file.name}" loading="lazy" onerror="this.onerror=null;this.src='data:image/svg+xml;utf8,<svg xmlns=%22http://www.w3.org/2000/svg%22 width=%22200%22 height=%22200%22><rect width=%22100%25%22 height=%22100%25%22 fill=%22transparent%22/><text x=%2250%25%22 y=%2250%25%22 font-family=%22sans-serif%22 font-size=%2214%22 fill=%22%238b949e%22 text-anchor=%22middle%22 dy=%22.3em%22>No Preview</text></svg>'">
+                        </div>
+                        <div class="card-info">
+                            <div class="card-title-parts">
+                                <div class="card-tag-row card-main-row">
+                                    <span class="card-label">Main:</span>
+                                    <span class="card-tag-value main-tag-value" title="${mainTag}">${mainTag}</span>
+                                    <button class="btn-edit-title btn-edit-main" title="Edit Main Tag"><i class="fa-solid fa-pen"></i></button>
+                                </div>
+                                <div class="card-tag-row card-sub-row">
+                                    <span class="card-label">Sub:</span>
+                                    <span class="card-tag-value sub-tags-value" title="${subTags}">${subTags}</span>
+                                    <button class="btn-edit-title btn-edit-sub" title="Edit Sub Tags"><i class="fa-solid fa-pen"></i></button>
+                                </div>
+                                <div class="card-tag-row card-name-row">
+                                    <span class="card-label">Name:</span>
+                                    <span class="card-tag-value card-file-name" title="${file.name}">${cleanName}</span>
+                                    <button class="btn-edit-title btn-edit-name" title="Edit Name"><i class="fa-solid fa-pen"></i></button>
+                                </div>
                             </div>
-                            <div class="card-tag-row card-sub-row">
-                                <span class="card-label">Sub:</span>
-                                <span class="card-tag-value sub-tags-value" title="${subTags}">${subTags}</span>
-                                <button class="btn-edit-title btn-edit-sub" title="Edit Sub Tags"><i class="fa-solid fa-pen"></i></button>
-                            </div>
-                            <div class="card-tag-row card-name-row">
-                                <span class="card-label">Name:</span>
-                                <span class="card-tag-value card-file-name" title="${file.name}">${cleanName}</span>
-                                <button class="btn-edit-title btn-edit-name" title="Edit Name"><i class="fa-solid fa-pen"></i></button>
+                            <div class="card-footer">
+                                <div class="file-meta">
+                                    <span>${file.stitches} S</span>
+                                    <span>${(file.size / 1024).toFixed(1)} KB</span>
+                                </div>
+                                <div class="card-actions">
+                                    <button class="action-circle btn-star ${file.is_starred ? 'active' : ''}" title="Star"><i class="fa-solid fa-star"></i></button>
+                                    <button class="action-circle btn-download" title="Download"><i class="fa-solid fa-download"></i></button>
+                                    <button class="action-circle btn-trash" title="Move to Trash"><i class="fa-solid fa-trash"></i></button>
+                                </div>
                             </div>
                         </div>
-                        <div class="card-footer">
-                            <div class="file-meta">
-                                <span>${file.stitches} S</span>
-                                <span>${(file.size / 1024).toFixed(1)} KB</span>
-                            </div>
-                            <div class="card-actions">
-                                <button class="action-circle btn-star ${file.is_starred ? 'active' : ''}" title="Star"><i class="fa-solid fa-star"></i></button>
-                                <button class="action-circle btn-download" title="Download"><i class="fa-solid fa-download"></i></button>
-                                <button class="action-circle btn-trash" title="Move to Trash"><i class="fa-solid fa-trash"></i></button>
-                            </div>
-                        </div>
-                    </div>
-                `;
-                
-                const btnEditMain = card.querySelector(".btn-edit-main");
-                const btnEditSub = card.querySelector(".btn-edit-sub");
-                const txtMain = card.querySelector(".main-tag-value");
-                const txtSub = card.querySelector(".sub-tags-value");
-                
-                const triggerMainEdit = (e) => {
-                    e.stopPropagation();
-                    showInlineEditor(card, file, "main", renderCardContent);
-                };
-                
-                const triggerSubEdit = (e) => {
-                    e.stopPropagation();
-                    showInlineEditor(card, file, "sub", renderCardContent);
-                };
-                
-                const btnEditName = card.querySelector(".btn-edit-name");
-                const txtName = card.querySelector(".card-file-name");
-                
-                const triggerNameEdit = (e) => {
-                    e.stopPropagation();
-                    showInlineEditor(card, file, "name", renderCardContent);
-                };
-                
-                if (btnEditMain) btnEditMain.addEventListener("click", triggerMainEdit);
-                if (txtMain) txtMain.addEventListener("click", triggerMainEdit);
-                if (btnEditSub) btnEditSub.addEventListener("click", triggerSubEdit);
-                if (txtSub) txtSub.addEventListener("click", triggerSubEdit);
-                if (btnEditName) btnEditName.addEventListener("click", triggerNameEdit);
-                if (txtName) txtName.addEventListener("click", triggerNameEdit);
-                
-                const star = card.querySelector(".btn-star");
-                star.addEventListener("click", async (e) => {
-                    e.stopPropagation();
-                    try {
-                        const res = await fetch(`/api/files/${file.id}/star`, { method: "POST" });
-                        const result = await res.json();
-                        file.is_starred = result.is_starred;
-                        if (result.is_starred) {
-                            star.classList.add("active");
-                        } else {
-                            star.classList.remove("active");
-                            if (currentStarred) {
-                                card.remove();
-                                if (document.querySelectorAll(".file-card").length === 0) loadFiles(true);
+                    `;
+                    
+                    const btnEditMain = card.querySelector(".btn-edit-main");
+                    const btnEditSub = card.querySelector(".btn-edit-sub");
+                    const txtMain = card.querySelector(".main-tag-value");
+                    const txtSub = card.querySelector(".sub-tags-value");
+                    
+                    const triggerMainEdit = (e) => {
+                        e.stopPropagation();
+                        showInlineEditor(card, file, "main", renderCardContent);
+                    };
+                    
+                    const triggerSubEdit = (e) => {
+                        e.stopPropagation();
+                        showInlineEditor(card, file, "sub", renderCardContent);
+                    };
+                    
+                    const btnEditName = card.querySelector(".btn-edit-name");
+                    const txtName = card.querySelector(".card-file-name");
+                    
+                    const triggerNameEdit = (e) => {
+                        e.stopPropagation();
+                        showInlineEditor(card, file, "name", renderCardContent);
+                    };
+                    
+                    if (btnEditMain) btnEditMain.addEventListener("click", triggerMainEdit);
+                    if (txtMain) txtMain.addEventListener("click", triggerMainEdit);
+                    if (btnEditSub) btnEditSub.addEventListener("click", triggerSubEdit);
+                    if (txtSub) txtSub.addEventListener("click", triggerSubEdit);
+                    if (btnEditName) btnEditName.addEventListener("click", triggerNameEdit);
+                    if (txtName) txtName.addEventListener("click", triggerNameEdit);
+                    
+                    const star = card.querySelector(".btn-star");
+                    star.addEventListener("click", async (e) => {
+                        e.stopPropagation();
+                        try {
+                            const res = await fetch(`/api/files/${file.id}/star`, { method: "POST" });
+                            const result = await res.json();
+                            file.is_starred = result.is_starred;
+                            if (result.is_starred) {
+                                star.classList.add("active");
+                            } else {
+                                star.classList.remove("active");
+                                if (currentStarred) {
+                                    card.remove();
+                                    if (document.querySelectorAll(".file-card").length === 0) loadFiles(true);
+                                }
                             }
-                        }
-                    } catch (e) { console.error("Toggle star failed", e); }
-                });
+                        } catch (e) { console.error("Toggle star failed", e); }
+                    });
 
-                const downloadBtn = card.querySelector(".btn-download");
-                downloadBtn.addEventListener("click", (e) => {
-                    e.stopPropagation();
-                    window.location.href = `/api/files/${file.id}/download`;
-                });
+                    const downloadBtn = card.querySelector(".btn-download");
+                    downloadBtn.addEventListener("click", (e) => {
+                        e.stopPropagation();
+                        window.location.href = `/api/files/${file.id}/download`;
+                    });
 
-                const trashBtn = card.querySelector(".btn-trash");
-                trashBtn.addEventListener("click", async (e) => {
-                    e.stopPropagation();
-                    if (!confirm(`Move ${file.name} to trash?`)) return;
-                    try {
-                        await fetch(`/api/files/${file.id}/trash`, { method: "POST" });
-                        card.remove();
-                        if (document.querySelectorAll(".file-card").length === 0) loadFiles(true);
-                        if (typeof loadTags === "function") loadTags(); // Refresh sidebar tags count
-                        const totalStats = document.getElementById("total-stats");
-                        if (totalStats) {
-                             const current = parseInt(totalStats.innerText);
-                             if (!isNaN(current)) totalStats.innerText = `${current - 1} Designs`;
-                        }
-                    } catch (e) { console.error("Trash failed", e); }
-                });
+                    const trashBtn = card.querySelector(".btn-trash");
+                    trashBtn.addEventListener("click", async (e) => {
+                        e.stopPropagation();
+                        if (!confirm(`Move ${file.name} to trash?`)) return;
+                        try {
+                            await fetch(`/api/files/${file.id}/trash`, { method: "POST" });
+                            card.remove();
+                            if (document.querySelectorAll(".file-card").length === 0) loadFiles(true);
+                            if (typeof loadTags === "function") loadTags(); // Refresh sidebar tags count
+                            const totalStats = document.getElementById("total-stats");
+                            if (totalStats) {
+                                 const current = parseInt(totalStats.innerText);
+                                 if (!isNaN(current)) totalStats.innerText = `${current - 1} Designs`;
+                            }
+                        } catch (e) { console.error("Trash failed", e); }
+                    });
+                }
+                
+                renderCardContent();
+                file.cardNode = card;
+                file.renderCard = renderCardContent;
+                card.addEventListener("click", () => showDetails(file));
+                gridContainer.appendChild(card);
+            } catch (err) {
+                console.error("Error rendering file card:", file.id, err);
             }
-            
-            renderCardContent();
-            file.cardNode = card;
-            file.renderCard = renderCardContent;
-            card.addEventListener("click", () => showDetails(file));
-            gridContainer.appendChild(card);
         });
 
         offset += data.items.length;
         hasMore = data.items.length === limit;
+
+        // Continuity check: If anchor is still in viewport (e.g. large screen didn't fill), trigger next automatically.
+        if (hasMore) {
+             const rect = scrollAnchor.getBoundingClientRect();
+             const isVisible = rect.top < window.innerHeight;
+             if (isVisible) {
+                  setTimeout(() => loadFiles(false), 100);
+             }
+        }
 
     } catch (e) {
         console.error("Failed to load files", e);
