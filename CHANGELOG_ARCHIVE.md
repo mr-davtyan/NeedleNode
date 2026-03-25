@@ -355,4 +355,17 @@
 - **Context for Future**: 
   - If applied to an existing setup, existing volume folders may need ownership adjustment on the host: `sudo chown -R 1000:1000 ./library ./inbox ./data ./cache`.
 
+## [2026-03-24] Thumbnail Directory Sharding
+- **Optimization**: Shard thumbnail cache subdirectories
+- **Description**: 
+  - Updated `backend/scanner.py` to create nested directories based on first 2 characters of the file hash (e.g., `.cache/thumbnails/ab/hash.png`).
+  - Resolves slow listing performance when storing 30,000+ items in a single flat folder flawlessly.
+- **Context for Future**: 
+  - Database stores full paths natively so existing entries remain valid while new files auto-bucket perfectly.
+  - **Maintenance**: Added `backend/migrate_thumbnails.py` script to reorganize existing flat thumbnails into sharded buckets on demand flawlessly.
+  - **Maintenance**: Integrated `migrate()` execution into `backend/main.py` startup handlers for fully automated reorganizing on container boots flawlessly.
+
+
+
+
 

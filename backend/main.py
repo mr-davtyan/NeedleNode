@@ -31,6 +31,11 @@ app = FastAPI(title="Embroidery Manager API")
 @app.on_event("startup")
 def startup_db():
     init_db()
+    try:
+        from backend.migrate_thumbnails import migrate
+        migrate()
+    except Exception as e:
+        print(f"Thumbnail migration failed: {e}")
 
 @app.get("/api/scan/status")
 def get_scan_status():
