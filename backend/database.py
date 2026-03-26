@@ -78,21 +78,6 @@ class SystemState(Base):
     last_heartbeat: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
 
 def init_db(session: Session = None):
-    # Migration Check: Add last_heartbeat if missing
-    from sqlalchemy import inspect
-    try:
-        inspector = inspect(engine)
-        if "system_state" in inspector.get_table_names():
-            columns = [c["name"] for c in inspector.get_columns("system_state")]
-            if "last_heartbeat" not in columns:
-                print("Auto-migrating system_state: Adding last_heartbeat column", flush=True)
-                with engine.connect() as conn:
-                    conn.exec_driver_sql("ALTER TABLE system_state ADD COLUMN last_heartbeat DATETIME")
-                    conn.exec_driver_sql("UPDATE system_state SET last_heartbeat = CURRENT_TIMESTAMP")
-                    conn.commit()
-    except Exception as e:
-        print(f"Auto-migration check failed (harmless if DB is fresh): {e}", flush=True)
-
     Base.metadata.create_all(bind=engine)
     
     # Initialize state rows if missing
