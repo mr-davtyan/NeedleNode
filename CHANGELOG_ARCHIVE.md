@@ -526,3 +526,14 @@
   - Added modern "Key Features" summary and technical stack specifications including Docker deployment instructions.
   - Synchronized `PROJECT_MAP.md` and `CHANGELOG_ARCHIVE.md` to reflect the latest architectural standards.
 - **Context for Future**: Provides a professional entry point for new users and contributors, accurately representing the platform's current enterprise-grade scaling capabilities.
+
+## [2026-03-25] Automated Testing Infrastructure
+- **Feature**: Established `pytest` suite for backend coverage
+- **Description**: 
+  - Created `backend/tests/` directory with `pytest` configuration and fixtures in `conftest.py`.
+  - Implemented `test_api.py` covering critical FastAPI endpoints (`/api/files`, `/api/star`, `/api/trash`, etc.) using `TestClient`.
+  - Implemented `test_core.py` verifying tag extraction, noise filtering, and path deduplication logic.
+  - Implemented `test_concurrency.py` validating SQLite Write-Ahead Logging (WAL) and multi-process state synchronization.
+  - **Enhancement**: Added atomic `increment_processed()` method to `DBStateProxy` in `backend/state.py` to eliminate race conditions during high-concurrency updates flawlessly.
+  - **Maintenance**: Refactored `init_db()` in `backend/database.py` to support session injection for test isolation flawlessly.
+- **Context for Future**: Run `PYTHONPATH=. pytest backend/tests/` to verify backend integrity securely across all future refactors flawlessly.

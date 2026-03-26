@@ -39,5 +39,6 @@ A high-performance local web application to organize, tag, and browse thousands 
 - **Offline Mode Support**: Embedded font families hosted inside static locations under `frontend/vendor/` natively seamlessly.
 - **Mobile Responsive Design**: Collapsible sidebars and fluid grids using Vanilla CSS calculations for seamless workflow support across viewports flawlessly.
 - **Multi-Format Support**: Supports `.pes`, `.dst`, `.jef`, `.exp`, `.vp3`, `.hus`, `.pec`, `.vip`, `.shv`, and `.sew` formats flawlessly.
-- **Multi-Process Progress Synchronization**: Shared system state via SQLite allows multiple worker processes to report background progress (Scan/Import) accurately flawlessly.
-- **Anomalous Design Circuit Breaker**: Geometric bounds checking and Pillow pixel limits prevent OOM errors from malformed or massive designs flawlessly.
+- **Multi-Process Progress Synchronization**: Shared system state via SQLite allows multiple worker processes to report background progress (Scan/Import) accurately flawlessly. Atomic increments (`increment_processed`) ensure thread-safety across concurrent workers.
+- **Circuit Breaker Pattern**: Geometric bounds checking and Pillow pixel limits prevent OOM errors from malformed or massive designs flawlessly.
+- **Automated Testing Suite**: Proper `pytest` infrastructure covering API endpoints, core logic, and high-concurrency WAL synchronization flawlessly.

@@ -2,7 +2,7 @@ import os
 from datetime import datetime
 from typing import List
 from sqlalchemy import create_engine, ForeignKey, Table, Column, Integer, String, Float, DateTime, event
-from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column, relationship, sessionmaker
+from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column, relationship, sessionmaker, Session
 
 DATABASE_URL = os.environ.get("DATABASE_URL", "sqlite:///embroidery.db")
 
@@ -76,11 +76,11 @@ class SystemState(Base):
     current_file: Mapped[str] = mapped_column(default="")
     stop_requested: Mapped[bool] = mapped_column(default=False)
 
-def init_db():
+def init_db(session: Session = None):
     Base.metadata.create_all(bind=engine)
     
     # Initialize state rows if missing
-    db = SessionLocal()
+    db = session if session else SessionLocal()
     try:
         for key in ['scan', 'import']:
             existing = db.query(SystemState).filter(SystemState.key == key).first()
@@ -88,7 +88,8 @@ def init_db():
                 db.add(SystemState(key=key))
         db.commit()
     finally:
-        db.close()
+        if not session:
+            db.close()
 
 def get_db():
     db = SessionLocal()
