@@ -5,10 +5,12 @@ A high-performance local web application to organize, tag, and browse thousands 
 
 ## Tech Stack
 - **Backend**: Python 3.12+ with **FastAPI**
+  - Web Server: **Gunicorn** with Uvicorn workers (Multi-process concurrency)
   - Dependency Management: **uv** (to bypass system venv/pip limitations)
   - Embroidery Parsing: **pyembroidery**
   - Image Processing: **Pillow** (for rendering previews)
-  - Database: **SQLite** (via standard `sqlite3` or `SQLAlchemy`)
+- **Database**: **SQLite** (via standard `sqlite3` or `SQLAlchemy`)
+  - Mode: **WAL (Write-Ahead Logging)** enabled for concurrent access.
 - **Frontend**: **Vite** + **Vanilla JS / React** (To be decided in implementation plan)
   - Styling: **Vanilla CSS** with rich design systems (Gradients, animations, grid layouts)
 - **Data Dir**: `library/` for files to scan.
@@ -37,4 +39,5 @@ A high-performance local web application to organize, tag, and browse thousands 
 - **Offline Mode Support**: Embedded font families hosted inside static locations under `frontend/vendor/` natively seamlessly.
 - **Mobile Responsive Design**: Collapsible sidebars and fluid grids using Vanilla CSS calculations for seamless workflow support across viewports flawlessly.
 - **Multi-Format Support**: Supports `.pes`, `.dst`, `.jef`, `.exp`, `.vp3`, `.hus`, `.pec`, `.vip`, `.shv`, and `.sew` formats flawlessly.
-- **Format Conversion**: Convert and download embroidery files into different formats directly from details drawer flawlessly.
+- **Multi-Process Progress Synchronization**: Shared system state via SQLite allows multiple worker processes to report background progress (Scan/Import) accurately flawlessly.
+- **Anomalous Design Circuit Breaker**: Geometric bounds checking and Pillow pixel limits prevent OOM errors from malformed or massive designs flawlessly.

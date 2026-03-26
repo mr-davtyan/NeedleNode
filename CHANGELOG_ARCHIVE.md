@@ -518,3 +518,11 @@
 - **BugFix**: Fix `[Errno 13] Permission denied: '/.gunicorn'`
 - **Description**: Added `ENV HOME=/tmp` to the `Dockerfile`. This prevents Gunicorn from attempting to create its internal control server directory in the restricted root (`/`) when running as a non-root user. Additionally maintained `--worker-tmp-dir /dev/shm` for optimized heartbeat performance.
 - **Context for Future**: Gunicorn defaults to using `$HOME/.gunicorn` for control server storage; in Docker containers where `HOME` defaults to `/`, this results in permission errors for non-root users.
+
+## [2026-03-25] Documentation Overhaul
+- **Feature**: Comprehensive README Update
+- **Description**: 
+  - Rewrote `README.md` to highlight all recent major features: High concurrency (Gunicorn/WAL), Parallel AI classification, dominant color extraction, direct uploads, soft deletion with undo, and mobile responsive UI enhancements.
+  - Added modern "Key Features" summary and technical stack specifications including Docker deployment instructions.
+  - Synchronized `PROJECT_MAP.md` and `CHANGELOG_ARCHIVE.md` to reflect the latest architectural standards.
+- **Context for Future**: Provides a professional entry point for new users and contributors, accurately representing the platform's current enterprise-grade scaling capabilities.
