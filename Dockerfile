@@ -23,5 +23,5 @@ COPY VERSION ./
 # Expose ports
 EXPOSE 8000
 
-# Start command
-CMD ["uvicorn", "backend.main:app", "--host", "0.0.0.0", "--port", "8000"]
+# Start command with Gunicorn (4 workers) for higher concurrency
+CMD ["gunicorn", "backend.main:app", "-w", "4", "-k", "uvicorn.workers.UvicornWorker", "--bind", "0.0.0.0:8000"]

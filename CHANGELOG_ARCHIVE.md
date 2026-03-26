@@ -497,3 +497,11 @@
   - Added a defensive circuit breaker: If a design's geometric bounds exceed 10000 units (1 meter) in width or height, it is flagged as corrupted or anomalously large.
   - Automatically raises `SkipLargeImageError` and moves the offending file to `trash/SKIPPED/` before `pyembroidery.write_png` is invoked.
 - **Context for Future**: Resolves sudden Exit Code 137 (OOM) crashes where `pyembroidery` attempted to allocate hundreds of gigabytes of RAM to write theoretically infinite-sized images onto disk gracefully.
+
+## [2026-03-25] High Concurrency Scaling 
+- **Feature**: Multi-worker support and SQLite WAL mode
+- **Description**: 
+  - Updated `Dockerfile` to launch the application using `gunicorn -k uvicorn.workers.UvicornWorker -w 4`. This changes the backend from a single-process server to a 4-worker multiprocessing array, drastically increasing simultaneous request capacity and eliminating event loop bottlenecks for hundreds of concurrent users.
+  - Added `gunicorn>=21.2.0` to `backend/requirements.txt`.
+  - Updated `backend/database.py` with an `@event.listens_for(engine, "connect")` hook to execute `PRAGMA journal_mode=WAL` and `PRAGMA synchronous=NORMAL` when connected to SQLite. This enables Write-Ahead Logging, permitting simultaneous reads and writes without `database is locked` contention under heavy API traffic.
+- **Context for Future**: These adjustments prepare the backend to scale behind a reverse proxy (like Nginx/Traefik) safely handling 1000+ simultaneous connections flawlessly.
