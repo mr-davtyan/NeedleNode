@@ -481,3 +481,11 @@
   - Added `MAX_WORKERS=1` to `docker-compose.yml` to allow easy configuration.
   - Implemented `threading.Lock()` to secure singleton `import_state` counters and file moving operations, avoiding any race conditions when processing files in parallel safely.
 - **Context for Future**: Drastically speeds up the `.pes` visual classification process. Keep `MAX_WORKERS=1` as default to avoid exhausting Gemini Vision API's rate limits (HTTP 429) natively without explicit overrides.
+
+## [2026-03-25] Batch Import Memory Fixes
+- **BugFix**: Fix OOM killer Docker Restarts
+- **Description**: 
+  - Updated `docker-compose.yml` changing `MAX_WORKERS` from 10 to 1, as 10 concurrent batches of 12 images consumed large amounts of RAM triggering Docker daemon out-of-memory container kills.
+  - Updated `backend/classify_inbox.py` to explicitly call `img.close()` on `PIL.Image` objects after `pyembroidery` renders, freeing unmanaged memory immediately instead of waiting for delayed garbage collection.
+  - Added explicit loop-level `gc.collect()` within the `ThreadPoolExecutor` to defensively purge remaining dead object references avoiding cascading heap buildup seamlessly.
+- **Context for Future**: Maintains strict memory footprint ceilings ensuring that NeedleNode stays online securely, especially on memory-constrained deployment hardware like NAS or Raspberry Pi arrays where batch imports normally spike limits.
