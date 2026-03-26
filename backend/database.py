@@ -66,8 +66,29 @@ class File(Base):
         secondary=file_tag, back_populates="files"
     )
 
+class SystemState(Base):
+    __tablename__ = "system_state"
+    
+    key: Mapped[str] = mapped_column(String, primary_key=True) # 'scan' or 'import'
+    is_active: Mapped[bool] = mapped_column(default=False)
+    processed: Mapped[int] = mapped_column(default=0)
+    total: Mapped[int] = mapped_column(default=0)
+    current_file: Mapped[str] = mapped_column(default="")
+    stop_requested: Mapped[bool] = mapped_column(default=False)
+
 def init_db():
     Base.metadata.create_all(bind=engine)
+    
+    # Initialize state rows if missing
+    db = SessionLocal()
+    try:
+        for key in ['scan', 'import']:
+            existing = db.query(SystemState).filter(SystemState.key == key).first()
+            if not existing:
+                db.add(SystemState(key=key))
+        db.commit()
+    finally:
+        db.close()
 
 def get_db():
     db = SessionLocal()

@@ -505,3 +505,11 @@
   - Added `gunicorn>=21.2.0` to `backend/requirements.txt`.
   - Updated `backend/database.py` with an `@event.listens_for(engine, "connect")` hook to execute `PRAGMA journal_mode=WAL` and `PRAGMA synchronous=NORMAL` when connected to SQLite. This enables Write-Ahead Logging, permitting simultaneous reads and writes without `database is locked` contention under heavy API traffic.
 - **Context for Future**: These adjustments prepare the backend to scale behind a reverse proxy (like Nginx/Traefik) safely handling 1000+ simultaneous connections flawlessly.
+
+## [2026-03-25] Multi-Process Progress Synchronization
+- **Feature**: Database-backed State Tracking
+- **Description**: 
+  - Refactored `backend/state.py` to use a `DBStateProxy` that reads and writes progress metadata (`processed`, `total`, `is_active`, etc.) directly to a new `SystemState` table in SQLite.
+  - This resolves the issue where the GUI progress bar would not update when running with multiple Gunicorn workers (as in-memory singletons are not shared across processes).
+  - Updated `backend/database.py` with the `SystemState` model and ensured the 'scan' and 'import' rows are initialized on startup in `init_db()`.
+- **Context for Future**: All workers now share the same "Source of Truth" for system status, ensuring consistent UI feedback regardless of which worker process handles the status request.
