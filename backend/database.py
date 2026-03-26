@@ -75,6 +75,7 @@ class SystemState(Base):
     total: Mapped[int] = mapped_column(default=0)
     current_file: Mapped[str] = mapped_column(default="")
     stop_requested: Mapped[bool] = mapped_column(default=False)
+    last_heartbeat: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
 
 def init_db(session: Session = None):
     Base.metadata.create_all(bind=engine)
@@ -85,7 +86,7 @@ def init_db(session: Session = None):
         for key in ['scan', 'import']:
             existing = db.query(SystemState).filter(SystemState.key == key).first()
             if not existing:
-                db.add(SystemState(key=key))
+                db.add(SystemState(key=key, last_heartbeat=datetime.utcnow()))
         db.commit()
     finally:
         if not session:

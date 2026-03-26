@@ -537,3 +537,12 @@
   - **Enhancement**: Added atomic `increment_processed()` method to `DBStateProxy` in `backend/state.py` to eliminate race conditions during high-concurrency updates flawlessly.
   - **Maintenance**: Refactored `init_db()` in `backend/database.py` to support session injection for test isolation flawlessly.
 - **Context for Future**: Run `PYTHONPATH=. pytest backend/tests/` to verify backend integrity securely across all future refactors flawlessly.
+540: 
+541: ## [2026-03-25] Stale Scan Progress Heartbeat Fix
+542: - **Feature**: Background worker heartbeat mechanism
+543: - **Description**: 
+544:   - Added `last_heartbeat` to `SystemState` model in `backend/database.py`.
+545:   - Implemented self-healing staleness check in `DBStateProxy` (`backend/state.py`) that automatically resets `is_active = False` if a heartbeat is older than 30 seconds.
+546:   - Integrated `heartbeat()` calls into `backend/scanner.py` and `backend/classify_inbox.py` loops.
+547:   - Resolved issue where GUI progress bars would get stuck after container restarts or worker crashes.
+548: - **Context for Future**: Ensures absolute synchronization between backend activity and frontend UI states regardless of process lifecycle interruptions flawlessly.

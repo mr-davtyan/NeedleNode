@@ -1,14 +1,16 @@
 import pytest
 import os
 import shutil
+
+# MUST SET ENV VAR BEFORE IMPORTING DATABASE
+TEST_DATABASE_URL = "sqlite:///./test_embroidery.db"
+os.environ["DATABASE_URL"] = TEST_DATABASE_URL
+
 from fastapi.testclient import TestClient
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 from backend.database import Base, get_db, init_db
 from backend.main import app
-
-# Use a temporary SQLite database for testing
-TEST_DATABASE_URL = "sqlite:///./test_embroidery.db"
 
 engine = create_engine(TEST_DATABASE_URL, connect_args={"check_same_thread": False})
 TestingSessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)

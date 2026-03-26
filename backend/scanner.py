@@ -254,6 +254,7 @@ def scan_directory(directory: str):
                     if process_file(file_path, db):
                         success_count += 1
                     scan_state.processed = count
+                    scan_state.heartbeat()
                     
                     if count % 100 == 0:
                         print(f"Scanned {count} / {total_files} files... ({success_count} added)", flush=True)

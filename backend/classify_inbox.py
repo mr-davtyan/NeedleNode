@@ -275,11 +275,13 @@ def process_inbox(dry_run=True, limit=None, batch_size=12, max_workers=None):
                     local_fail += 1
                     with state_lock:
                         import_state.processed += 1
+                        import_state.heartbeat()
                 except Exception as e:
                     print(f"  Error rendering {file}: {e}", flush=True)
                     local_fail += 1
                     with state_lock:
                         import_state.processed += 1
+                        import_state.heartbeat()
 
             if not batch_images:
                 with state_lock:
@@ -303,6 +305,7 @@ def process_inbox(dry_run=True, limit=None, batch_size=12, max_workers=None):
                         local_fail += 1
                         with state_lock:
                             import_state.processed += 1
+                            import_state.heartbeat()
                         continue
 
                     main_tag = classification.main_tag.strip().replace(" ", "_").replace("/", "-")
@@ -330,12 +333,14 @@ def process_inbox(dry_run=True, limit=None, batch_size=12, max_workers=None):
                             
                         local_success += 1
                         import_state.processed += 1
+                        import_state.heartbeat()
 
             except Exception as e:
                 print(f"Batch processing failed: {e}", flush=True)
                 local_fail += len(batch_images)
                 with state_lock:
                     import_state.processed += len(batch_images)
+                    import_state.heartbeat()
                 if "429" in str(e) or "RESOURCE_EXHAUSTED" in str(e):
                     print("Quota exceeded or rate limited. Aborting further requests.", flush=True)
                     import_state.stop_requested = True

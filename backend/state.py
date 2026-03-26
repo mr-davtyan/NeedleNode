@@ -1,4 +1,4 @@
-# backend/state.py
+from datetime import datetime
 from backend.database import SessionLocal, SystemState
 
 class DBStateProxy:
@@ -13,34 +13,62 @@ class DBStateProxy:
         row = session.query(SystemState).filter(SystemState.key == self._key).first()
         if not row:
             # Should have been created by init_db, but fail-safe here
-            row = SystemState(key=self._key)
+            row = SystemState(key=self._key, last_heartbeat=datetime.utcnow())
             session.add(row)
             session.commit()
             session.refresh(row)
         return row
 
+    def heartbeat(self):
+        """Updates the last_heartbeat timestamp for the current state."""
+        with SessionLocal() as session:
+            row = self._get_row(session)
+            row.last_heartbeat = datetime.utcnow()
+            session.commit()
+
+    def _check_staleness(self, row, session):
+        """
+        If is_active is True but heartbeat is older than 30s, reset to False.
+        Returns True if the state was reset.
+        """
+        if row.is_active:
+            delta = (datetime.utcnow() - row.last_heartbeat).total_seconds()
+            if delta > 30:
+                row.is_active = False
+                session.commit()
+                return True
+        return False
+
     @property
     def is_scanning(self):
         with SessionLocal() as session:
-            return self._get_row(session).is_active
+            row = self._get_row(session)
+            self._check_staleness(row, session)
+            return row.is_active
     
     @is_scanning.setter
     def is_scanning(self, value):
         with SessionLocal() as session:
             row = self._get_row(session)
             row.is_active = value
+            if value:
+                row.last_heartbeat = datetime.utcnow()
             session.commit()
 
     @property
     def is_importing(self):
         with SessionLocal() as session:
-            return self._get_row(session).is_active
+            row = self._get_row(session)
+            self._check_staleness(row, session)
+            return row.is_active
     
     @is_importing.setter
     def is_importing(self, value):
         with SessionLocal() as session:
             row = self._get_row(session)
             row.is_active = value
+            if value:
+                row.last_heartbeat = datetime.utcnow()
             session.commit()
 
     @property
@@ -106,6 +134,7 @@ class DBStateProxy:
             row.total = 0
             row.current_file = ""
             row.stop_requested = False
+            row.last_heartbeat = datetime.utcnow()
             session.commit()
 
 # Singleton instances (Proxies)

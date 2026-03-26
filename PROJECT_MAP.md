@@ -42,3 +42,4 @@ A high-performance local web application to organize, tag, and browse thousands 
 - **Multi-Process Progress Synchronization**: Shared system state via SQLite allows multiple worker processes to report background progress (Scan/Import) accurately flawlessly. Atomic increments (`increment_processed`) ensure thread-safety across concurrent workers.
 - **Circuit Breaker Pattern**: Geometric bounds checking and Pillow pixel limits prevent OOM errors from malformed or massive designs flawlessly.
 - **Automated Testing Suite**: Proper `pytest` infrastructure covering API endpoints, core logic, and high-concurrency WAL synchronization flawlessly.
+- **Self-Healing State**: Background tasks (Scan/Import) utilize a heartbeat mechanism to detect and reset stale "active" states after container restarts or worker crashes automatically flawlessly.
