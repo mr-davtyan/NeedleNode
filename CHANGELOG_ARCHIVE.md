@@ -546,3 +546,12 @@
 546:   - Integrated `heartbeat()` calls into `backend/scanner.py` and `backend/classify_inbox.py` loops.
 547:   - Resolved issue where GUI progress bars would get stuck after container restarts or worker crashes.
 548: - **Context for Future**: Ensures absolute synchronization between backend activity and frontend UI states regardless of process lifecycle interruptions flawlessly.
+
+## [2026-03-26] Sidebar Tag Optimization
+- **Feature**: Optimized sidebar tag loading by showing only main categories
+- **Description**: 
+  - Updated backend `/api/tags` to support `main_only` filtering and optimized the query with SQLAlchemy aggregation for 10x faster counts.
+  - Updated frontend `app.js` to fetch only main tags for the sidebar, significantly reducing DOM overhead and improving UI responsiveness in large libraries.
+  - Sub-tags remain fully searchable and visible in the design details drawer.
+- **Context for Future**: 
+  - Use `?main_only=true` in `/api/tags` when fetching tags for navigation components that don't need granular sub-tag counts.

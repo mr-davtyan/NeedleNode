@@ -199,19 +199,23 @@ def trash_file(file_id: int, db: Session = Depends(get_db)):
     return {"status": "success", "message": "Moved to trash"}
 
 @app.get("/api/tags")
-def get_tags(db: Session = Depends(get_db)):
-    from sqlalchemy.orm import selectinload
+def get_tags(main_only: bool = False, db: Session = Depends(get_db)):
+    from sqlalchemy import func
+    from backend.database import file_tag
     
-    tags = db.query(Tag).options(
-        selectinload(Tag.files).selectinload(File.tags)
-    ).join(Tag.files).distinct().all()
+    query = db.query(Tag, func.count(file_tag.c.file_id).label("count")).join(file_tag).group_by(Tag.id)
+    
+    if main_only:
+        query = query.filter(Tag.is_main == True)
+        
+    results = query.all()
     
     main_tags = []
     sub_tags = []
     
-    for t in tags:
-        tag_data = {"name": t.name, "is_hidden": t.is_hidden, "count": len(t.files)}
-        if t.is_main:
+    for tag, count in results:
+        tag_data = {"name": tag.name, "is_hidden": tag.is_hidden, "count": count}
+        if tag.is_main:
             main_tags.append(tag_data)
         else:
             sub_tags.append(tag_data)

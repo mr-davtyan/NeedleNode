@@ -84,3 +84,21 @@ def test_get_tags(client, db):
     data = response.json()
     assert any(t["name"] == "nature" for t in data["main"])
     assert any(t["name"] == "leaf" for t in data["sub"])
+
+def test_get_tags_main_only(client, db):
+    tag_main = Tag(name="ocean", is_main=True)
+    tag_sub = Tag(name="fish", is_main=False)
+    db.add_all([tag_main, tag_sub])
+    db.commit()
+    
+    test_file = File(name="ocean.pes", path="library/ocean/ocean.pes", size=100)
+    test_file.tags = [tag_main, tag_sub]
+    db.add(test_file)
+    db.commit()
+    
+    response = client.get("/api/tags?main_only=true")
+    assert response.status_code == 200
+    data = response.json()
+    assert any(t["name"] == "ocean" for t in data["main"])
+    assert not any(t["name"] == "fish" for t in data["sub"])
+    assert data["sub"] == []
