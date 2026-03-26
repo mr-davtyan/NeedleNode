@@ -513,3 +513,8 @@
   - This resolves the issue where the GUI progress bar would not update when running with multiple Gunicorn workers (as in-memory singletons are not shared across processes).
   - Updated `backend/database.py` with the `SystemState` model and ensured the 'scan' and 'import' rows are initialized on startup in `init_db()`.
 - **Context for Future**: All workers now share the same "Source of Truth" for system status, ensuring consistent UI feedback regardless of which worker process handles the status request.
+
+## [2026-03-25] Gunicorn Permission Fix
+- **BugFix**: Fix `[Errno 13] Permission denied: '/.gunicorn'`
+- **Description**: Added `--worker-tmp-dir /dev/shm` to the Gunicorn startup command in the `Dockerfile`. This ensures that worker heartbeat files are stored in a memory-backed, writable shared directory rather than attempting to write to the restricted root directory as a non-root user.
+- **Context for Future**: Always use `/dev/shm` for Gunicorn in Docker containers to avoid disk I/O latency and permission errors.

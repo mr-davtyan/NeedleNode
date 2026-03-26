@@ -24,4 +24,5 @@ COPY VERSION ./
 EXPOSE 8000
 
 # Start command with Gunicorn (4 workers) for higher concurrency
-CMD ["gunicorn", "backend.main:app", "-w", "4", "-k", "uvicorn.workers.UvicornWorker", "--bind", "0.0.0.0:8000"]
+# Use /dev/shm for worker heartbeats to avoid permission issues and improve performance
+CMD ["gunicorn", "backend.main:app", "-w", "4", "-k", "uvicorn.workers.UvicornWorker", "--bind", "0.0.0.0:8000", "--worker-tmp-dir", "/dev/shm"]
