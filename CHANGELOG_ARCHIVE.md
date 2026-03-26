@@ -516,5 +516,5 @@
 
 ## [2026-03-25] Gunicorn Permission Fix
 - **BugFix**: Fix `[Errno 13] Permission denied: '/.gunicorn'`
-- **Description**: Added `--worker-tmp-dir /dev/shm` to the Gunicorn startup command in the `Dockerfile`. This ensures that worker heartbeat files are stored in a memory-backed, writable shared directory rather than attempting to write to the restricted root directory as a non-root user.
-- **Context for Future**: Always use `/dev/shm` for Gunicorn in Docker containers to avoid disk I/O latency and permission errors.
+- **Description**: Added `ENV HOME=/tmp` to the `Dockerfile`. This prevents Gunicorn from attempting to create its internal control server directory in the restricted root (`/`) when running as a non-root user. Additionally maintained `--worker-tmp-dir /dev/shm` for optimized heartbeat performance.
+- **Context for Future**: Gunicorn defaults to using `$HOME/.gunicorn` for control server storage; in Docker containers where `HOME` defaults to `/`, this results in permission errors for non-root users.
