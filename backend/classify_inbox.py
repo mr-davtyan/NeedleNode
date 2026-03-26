@@ -253,6 +253,7 @@ def process_inbox(dry_run=True, limit=None, batch_size=12, max_workers=None):
             if import_state.stop_requested:
                 return
 
+            import_state.heartbeat() # Refresh heartbeat before potentially long AI call
             print(f"\n--- Processing Batch of {len(current_batch_files)} files ---", flush=True)
             
             batch_images = []
