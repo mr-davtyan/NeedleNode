@@ -489,3 +489,11 @@
   - Updated `backend/classify_inbox.py` to explicitly call `img.close()` on `PIL.Image` objects after `pyembroidery` renders, freeing unmanaged memory immediately instead of waiting for delayed garbage collection.
   - Added explicit loop-level `gc.collect()` within the `ThreadPoolExecutor` to defensively purge remaining dead object references avoiding cascading heap buildup seamlessly.
 - **Context for Future**: Maintains strict memory footprint ceilings ensuring that NeedleNode stays online securely, especially on memory-constrained deployment hardware like NAS or Raspberry Pi arrays where batch imports normally spike limits.
+
+## [2026-03-25] Anomalous Pattern Size OOM Fix
+- **BugFix**: Catch and skip anomalous pattern bounds before PNG generation
+- **Description**: 
+  - Updated `backend/classify_inbox.py` and `backend/scanner.py` to calculate `pattern.bounds()` immediately after parsing.
+  - Added a defensive circuit breaker: If a design's geometric bounds exceed 10000 units (1 meter) in width or height, it is flagged as corrupted or anomalously large.
+  - Automatically raises `SkipLargeImageError` and moves the offending file to `trash/SKIPPED/` before `pyembroidery.write_png` is invoked.
+- **Context for Future**: Resolves sudden Exit Code 137 (OOM) crashes where `pyembroidery` attempted to allocate hundreds of gigabytes of RAM to write theoretically infinite-sized images onto disk gracefully.
