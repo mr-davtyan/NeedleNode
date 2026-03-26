@@ -279,6 +279,14 @@ def process_inbox(dry_run=True, limit=None, batch_size=12, max_workers=None):
                         import_state.heartbeat()
                 except Exception as e:
                     print(f"  Error rendering {file}: {e}", flush=True)
+                    try:
+                        # Move corrupted or unreadable files to trash/SKIPPED folder
+                        SKIPPED_DIR = "trash/SKIPPED"
+                        os.makedirs(SKIPPED_DIR, exist_ok=True)
+                        shutil.move(pes_path, os.path.join(SKIPPED_DIR, os.path.basename(pes_path)))
+                        print(f"  Moved corrupted/failing file to {SKIPPED_DIR}", flush=True)
+                    except Exception as move_err:
+                        print(f"  Failed to move corrupted file: {move_err}", flush=True)
                     local_fail += 1
                     with state_lock:
                         import_state.processed += 1
