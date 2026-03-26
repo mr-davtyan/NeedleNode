@@ -555,3 +555,12 @@
   - Sub-tags remain fully searchable and visible in the design details drawer.
 - **Context for Future**: 
   - Use `?main_only=true` in `/api/tags` when fetching tags for navigation components that don't need granular sub-tag counts.
+
+## [2026-03-26] Improved Error Handling for Scanning & Imports
+- **Feature**: Automatic isolation of corrupted or unreadable embroidery files
+- **Description**: 
+  - Updated `scanner.py` and `classify_inbox.py` to automatically move files that trigger processing errors (e.g., `TypeError`, `NoneType` errors, or unreadable patterns) to the `trash/SKIPPED/` directory.
+  - This prevents the background scanner from repeatedly attempting to index problematic files, improving overall system stability and performance.
+  - Added explicit logging when files are moved to the skipped folder to assist in identifying corrupted assets.
+- **Context for Future**: 
+  - Check `trash/SKIPPED/` periodically if files are missing from the library after a scan.
