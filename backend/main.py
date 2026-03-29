@@ -1,5 +1,6 @@
 import os
-from fastapi import FastAPI, Depends, BackgroundTasks, HTTPException
+import fastapi
+from fastapi import FastAPI, Depends, BackgroundTasks, HTTPException, UploadFile
 from fastapi.responses import FileResponse, JSONResponse
 from fastapi.staticfiles import StaticFiles
 from sqlalchemy.orm import Session
@@ -305,6 +306,20 @@ def import_and_scan():
 def trigger_scan(background_tasks: BackgroundTasks):
     background_tasks.add_task(import_and_scan)
     return {"status": "scanning", "message": "Background Import & Scan started"}
+
+@app.post("/api/upload")
+async def upload_files(files: List[UploadFile] = fastapi.File(...)):
+    import shutil
+    import os
+    os.makedirs("inbox", exist_ok=True)
+    count = 0
+    for file in files:
+        if file.filename:
+            path = os.path.join("inbox", file.filename)
+            with open(path, "wb") as buffer:
+                shutil.copyfileobj(file.file, buffer)
+            count += 1
+    return {"status": "success", "uploaded": count}
 
 @app.post("/api/files/{file_id}/edit_tags")
 def edit_tags(file_id: int, input_data: EditTagsInput, db: Session = Depends(get_db)):
