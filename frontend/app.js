@@ -658,7 +658,8 @@ function showDetails(file) {
 
     detailImg.src = `/api/thumbnail/${file.id}`;
     detailPath.innerText = file.path;
-    detailSize.innerText = `${(file.size / 1024).toFixed(1)} KB`;
+    const formattedDate = file.modified_at ? new Date(file.modified_at).toLocaleDateString() : '-';
+    detailSize.innerHTML = `${(file.size / 1024).toFixed(1)} KB <span style="color: var(--text-secondary); margin-left: 15px; font-size: 0.9em;"><strong>Date:</strong> ${formattedDate}</span>`;
     detailStitches.innerText = file.stitches || "-";
     detailColors.innerText = file.colors || "-";
     detailWidth.innerText = file.width ? `${file.width.toFixed(1)} mm` : "-";

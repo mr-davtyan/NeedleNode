@@ -730,12 +730,11 @@ body.light-theme {
     display: grid;
     grid-template-columns: repeat(2, 1fr);
     gap: 15px;
-    margin-top: 20px;
 }
 
 .stat-box {
     background: var(--item-subtle-bg);
-    padding: 15px;
+    padding: 6px;
     border-radius: 8px;
     text-align: center;
 }
@@ -771,8 +770,16 @@ body.light-theme {
 
 .metadata {
     margin-top: auto;
-    font-size: 0.8rem;
+    padding: 15px 0;
+    font-size: 0.85rem;
     color: var(--text-secondary);
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.metadata p {
+    margin: 0;
 }
 
 .scroll-anchor {
@@ -1121,6 +1128,8 @@ body.sidebar-open .sidebar-overlay {
         max-height: 90vh;
         overflow-y: auto;
         gap: 15px;
+        position: fixed;
+        top: 0;
     }
 
     .details-image {
