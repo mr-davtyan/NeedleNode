@@ -652,20 +652,32 @@ async function loadFiles(reset = false) {
                     });
 
                     const trashBtn = card.querySelector(".btn-trash");
-                    trashBtn.addEventListener("click", async (e) => {
+                    trashBtn.addEventListener("click", (e) => {
                         e.stopPropagation();
-                        if (!confirm(`Move ${file.name} to trash?`)) return;
-                        try {
-                            await fetch(`/api/files/${file.id}/trash`, { method: "POST" });
-                            card.remove();
-                            if (document.querySelectorAll(".file-card").length === 0) loadFiles(true);
-                            if (typeof loadTags === "function") loadTags(); // Refresh sidebar tags count
-                            const totalStats = document.getElementById("total-stats");
-                            if (totalStats) {
-                                const current = parseInt(totalStats.innerText);
-                                if (!isNaN(current)) totalStats.innerText = `${current - 1} Designs`;
-                            }
-                        } catch (e) { console.error("Trash failed", e); }
+                        
+                        card.style.display = 'none';
+                        const totalStats = document.getElementById("total-stats");
+                        if (totalStats) {
+                            const current = parseInt(totalStats.innerText);
+                            if (!isNaN(current)) totalStats.innerText = `${current - 1} Designs`;
+                        }
+
+                        if (typeof showUndoToast === "function") {
+                            showUndoToast(file, async () => {
+                                try {
+                                    await fetch(`/api/files/${file.id}/trash`, { method: "POST" });
+                                    card.remove();
+                                    if (document.querySelectorAll(".file-card:not([style*='display: none'])").length === 0) loadFiles(true);
+                                    if (typeof loadTags === "function") loadTags(); // Refresh sidebar tags count
+                                } catch (e) { console.error("Trash failed", e); }
+                            }, () => {
+                                card.style.display = '';
+                                if (totalStats) {
+                                    const current = parseInt(totalStats.innerText);
+                                    if (!isNaN(current)) totalStats.innerText = `${current + 1} Designs`;
+                                }
+                            });
+                        }
                     });
                 }
 
@@ -829,23 +841,35 @@ function showDetails(file) {
     if (detailDelete) {
         const deleteBtn = detailDelete.cloneNode(true);
         detailDelete.parentNode.replaceChild(deleteBtn, detailDelete);
-        deleteBtn.addEventListener("click", async () => {
-            if (!confirm(`Move ${file.name} to trash?`)) return;
-            try {
-                await fetch(`/api/files/${file.id}/trash`, { method: "POST" });
-                detailsOverlay.classList.remove("active");
-                if (file.cardNode) {
-                    file.cardNode.remove();
-                    if (document.querySelectorAll(".file-card").length === 0) {
-                        loadFiles(true);
+        deleteBtn.addEventListener("click", () => {
+            detailsOverlay.classList.remove("active");
+            if (file.cardNode) file.cardNode.style.display = 'none';
+            const totalStats = document.getElementById("total-stats");
+            if (totalStats) {
+                const current = parseInt(totalStats.innerText);
+                if (!isNaN(current)) totalStats.innerText = `${current - 1} Designs`;
+            }
+
+            if (typeof showUndoToast === "function") {
+                showUndoToast(file, async () => {
+                    try {
+                        await fetch(`/api/files/${file.id}/trash`, { method: "POST" });
+                        if (file.cardNode) {
+                            file.cardNode.remove();
+                            if (document.querySelectorAll(".file-card:not([style*='display: none'])").length === 0) {
+                                loadFiles(true);
+                            }
+                        }
+                        if (typeof loadTags === "function") loadTags();
+                    } catch (e) { console.error("Trash from details failed", e); }
+                }, () => {
+                    if (file.cardNode) file.cardNode.style.display = '';
+                    if (totalStats) {
+                        const current = parseInt(totalStats.innerText);
+                        if (!isNaN(current)) totalStats.innerText = `${current + 1} Designs`;
                     }
-                }
-                const totalStats = document.getElementById("total-stats");
-                if (totalStats) {
-                    const current = parseInt(totalStats.innerText);
-                    if (!isNaN(current)) totalStats.innerText = `${current - 1} Designs`;
-                }
-            } catch (e) { console.error("Trash from details failed", e); }
+                });
+            }
         });
     }
 
@@ -1067,4 +1091,76 @@ function showInlineEditor(card, file, type, onSuccess) {
         if (e.key === "Enter") btnSave.click();
         if (e.key === "Escape") btnCancel.click();
     });
+}
+
+let pendingTrashData = null; // { file, onConfirmTrash, onUndo }
+let pendingTrashTimeout = null;
+let pendingTrashInterval = null;
+
+function executePendingTrash() {
+    if (pendingTrashData) {
+        pendingTrashData.onConfirmTrash();
+        pendingTrashData = null;
+    }
+    const container = document.querySelector('.undo-toast-container');
+    if (container) container.classList.remove('active');
+}
+
+function cancelPendingTrash() {
+    if (pendingTrashData) {
+        pendingTrashData.onUndo();
+        pendingTrashData = null;
+    }
+    const container = document.querySelector('.undo-toast-container');
+    if (container) container.classList.remove('active');
+    if (pendingTrashTimeout) clearTimeout(pendingTrashTimeout);
+    if (pendingTrashInterval) clearInterval(pendingTrashInterval);
+}
+
+function showUndoToast(file, onConfirmTrash, onUndo) {
+    // If there's already a pending trash, execute it immediately
+    if (pendingTrashData) {
+        executePendingTrash();
+        if (pendingTrashTimeout) clearTimeout(pendingTrashTimeout);
+        if (pendingTrashInterval) clearInterval(pendingTrashInterval);
+    }
+
+    pendingTrashData = { file, onConfirmTrash, onUndo };
+    
+    let container = document.querySelector('.undo-toast-container');
+    if (!container) {
+        container = document.createElement('div');
+        container.className = 'undo-toast-container';
+        container.innerHTML = `
+            <div class="undo-toast">
+                <div class="undo-toast-msg"></div>
+                <button class="btn-undo">Undo (5s)</button>
+            </div>
+        `;
+        document.body.appendChild(container);
+        
+        container.querySelector('.btn-undo').addEventListener('click', () => {
+            cancelPendingTrash();
+        });
+    }
+    
+    container.classList.add('active');
+    const msgEl = container.querySelector('.undo-toast-msg');
+    const btnEl = container.querySelector('.btn-undo');
+    
+    msgEl.innerText = `Deleted ${file.name}`;
+    let secondsLeft = 5;
+    btnEl.innerText = `Undo (${secondsLeft}s)`;
+    
+    pendingTrashInterval = setInterval(() => {
+        secondsLeft--;
+        if (secondsLeft > 0) {
+            btnEl.innerText = `Undo (${secondsLeft}s)`;
+        }
+    }, 1000);
+    
+    pendingTrashTimeout = setTimeout(() => {
+        executePendingTrash();
+        clearInterval(pendingTrashInterval);
+    }, 5000);
 }
