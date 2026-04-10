@@ -252,10 +252,10 @@ body {
     display: flex;
     flex-direction: row;
     align-items: center;
-    gap: 12px;
+    gap: 6px;
     font-size: 0.8rem;
     background: var(--item-subtle-bg);
-    padding: 8px 12px;
+    padding: 6px 10px;
     border-radius: 8px;
     border: 1px solid var(--border-color);
 }
@@ -265,17 +265,12 @@ body {
 }
 
 .scan-text {
-    font-size: 0.75rem;
-    color: var(--text-secondary);
-    white-space: nowrap;
-    max-width: 140px;
-    overflow: hidden;
-    text-overflow: ellipsis;
+    display: none;
 }
 
 .progress-bar-bg {
-    width: 120px;
-    height: 6px;
+    width: 60px;
+    height: 4px;
     background: var(--item-subtle-bg);
     border-radius: 3px;
     overflow: hidden;
@@ -290,7 +285,7 @@ body {
 
 .progress-numbers {
     font-style: thin;
-    font-size: 0.75rem;
+    font-size: 0.7rem;
     color: var(--text-secondary);
     white-space: nowrap;
 }
@@ -1080,26 +1075,7 @@ body.sidebar-open .sidebar-overlay {
         flex-shrink: 0;
     }
 
-    /* Optimize Scan Progress for Mobile */
-    .scan-progress {
-        gap: 6px;
-        padding: 6px 10px;
-    }
 
-    .scan-text {
-        display: none;
-        /* Hide 'Scanning...' text to save space */
-    }
-
-    .progress-numbers {
-        font-size: 0.7rem;
-    }
-
-    .progress-bar-bg {
-        width: 60px;
-        /* Scale down progress bar */
-        height: 4px;
-    }
 
     /* Hide text on some buttons to save space */
     #btn-scan span {
