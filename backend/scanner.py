@@ -1,4 +1,6 @@
 import os
+import shutil
+import warnings
 import hashlib
 import pyembroidery
 from datetime import datetime
@@ -112,10 +114,22 @@ def process_file(file_path: str, db: Session) -> bool:
         pyembroidery.write_png(pattern, thumb_path)
         
         # Add white background to thumbnail
-        img = Image.open(thumb_path).convert("RGBA")
-        background = Image.new("RGB", img.size, (255, 255, 255))
-        background.paste(img, (0, 0), img)
-        background.save(thumb_path)
+        try:
+            with warnings.catch_warnings():
+                warnings.simplefilter('error', Image.DecompressionBombWarning)
+                img = Image.open(thumb_path).convert("RGBA")
+                
+            background = Image.new("RGB", img.size, (255, 255, 255))
+            background.paste(img, (0, 0), img)
+            background.save(thumb_path)
+        except (Image.DecompressionBombError, Image.DecompressionBombWarning):
+            print(f"Skipping large image: {file_path}")
+            if os.path.exists(thumb_path):
+                os.remove(thumb_path)
+            SKIPPED_DIR = "trash/SKIPPED"
+            os.makedirs(SKIPPED_DIR, exist_ok=True)
+            shutil.move(file_path, os.path.join(SKIPPED_DIR, os.path.basename(file_path)))
+            return False
         
         # Database entry
         db_file = File(
