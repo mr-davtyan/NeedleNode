@@ -59,6 +59,10 @@ def render_embroidery_to_image(emb_path: str) -> Image.Image:
         img = background
         img.thumbnail((256, 256))
         return img
+    except SkipLargeImageError:
+        raise
+    except Exception as e:
+        raise SkipLargeImageError(f"Rendering error for {os.path.basename(emb_path)}: {e}")
     finally:
         if os.path.exists(temp_png):
             os.remove(temp_png)
@@ -259,8 +263,8 @@ def process_inbox(dry_run=True, limit=None, batch_size=12):
                         continue
 
                     main_tag = classification.main_tag.strip().replace(" ", "_").replace("/", "-")
-                    sub_tags = [t.strip().replace(" ", "-") for t in classification.sub_tags]
-                    main_colors = [c.strip().replace(" ", "-") for c in classification.main_colors] if hasattr(classification, "main_colors") else []
+                    sub_tags = [t.strip().replace(" ", "-").replace("/", "-") for t in classification.sub_tags]
+                    main_colors = [c.strip().replace(" ", "-").replace("/", "-") for c in classification.main_colors] if hasattr(classification, "main_colors") else []
                     
                     if not main_tag:
                         main_tag = "Unsorted"
