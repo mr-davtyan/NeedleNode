@@ -287,13 +287,13 @@ def trigger_import(background_tasks: BackgroundTasks):
     if import_state.is_importing:
         raise HTTPException(status_code=400, detail="Import already in progress")
     # Trigger live run in background
-    background_tasks.add_task(process_inbox, dry_run=False, batch_size=12)
+    background_tasks.add_task(process_inbox, dry_run=False, batch_size=6)
     return {"status": "importing", "message": "Background import started"}
 
 def import_and_scan():
     # 1. Process inbox (Live Run)
     try:
-        process_inbox(dry_run=False, batch_size=12)
+        process_inbox(dry_run=False, batch_size=6)
     except Exception as e:
         print(f"Chained Import failed: {e}")
     # 2. Scan Library
