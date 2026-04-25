@@ -4,6 +4,9 @@ import argparse
 import io
 import tempfile
 import warnings
+import json
+import uuid
+from typing import Optional
 import pyembroidery
 from PIL import Image
 from pydantic import BaseModel, Field
@@ -40,17 +43,21 @@ def render_embroidery_to_image(emb_path: str) -> Image.Image:
     """
     Renders an embroidery file to a PIL Image using pyembroidery.
     """
-    # Temporary file for pyembroidery to write to
-    temp_png = os.path.join(tempfile.gettempdir(), f".temp_{os.path.basename(emb_path)}.png")
+    # Unique temporary file for pyembroidery to write to
+    temp_id = str(uuid.uuid4())
+    temp_png = os.path.join(tempfile.gettempdir(), f".temp_render_{temp_id}.png")
     try:
+        # print(f"    [RENDER] Reading {os.path.basename(emb_path)}...", flush=True)
         pattern = pyembroidery.read(emb_path)
         if not pattern:
             raise ValueError(f"Could not read pattern from {emb_path}")
             
+        # print(f"    [RENDER] Writing PNG {os.path.basename(emb_path)}...", flush=True)
         pyembroidery.write_png(pattern, temp_png)
         with warnings.catch_warnings():
             warnings.simplefilter('error', Image.DecompressionBombWarning)
             try:
+                # print(f"    [RENDER] Opening PNG {os.path.basename(emb_path)}...", flush=True)
                 img = Image.open(temp_png).convert("RGBA")
             except (Image.DecompressionBombError, Image.DecompressionBombWarning):
                 raise SkipLargeImageError(f"Image too large: {os.path.basename(emb_path)}")
@@ -152,7 +159,7 @@ def process_inbox(dry_run=True, limit=None, batch_size=6):
     client = genai.Client() # Uses GEMINI_API_KEY
     
     if not os.path.exists(INBOX_DIR):
-        print(f"Inbox directory '{INBOX_DIR}' not found.")
+        print(f"Inbox directory {INBOX_DIR} not found.", flush=True)
         return
 
     import_state.reset()
@@ -162,10 +169,10 @@ def process_inbox(dry_run=True, limit=None, batch_size=6):
     success_count = 0
     fail_count = 0
 
-    print(f"--- Starting Batch Classification ({'DRY RUN' if dry_run else 'LIVE'}) ---")
+    print(f"--- Starting Batch Classification (LIVE) ---", flush=True)
     if limit:
-        print(f"Limit: {limit} files")
-    print(f"Batch Size: {batch_size}")
+        print(f"Limit: {limit} files", flush=True)
+    print(f"Batch Size: {batch_size}", flush=True)
 
     try:
         # 0. Get existing main tags for prompt context to avoid singular/plural conflicts
@@ -208,39 +215,40 @@ def process_inbox(dry_run=True, limit=None, batch_size=6):
                      all_files.append((pes_path, file, rel_path))
 
         if not all_files:
-            print("No supported embroidery files found in inbox.")
+            print("No supported embroidery files found in inbox.", flush=True)
             return
-
+        all_files = sorted(all_files, key=lambda x: x[0])
         import_state.total = len(all_files)
-        print(f"Found {len(all_files)} files total in inbox.")
+        print(f"Found {len(all_files)} files total in inbox.", flush=True)
 
         # 2. Process in batches
         for i in range(0, len(all_files), batch_size):
             if import_state.stop_requested:
-                 print("\nImport stopped by user request.")
+                 print("\nImport stopped by user request.", flush=True)
                  break
                  
             if limit and success_count >= limit:
-                 print(f"\nReached limit of {limit} files. Stopping.")
+                 print(f"\nReached limit of {limit} files. Stopping.", flush=True)
                  break
 
             current_batch_files = all_files[i : i + batch_size]
             if limit and success_count + len(current_batch_files) > limit:
                  current_batch_files = current_batch_files[: limit - success_count]
 
-            print(f"\n--- Processing Batch of {len(current_batch_files)} files ---")
+            print(f"\n--- Processing Batch of {len(current_batch_files)} files ---", flush=True)
             
             batch_images = []
             valid_files_in_batch = []
             
-            for pes_path, file, rel_path in current_batch_files:
+            for idx_in_batch, (pes_path, file, rel_path) in enumerate(current_batch_files):
                 import_state.current_file = file
                 try:
+                    # print(f"  Rendering {file}...", flush=True)
                     img = render_embroidery_to_image(pes_path)
                     batch_images.append((img, rel_path, pes_path))
                     valid_files_in_batch.append((pes_path, file, rel_path))
                 except SkipLargeImageError as e:
-                    print(f"  {e}")
+                    print(f"  {e}", flush=True)
                     SKIPPED_DIR = "trash/SKIPPED"
                     os.makedirs(SKIPPED_DIR, exist_ok=True)
                     shutil.move(pes_path, os.path.join(SKIPPED_DIR, os.path.basename(pes_path)))
@@ -248,7 +256,7 @@ def process_inbox(dry_run=True, limit=None, batch_size=6):
                     # Progress still counts as "processed" for UI
                     import_state.processed += 1
                 except Exception as e:
-                    print(f"  Error rendering {file}: {e}")
+                    print(f"  Error rendering {file}: {e}", flush=True)
                     fail_count += 1
                     import_state.processed += 1
 
@@ -268,8 +276,8 @@ def process_inbox(dry_run=True, limit=None, batch_size=6):
                          
                     classification = results_dict.get(idx_in_batch)
                     if not classification:
-                        print(f"  Warning: No classification returned for index {idx_in_batch} ({file})")
-                        print(f"  Gemini returned indexes: {[r.batch_index for r in results]}")
+                        print(f"  Warning: No classification returned for index {idx_in_batch} ({file})", flush=True)
+                        print(f"  Gemini returned indexes: {[r.batch_index for r in results]}", flush=True)
                         fail_count += 1
                         import_state.processed += 1
                         continue
@@ -308,18 +316,18 @@ def process_inbox(dry_run=True, limit=None, batch_size=6):
                     if not dry_run:
                         os.makedirs(target_dir, exist_ok=True)
                         shutil.move(pes_path, target_path)
-                        print("  [MOVED]")
+                        print("  [MOVED]", flush=True)
                     
                     success_count += 1
                     import_state.processed += 1
 
             except Exception as e:
-                print(f"Batch processing failed: {e}")
+                print(f"Batch processing failed: {e}", flush=True)
                 batch_len = len(current_batch_files)
                 fail_count += batch_len
                 import_state.processed += batch_len
                 if "429" in str(e) or "RESOURCE_EXHAUSTED" in str(e):
-                    print("Quota exceeded or rate limited. Aborting further requests.")
+                    print("Quota exceeded or rate limited. Aborting further requests.", flush=True)
                     break
 
     finally:
