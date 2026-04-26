@@ -155,7 +155,7 @@ def get_unique_target_path(target_dir: str, main_tag: str, sub_tags_str: str, or
          
     return target_path, new_filename
 
-def process_inbox(dry_run=True, limit=None, batch_size=6):
+def process_inbox(dry_run=True, limit=None, batch_size=12):
     client = genai.Client() # Uses GEMINI_API_KEY
     
     if not os.path.exists(INBOX_DIR):
@@ -352,7 +352,7 @@ if __name__ == "__main__":
     parser.add_argument("--run", action="store_true", help="Perform actual file moving (defaults to dry-run)")
     parser.add_argument("--dry-run", action="store_true", help="Dry run mode (default)")
     parser.add_argument("--limit", type=int, help="Limit number of files to process")
-    parser.add_argument("--batch-size", type=int, default=6, help="Number of files to process per Gemini call")
+    parser.add_argument("--batch-size", type=int, default=12, help="Number of files to process per Gemini call")
     parser.add_argument("--api-key", type=str, help="Gemini API Key")
     args = parser.parse_args()
 
