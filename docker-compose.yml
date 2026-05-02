@@ -11,6 +11,7 @@ services:
     environment:
       # Absolute path inside the container to the data volume mount
       - DATABASE_URL=sqlite:////app/data/embroidery.db
+      - MAX_WORKERS=10
       # Add your Gemini API Key here for AI indexing features
       # - GEMINI_API_KEY=AIzaSy...
     volumes:
