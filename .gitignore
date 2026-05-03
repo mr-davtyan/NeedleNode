@@ -11,4 +11,4 @@ frontend/app.js.map
 node_modules/server.log
 .server.pid
 server.log
-.temp*
+.temp**.pes
