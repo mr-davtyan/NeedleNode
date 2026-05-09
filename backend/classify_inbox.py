@@ -7,6 +7,7 @@ import warnings
 import json
 import uuid
 import threading
+import gc
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from typing import Optional
 import pyembroidery
@@ -66,7 +67,9 @@ def render_embroidery_to_image(emb_path: str) -> Image.Image:
                 
         background = Image.new("RGB", img.size, (255, 255, 255))
         background.paste(img, (0, 0), img) # Paste with mask
+        original_img = img
         img = background
+        original_img.close()
         img.thumbnail((256, 256))
         return img
     except SkipLargeImageError:
@@ -94,6 +97,7 @@ def classify_embroidery_batch(client: genai.Client, images_with_filenames: list[
             mime_type='image/png',
         ))
         filenames_list.append(name)
+        img.close() # Free unmanaged memory explicitly
 
     existing_list_str = ", ".join([f"'{t}'" for t in existing_main_tags[:50]]) if existing_main_tags else "None"
     
@@ -332,6 +336,8 @@ def process_inbox(dry_run=True, limit=None, batch_size=12, max_workers=None):
             with state_lock:
                 success_count += local_success
                 fail_count += local_fail
+                
+            gc.collect() # Force free unused intermediate objects in this thread
 
         with ThreadPoolExecutor(max_workers=max_workers) as executor:
             futures = [executor.submit(process_batch, batch) for batch in batches]
