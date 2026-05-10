@@ -55,6 +55,13 @@ def render_embroidery_to_image(emb_path: str) -> Image.Image:
         if not pattern:
             raise ValueError(f"Could not read pattern from {emb_path}")
             
+        bounds = pattern.bounds()
+        if bounds:
+            width = bounds[2] - bounds[0]
+            height = bounds[3] - bounds[1]
+            if width > 10000 or height > 10000 or width <= 0 or height <= 0:
+                 raise SkipLargeImageError(f"Pattern bounds too large or invalid ({width}x{height}): {os.path.basename(emb_path)}")
+                 
         # print(f"    [RENDER] Writing PNG {os.path.basename(emb_path)}...", flush=True)
         pyembroidery.write_png(pattern, temp_png)
         with warnings.catch_warnings():

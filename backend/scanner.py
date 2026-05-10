@@ -116,6 +116,14 @@ def process_file(file_path: str, db: Session) -> bool:
         temp_id = str(uuid.uuid4())
         temp_png = os.path.join(tempfile.gettempdir(), f".temp_scan_{temp_id}.png")
         try:
+            if width * 10.0 > 10000 or height * 10.0 > 10000 or width <= 0 or height <= 0:
+                # Move huge files to SKIPPED folder
+                SKIPPED_DIR = "trash/SKIPPED"
+                os.makedirs(SKIPPED_DIR, exist_ok=True)
+                shutil.move(file_path, os.path.join(SKIPPED_DIR, os.path.basename(file_path)))
+                print(f"  Skipping large pattern bounds and moving to trash/SKIPPED: {os.path.basename(file_path)}", flush=True)
+                return False
+
             pyembroidery.write_png(pattern, temp_png)
             with warnings.catch_warnings():
                 warnings.simplefilter('error', Image.DecompressionBombWarning)
