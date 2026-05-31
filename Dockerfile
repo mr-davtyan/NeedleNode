@@ -7,6 +7,7 @@ WORKDIR /app
 # Enable bytecode compilation
 ENV PYTHONDONTWRITEBYTECODE=1
 ENV PYTHONUNBUFFERED=1
+ENV HOME=/tmp
 
 # Install uv (from official image)
 COPY --from=ghcr.io/astral-sh/uv:latest /uv /uvx /bin/
