@@ -55,6 +55,13 @@ class DBStateProxy:
             row.processed = value
             session.commit()
 
+    def increment_processed(self, delta=1):
+        with SessionLocal() as session:
+            session.query(SystemState).filter(SystemState.key == self._key).update(
+                {SystemState.processed: SystemState.processed + delta}
+            )
+            session.commit()
+
     @property
     def total(self):
         with SessionLocal() as session:
