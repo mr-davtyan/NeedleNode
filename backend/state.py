@@ -27,14 +27,15 @@ class DBStateProxy:
             session.commit()
 
     def _check_staleness(self, row, session):
-        """
-        If is_active is True but heartbeat is older than 30s, reset to False.
-        Returns True if the state was reset.
-        """
-        if row.is_active:
+        """Checks if the heartbeat is too old and resets the state if so."""
+        if row.is_active and row.last_heartbeat:
             delta = (datetime.utcnow() - row.last_heartbeat).total_seconds()
-            if delta > 30:
+            # Increase timeout to 5 minutes to accommodate slow AI processing
+            if delta > 300: 
+                print(f"DEBUG: {self._key} state is stale ({delta}s). Resetting to inactive.", flush=True)
                 row.is_active = False
+                row.processed = 0
+                row.total = 0
                 session.commit()
                 return True
         return False

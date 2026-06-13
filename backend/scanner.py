@@ -238,6 +238,7 @@ def scan_directory(directory: str):
         success_count = 0
         
         print(f"Starting scan in {directory}...", flush=True)
+        scan_state.heartbeat() # Refresh heartbeat at start
         for root, _, files in os.walk(directory):
             if scan_state.stop_requested:
                 print("Scan stopped by user request.", flush=True)
