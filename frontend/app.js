@@ -389,12 +389,11 @@ function setupInfiniteScroll() {
 
 async function loadTags() {
     try {
-        const res = await fetch("/api/tags");
+        const res = await fetch("/api/tags?main_only=true");
         const tags = await res.json();
 
         // Hide tags with only 1 file
         if (tags.main) tags.main = tags.main.filter(t => (t.count || 0) > 1);
-        if (tags.sub) tags.sub = tags.sub.filter(t => (t.count || 0) > 1);
 
         const tagsList = document.getElementById("tags-list");
         tagsList.innerHTML = "";
@@ -458,25 +457,6 @@ async function loadTags() {
         if (tags.main) {
             tags.main.sort((a, b) => a.name.localeCompare(b.name));
             tags.main.forEach(tag => {
-                tagsList.appendChild(createTagNode(tag));
-            });
-        }
-
-        const hasMain = tags.main && tags.main.length > 0;
-        const hasSub = tags.sub && tags.sub.length > 0;
-        if (hasMain && hasSub) {
-            const hr = document.createElement("div");
-            hr.className = "tag-divider";
-            hr.style.height = "1px";
-            hr.style.background = "rgba(255,255,255,0.06)";
-            hr.style.margin = "8px 5px";
-            tagsList.appendChild(hr);
-        }
-
-        // Render Sub Tags
-        if (tags.sub) {
-            tags.sub.sort((a, b) => a.name.localeCompare(b.name));
-            tags.sub.forEach(tag => {
                 tagsList.appendChild(createTagNode(tag));
             });
         }
