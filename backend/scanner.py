@@ -92,6 +92,13 @@ def process_file(file_path: str, db: Session) -> bool:
 
         pattern = pyembroidery.read(file_path)
         if not pattern:
+            try:
+                SKIPPED_DIR = "trash/SKIPPED"
+                os.makedirs(SKIPPED_DIR, exist_ok=True)
+                shutil.move(file_path, os.path.join(SKIPPED_DIR, os.path.basename(file_path)))
+                print(f"  Unreadable pattern - moved to {SKIPPED_DIR}: {os.path.basename(file_path)}", flush=True)
+            except Exception as move_err:
+                print(f"  Failed to move unreadable file: {move_err}", flush=True)
             return False
             
         # Metadata extraction
@@ -188,6 +195,14 @@ def process_file(file_path: str, db: Session) -> bool:
     except Exception as e:
         db.rollback()
         print(f"  Error processing {os.path.basename(file_path)}: {e}", flush=True)
+        try:
+            # Move corrupted or unreadable files to trash/SKIPPED folder
+            SKIPPED_DIR = "trash/SKIPPED"
+            os.makedirs(SKIPPED_DIR, exist_ok=True)
+            shutil.move(file_path, os.path.join(SKIPPED_DIR, os.path.basename(file_path)))
+            print(f"  Moved corrupted/failing file to {SKIPPED_DIR}", flush=True)
+        except Exception as move_err:
+            print(f"  Failed to move corrupted file: {move_err}", flush=True)
         return False
 
 from backend.state import scan_state
