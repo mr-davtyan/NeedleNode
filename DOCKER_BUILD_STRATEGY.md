@@ -14,13 +14,13 @@ graph TD
     C -->|2. Multi-stage build| E[Dockerfile]
     E -->|Stage 1: Build| F[Build Assets / Wasm]
     E -->|Stage 2: Runtime| G[Final Image]
-    C -->|3. Pushes to| H[Private Registry]
+    C -->|3. Pushes to| H[GitHub Container Registry (GHCR)]
     H -->|Tags| I[x.y.z]
     H -->|Tags| J[latest]
     H -->|Cache| K[buildcache]
 ```
 
-The strategy combines **version-file-driven triggers**, **multi-stage Docker builds**, and **GitHub Actions** to deliver optimized, multi-architecture containers to a private registry with build cache management.
+The strategy combines **version-file-driven triggers**, **multi-stage Docker builds**, and **GitHub Actions** to deliver optimized, multi-architecture containers to GitHub Container Registry (`ghcr.io`) with build cache management.
 
 ---
 
@@ -52,7 +52,7 @@ The GitHub Actions pipeline automates the packaging and publication of the image
     -   **QEMU**: Enables emulation so the runner can build images for non-native boards (e.g., building ARM64 on an AMD64 GitHub runner).
     -   **Docker Buildx**: Extended builder tool required for multi-arch support and registry caching.
 2.  **Registry Authentication**:
-    -   Uses secrets safely injected via GitHub repository settings (`DOCKER_REGISTRY_USERNAME`, `DOCKER_REGISTRY_PASSWORD`).
+    -   Uses GitHub's automatic `${{ secrets.GITHUB_TOKEN }}` with `packages: write` scope (no manual secrets needed).
 3.  **Advanced Layer Caching**:
     -   Uses registry-based caching:
         ```yaml
@@ -114,9 +114,8 @@ To import this exact pipeline setup into a duplicate or sister repository:
 2.  **Add Configuration**:
     -   Copy `.github/workflows/docker-publish.yml` to the targeted repository.
     -   Update the `IMAGE_NAME` in the `env:` block.
-3.  **Setup Secrets**:
-    -   Go to Repository `Settings` -> `Secrets and variables` -> `Actions`.
-    -   Add `DOCKER_REGISTRY_USERNAME` and `DOCKER_REGISTRY_PASSWORD`.
+3.  **Permissions**:
+    -   Ensure the workflow has `packages: write` permissions enabled (handled natively via the workflow file using `${{ secrets.GITHUB_TOKEN }}`).
 4.  **Write Multi-Stage Dockerfile**:
     Ensure any asset preprocessing (webpack, vite, or binary builds for languages like Go/Rust) is performed in an appropriate `builder` stage, then copied forward securely into a `slim` final stage to keep the image size minimal. If no pre-compilation is needed, a single-stage Dockerfile is fully compatible with this pipeline.
 

@@ -27,7 +27,7 @@ A high-performance local web application to organize, tag, and browse thousands 
 ## CI/CD & DevOps
 - **Docker**: `Dockerfile` setups isolated system-wide Python FastAPI server bundle correctly.
 - **Docker Compose**: `docker-compose.yml` for local deployment with persistent data volumes running securely as user 1000:1000 flawlessly.
-- **GitHub Actions**: Automated `.github/workflows/docker-publish.yml` builds/pushes strictly on `VERSION` file changes flawlessly caching layers accurately.
+- **GitHub Actions**: Automated `.github/workflows/docker-publish.yml` builds/pushes to GitHub Container Registry (`ghcr.io/mr-davtyan/needlenode`) strictly on `VERSION` file changes using `${{ secrets.GITHUB_TOKEN }}` flawlessly caching layers accurately.
 - **Versioning**: `VERSION` file & `bump-version.sh` for driving tagging seamlessly.
 
 ## Patterns
