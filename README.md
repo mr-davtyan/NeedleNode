@@ -2,6 +2,8 @@
 
 A high-performance local web application to organize, tag, and browse thousands of embroidery files (PES, DST, JEF, etc.) with AI-powered classification and a rich, responsive interface.
 
+![NeedleNode Light/Dark Mode Interface](sh_collage.jpg)
+
 ## Key Features
 
 -   **AI-Powered Inbox Classification**: Automatically sort, rename, and tag incoming designs using Gemini Vision with parallel batch processing and dominant color extraction.
