@@ -16,3 +16,4 @@ server.log
 *.pes
 .env
 .env.*
+CHANGELOG_ARCHIVE.md
