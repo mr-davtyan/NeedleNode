@@ -319,7 +319,11 @@ async def upload_files(files: List[UploadFile] = fastapi.File(...)):
     count = 0
     for file in files:
         if file.filename:
-            path = os.path.join("inbox", file.filename)
+            # Strip any directory components so uploads can't escape the inbox
+            safe_name = os.path.basename(file.filename.replace("\\", "/"))
+            if not safe_name or safe_name in (".", ".."):
+                continue
+            path = os.path.join("inbox", safe_name)
             with open(path, "wb") as buffer:
                 shutil.copyfileobj(file.file, buffer)
             count += 1
