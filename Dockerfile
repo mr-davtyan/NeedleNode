@@ -20,6 +20,9 @@ RUN uv pip install --system -r backend/requirements.txt
 COPY backend/ ./backend/
 COPY frontend/ ./frontend/
 COPY VERSION ./
+# AGPL-3.0 requires the licence to accompany every conveyed copy, and the
+# image is a conveyed copy.
+COPY LICENSE ./
 
 # Expose ports
 EXPOSE 8000
