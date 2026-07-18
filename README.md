@@ -70,7 +70,7 @@ In short — you are free to use, run, modify, and distribute this software, inc
 -   Any distributed or modified version must remain under the AGPL-3.0 and ship its source.
 -   **If you run a modified version as a network service, you must offer its source to your users** (AGPL §13). This is the clause that separates the AGPL from the plain GPL.
 
-Copyright © 2025 Artem D.
+Copyright © 2025 Artem Davtyan
 
 ## Third-Party Assets
 
