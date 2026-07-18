@@ -1,3 +1,12 @@
+# NeedleNode - embroidery file manager
+# Copyright (C) 2025 Artem D.
+#
+# This program is free software: you can redistribute it and/or modify it under
+# the terms of the GNU Affero General Public License as published by the Free
+# Software Foundation, either version 3 of the License, or (at your option) any
+# later version. See the LICENSE file at the repository root, or
+# <https://www.gnu.org/licenses/>.
+
 import os
 import fastapi
 from fastapi import FastAPI, Depends, BackgroundTasks, HTTPException, UploadFile

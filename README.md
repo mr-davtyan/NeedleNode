@@ -61,6 +61,24 @@ NeedleNode enforces a structured hierarchy to ensure portability:
 
 This structure allows the built-in scanner to reconstruct the entire metadata database even if the SQLite file is deleted, ensuring your organization is never locked into the application.
 
+## License
+
+NeedleNode is licensed under the **[GNU Affero General Public License v3.0](LICENSE)**.
+
+In short — you are free to use, run, modify, and distribute this software, including commercially. In return:
+
+-   Any distributed or modified version must remain under the AGPL-3.0 and ship its source.
+-   **If you run a modified version as a network service, you must offer its source to your users** (AGPL §13). This is the clause that separates the AGPL from the plain GPL.
+
+Copyright © 2025 Artem D.
+
+## Third-Party Assets
+
+NeedleNode bundles the following assets locally to support offline use. Full license texts are included alongside the files.
+
+-   **[Font Awesome Free](https://fontawesome.com) 6.5.1** — © Fonticons, Inc. Icons: [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/), Fonts: SIL OFL 1.1, Code: MIT. See [`frontend/vendor/font-awesome/LICENSE.txt`](frontend/vendor/font-awesome/LICENSE.txt).
+-   **[Outfit](https://github.com/Outfitio/Outfit-Fonts)** — © 2021 The Outfit Project Authors, licensed under [SIL Open Font License 1.1](http://scripts.sil.org/OFL). See [`frontend/vendor/outfit/LICENSE.txt`](frontend/vendor/outfit/LICENSE.txt).
+
 ## Scaling & Security
 
 -   **High Concurrency**: Ships with 4 Gunicorn workers by default, capable of handling 1000+ simultaneous connections.

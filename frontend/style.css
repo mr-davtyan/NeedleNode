@@ -96,6 +96,27 @@ body {
     /* Prevent the nav container itself from overflowing */
 }
 
+.sidebar-footer {
+    padding-top: 12px;
+    margin-top: 8px;
+    border-top: 1px solid var(--border-color);
+    flex-shrink: 0;
+}
+
+.sidebar-footer a {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 0.75rem;
+    color: var(--text-secondary);
+    text-decoration: none;
+    transition: color 0.2s ease;
+}
+
+.sidebar-footer a:hover {
+    color: var(--accent-color);
+}
+
 .nav-section {
     margin-bottom: 25px;
 }
