@@ -564,3 +564,16 @@
   - Added explicit logging when files are moved to the skipped folder to assist in identifying corrupted assets.
 - **Context for Future**: 
   - Check `trash/SKIPPED/` periodically if files are missing from the library after a scan.
+
+## [2026-07-19] Security Audit & Git History Purge
+- **Feature**: Untracked `.env` and purged exposed Gemini API Key from Git history
+- **Description**: 
+  - Ran automated repository security audit across all 174 historical commits and blobs.
+  - Identified exposed Google Gemini API key in `.env` committed in historical commits `d266c2b` and `32a9bbce`.
+  - Added `.env` and `.env.*` to `.gitignore` to prevent future secret tracking.
+  - Used `git-filter-repo` to permanently purge `.env` and the secret key from all Git commits across all branches.
+  - Preserved local `.env` configuration file safely in working directory in untracked state.
+- **Context for Future**:
+  - Keep secrets strictly in untracked `.env` files or environment variables.
+  - Do not commit `.env` files to Git.
+

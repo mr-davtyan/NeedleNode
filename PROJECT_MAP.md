@@ -44,3 +44,5 @@ A high-performance local web application to organize, tag, and browse thousands 
 - **Circuit Breaker Pattern**: Geometric bounds checking and Pillow pixel limits prevent OOM errors from malformed or massive designs flawlessly.
 - **Automated Testing Suite**: Proper `pytest` infrastructure covering API endpoints, core logic, and high-concurrency WAL synchronization flawlessly.
 - **Self-Healing State**: Background tasks (Scan/Import) utilize a heartbeat mechanism to detect and reset stale "active" states after container restarts or worker crashes automatically flawlessly.
+- **Environment & Secret Hygiene**: `.env` and `.env.*` files are untracked and strictly excluded via `.gitignore` to prevent secret leakage.
+
