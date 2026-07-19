@@ -2,6 +2,7 @@
 __pycache__/
 *.pyc
 .cache/
+.pytest_cache/
 embroidery.db*
 test_embroidery.db*
 library/

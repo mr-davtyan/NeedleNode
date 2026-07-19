@@ -27,8 +27,8 @@ def test_staleness_detection_and_reset(db):
     with SessionLocal() as session:
         row = session.query(SystemState).filter(SystemState.key == 'scan').first()
         row.is_active = True
-        # Set heartbeat to 60 seconds ago
-        row.last_heartbeat = datetime.utcnow() - timedelta(seconds=60)
+        # Set heartbeat well past the 300s staleness timeout in DBStateProxy
+        row.last_heartbeat = datetime.utcnow() - timedelta(seconds=400)
         session.commit()
         
     # Standard getter should now detect staleness and return False
