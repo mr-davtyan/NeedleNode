@@ -573,7 +573,7 @@
   - Verified zero active or historical secret findings remaining across all commits, branches, and reflogs.
   - Verified working tree cleanliness and confirmed `.env` is safely untracked under `.gitignore`.
 - **Context for Future**:
-  - Run `python3 scratch/scan_all_git_blobs.py` if future automated verification of Git object database is required.
+  - Run automated verification scripts if future inspection of Git object database is required.
 
 ## [2026-07-19] Migration to GitHub Container Registry (GHCR)
 - **Feature**: GitHub Actions & Docker image configuration updated for public GitHub repository & GHCR
