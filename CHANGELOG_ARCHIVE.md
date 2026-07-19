@@ -578,7 +578,7 @@
 ## [2026-07-19] Migration to GitHub Container Registry (GHCR)
 - **Feature**: GitHub Actions & Docker image configuration updated for public GitHub repository & GHCR
 - **Description**:
-  - Replaced all references to private Docker registry (`ghcr.io/mr-davtyan/needlenode`) and private Git remote (`github.com/mr-davtyan/NeedleNode`) with official GitHub repository configuration (`https://github.com/mr-davtyan/NeedleNode.git`) and GitHub Container Registry (`ghcr.io/mr-davtyan/needlenode`).
+  - Replaced all references to legacy private Docker registry and private Git remote with official GitHub repository configuration (`https://github.com/mr-davtyan/NeedleNode.git`) and GitHub Container Registry (`ghcr.io/mr-davtyan/needlenode`).
   - Updated `.github/workflows/docker-publish.yml` to authenticate via automatic `${{ secrets.GITHUB_TOKEN }}` with `packages: write` permissions, eliminating the need for manual registry credentials.
   - Updated `docker-compose.yml` image target to `ghcr.io/mr-davtyan/needlenode:latest`.
   - Updated `DOCKER_BUILD_STRATEGY.md` and `PROJECT_MAP.md` documentation to reflect the GHCR build pipeline architecture.
