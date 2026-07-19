@@ -14,3 +14,5 @@ node_modules/
 server.log
 .temp*
 *.pes
+.env
+.env.*
