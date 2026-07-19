@@ -3,7 +3,7 @@ version: '3.8'
 services:
   needlenode:
     user: "1000:1000"
-    image: ghcr.io/mr-davtyan/needlenode/needlenode:latest
+    image: ghcr.io/mr-davtyan/needlenode:latest
     container_name: needlenode
     restart: unless-stopped
     ports:
