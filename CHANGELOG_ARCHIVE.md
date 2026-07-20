@@ -585,4 +585,13 @@
 - **Context for Future**:
   - Pushing changes to the `VERSION` file on `main` will automatically build and publish multi-arch images (`amd64`, `arm64`) to `ghcr.io/mr-davtyan/needlenode`.
 
+## [2026-07-20] Restricted GitHub Actions Trigger to VERSION File Changes
+- **Feature**: Strict `paths` and `branches` trigger filter in GitHub Actions workflow
+- **Description**:
+  - Refactored `.github/workflows/docker-publish.yml` to include `branches: - main` alongside `paths: - 'VERSION'` under the `on.push` trigger block.
+  - Ensures automated Docker container build and push pipelines to GHCR are triggered strictly when commits pushed to `main` contain modifications to the `VERSION` file, preventing unwanted builds on non-version commits or external refs.
+- **Context for Future**:
+  - The workflow can still be manually dispatched using `workflow_dispatch` via GitHub UI/CLI when needed.
+
+
 
